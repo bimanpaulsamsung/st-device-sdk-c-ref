@@ -91,6 +91,7 @@ static IOT_CAP_HANDLE *handle_list[3] = {NULL};
 static int32_t smartswitch_switch_state = SMARTSWITCH_SWITCH_ON;
 
 static iot_status_t g_iot_status;
+static iot_stat_lv_t g_iot_stat_lv;
 
 static int noti_led_mode = LED_ANIMATION_MODE_IDLE;
 
@@ -215,6 +216,7 @@ static void iot_status_cb(iot_status_t status,
 		iot_stat_lv_t stat_lv, void *usr_data)
 {
 	g_iot_status = status;
+	g_iot_stat_lv = stat_lv;
 	printf("iot_status: %d, lv: %d\n", status, stat_lv);
 
 	switch(status)
@@ -375,7 +377,9 @@ static void adc_task(void *arg)
 {
 	for(;;){
 		vTaskDelay(5000 / portTICK_PERIOD_MS);
-		send_battery_cap_evt(handle_btry);
+		if((g_iot_status == IOT_STATUS_CONNECTING) && (g_iot_stat_lv == IOT_STAT_LV_DONE)){
+			send_battery_cap_evt(handle_btry);
+		}
 	}
 }
 
