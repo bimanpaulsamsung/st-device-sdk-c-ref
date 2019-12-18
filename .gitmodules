@@ -16,3 +16,6 @@
 [submodule "bsp/rtl8721c"]
 	path = bsp/rtl8721c
 	url = https://github.com/ambiot/ambd_sdk.git
+[submodule "bsp/mt7682_ss"]
+	path = bsp/mt7682_ss
+	url = ssh://slp-info.sec.samsung.net:29418/rtos/freertos/mediatek/mt7682
