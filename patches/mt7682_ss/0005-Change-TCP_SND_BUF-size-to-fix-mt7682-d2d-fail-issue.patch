@@ -1,0 +1,45 @@
+From d8ed4f3a05dbe74d5ca16310e9bc5d433f1a0151 Mon Sep 17 00:00:00 2001
+From: "baojun.luo" <baojun.luo@samsung.com>
+Date: Tue, 31 Dec 2019 00:01:14 +0900
+Subject: [PATCH] Change TCP_SND_BUF size to fix mt7682 d2d fail issue
+
+Signed-off-by: baojun.luo <43360374+baojunluo@users.noreply.github.com>
+---
+ middleware/third_party/lwip/src/core/init.c         | 2 +-
+ project/mt7682_hdk/apps/stdk_project/inc/lwipopts.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/middleware/third_party/lwip/src/core/init.c b/middleware/third_party/lwip/src/core/init.c
+index 0b63405..5193f20 100644
+--- a/middleware/third_party/lwip/src/core/init.c
++++ b/middleware/third_party/lwip/src/core/init.c
+@@ -262,7 +262,7 @@
+ #endif
+
+ #ifndef LWIP_DISABLE_TCP_SANITY_CHECKS
+-#define LWIP_DISABLE_TCP_SANITY_CHECKS  0
++#define LWIP_DISABLE_TCP_SANITY_CHECKS  1
+ #endif
+ #ifndef LWIP_DISABLE_MEMP_SANITY_CHECKS
+ #define LWIP_DISABLE_MEMP_SANITY_CHECKS 0
+diff --git a/project/mt7682_hdk/apps/stdk_project/inc/lwipopts.h b/project/mt7682_hdk/apps/stdk_project/inc/lwipopts.h
+index b0443f5..e231013 100644
+--- a/project/mt7682_hdk/apps/stdk_project/inc/lwipopts.h
++++ b/project/mt7682_hdk/apps/stdk_project/inc/lwipopts.h
+@@ -176,11 +176,11 @@ a lot of data that needs to be copied, this should be set high. */
+ #define TCP_MSS                 1476
+
+ /* TCP sender buffer space (bytes). */
+-#define TCP_SND_BUF             (24 * 1024) //(12 * 1024)
++#define TCP_SND_BUF             (64)
+
+ /* TCP sender buffer space (pbufs). This must be at least = 2 *
+    TCP_SND_BUF/TCP_MSS for things to work. */
+-#define TCP_SND_QUEUELEN        ((4 * (TCP_SND_BUF) + (TCP_MSS - 1))/(TCP_MSS))
++#define TCP_SND_QUEUELEN        (4 * (TCP_MSS))
+
+ /* TCP receive window. */
+ #define TCP_WND                 (24 * 1024)
+--
+2.7.4
+
