@@ -130,6 +130,7 @@ static void _cli_cmd_dummy_cmd(char *string)
 struct cli_command cmd_list[] = {
         {"wifi_test", "for test wlan interface", iot_cli_cmd_wifi_test},
         {"dummy", "dummy command for cli", _cli_cmd_dummy_cmd},
+        {"iperf", "run iperf : iperf -s -i 1 or iperf -c xx.xx.xx.xx -i 1", iot_cli_cmd_network_iperf},
 };
 /*================ update cli cmd list end====================*/
 

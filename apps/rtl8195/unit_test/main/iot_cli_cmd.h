@@ -22,4 +22,5 @@ int iot_cli_copy_nth_arg(char* dest, char* src, int size, int n);
 
 /*=============extern the cli cmd function==================*/
 void iot_cli_cmd_wifi_test(char *string);
+void iot_cli_cmd_network_iperf(char *string);
 
