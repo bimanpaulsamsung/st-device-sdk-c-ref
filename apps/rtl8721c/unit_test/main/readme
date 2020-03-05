@@ -1,0 +1,18 @@
+1, device_info.json and onboarding_config.json is for test the stdk api.
+   if you do not add any test for stdk, please do not remove them. because
+   they are must file for project building.
+2, iot_uart_cli.c and iot_uart_cli.h is code about uart.
+   Please do not modify them, we have test it. if have issue, please report it.
+3, iot_cli_cmd.c iot_cli_cmd.h they are help api for cli cmd operation.
+   Most of time, do not need modify them.
+4, test case list:
+	1, wifi_test
+		a, wifi_test init
+		b, wifi_test sta
+		c, wifi_test ap
+		d, todo for iperf
+		e, ....
+	2, iperf test :TODO
+	3, nv test
+	4, system test
+	5, ....
