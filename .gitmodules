@@ -4,9 +4,6 @@
 [submodule "bsp/esp32"]
 	path = bsp/esp32
 	url = https://github.com/espressif/esp-idf.git
-[submodule "iot-core"]
-	path = iot-core
-	url = https://github.com/SmartThingsCommunity/st-device-sdk-c.git
 [submodule "bsp/rtl8195"]
 	path = bsp/rtl8195
 	url = https://github.com/ambiot/amb1_sdk.git
@@ -19,3 +16,6 @@
 [submodule "bsp/mt7682_ss"]
 	path = bsp/mt7682_ss
 	url = ssh://slp-info.sec.samsung.net:29418/rtos/freertos/mediatek/mt7682
+[submodule "iot-core"]
+	path = iot-core
+	url = git@github.sec.samsung.net:STDK/st-device-sdk-c.git
