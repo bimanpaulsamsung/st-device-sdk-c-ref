@@ -15,14 +15,14 @@ RESULT_FILE_APP=result_${VERSION}_${COMMIT_TS_CT}_${COMMIT_ID}_${TIME}_app.csv
 
 
 STDK_PATH="$PWD"
-TOOL_PATH="${STDK_PATH}/tools"
+TOOL_PATH="${STDK_PATH}/tools/private"
 PROJECT_PATH="${STDK_PATH}/apps/${CHIP_NAME}/${PROJECT_TITLE}"
 
 
 print_usage () {
-  echo "    Usage: tools/check_memory.sh CHIP_NAME PROJECT_NAME"
+  echo "    Usage: ${TOOL_PATH}/check_memory.sh CHIP_NAME PROJECT_NAME"
   echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-  echo "    ex) tools/check_memory.sh esp8266 smart_switch"
+  echo "    ex) ${TOOL_PATH}/check_memory.sh esp8266 smart_switch"
   echo
 }
 
@@ -39,7 +39,7 @@ get_map_info()
 	cd ${STDK_PATH}
 	rm -f ${RESULT_FILE_MAP}
 
-	${STDK_PATH}/tools/map_parser.py ${PROJECT_PATH}/build/${MAP_FILE} ${RESULT_FILE_MAP}
+	${TOOL_PATH}/map_parser.py ${PROJECT_PATH}/build/${MAP_FILE} ${RESULT_FILE_MAP}
 
 	mv ${RESULT_FILE_MAP} ${PROJECT_PATH}/build/
 	cd ${PROJECT_PATH}/build

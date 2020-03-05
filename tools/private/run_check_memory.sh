@@ -8,13 +8,18 @@ GIT_PATH=${5}
 
 TIME=`date +%Y%m%d_%H%M%S`
 
+STDK_PATH=${PWD}
+TOOL_PATH=${PWD}/tools/private
+OUTPUT_PATH=${STDK_PATH}/run_output_${TIME}
+
+
 BUILD_SH="build.sh"
 
 print_usage () {
-  echo "Usage: tools/run_check_memory.sh CHIP_NAME APP_NAME usr/eng RETRY_N GIT_PATH"
+  echo "Usage: ${TOOL_PATH}/run_check_memory.sh CHIP_NAME APP_NAME usr/eng RETRY_N GIT_PATH"
   echo 
-  echo "ex) tools/run_check_memory.sh esp8266 smart_switch usr 5 bsp/esp8266"
-  echo "ex) tools/run_check_memory.sh esp32 smart_lamp eng 5 iot-core"
+  echo "ex) ${TOOL_PATH}/run_check_memory.sh esp8266 smart_switch usr 5 bsp/esp8266"
+  echo "ex) ${TOOL_PATH}/run_check_memory.sh esp32 smart_lamp eng 5 iot-core"
   exit
 }
 
@@ -29,10 +34,6 @@ fi
 if [ "${USRENG}" = "usr" ]; then
   BUILD_SH="usr_build.sh"
 fi
-
-STDK_PATH=${PWD}
-TOOL_PATH=${PWD}/tools
-OUTPUT_PATH=${STDK_PATH}/run_output_${TIME}
 
 mkdir ${OUTPUT_PATH}
 mkdir ${OUTPUT_PATH}/binary
