@@ -19,3 +19,6 @@
 [submodule "iot-core"]
 	path = iot-core
 	url = git@github.sec.samsung.net:STDK/st-device-sdk-c.git
+[submodule "bsp/emw3166/mico-os"]
+	path = bsp/emw3166/mico-os
+	url = https://github.com/MXCHIP/mico-os
