@@ -23,9 +23,12 @@ print_usage () {
 
 if [ "${3}" = "clean" ]; then
 	OUTPUT_BUILD=n
-	pushd ${PWD}/bsp/${CHIP_NAME} > /dev/null
+	pushd ${PWD} > /dev/null
 	find . -name *.o | xargs rm
 	find . -name *.d | xargs rm
+	popd > /dev/null
+
+	pushd ${PWD}/bsp/${CHIP_NAME} > /dev/null
 	./build.sh ${BOARD_NAME} clean
 	./build.sh ${BOARD_NAME} stdk_project clean
 	if [ -d "out" ]; then
@@ -54,7 +57,8 @@ pushd ${PWD}/bsp/${CHIP_NAME}/ > /dev/null
 popd > /dev/null
 if [ ${OUTPUT_BUILD} = y ]; then
 	BINARY_PATH=${PWD}/bsp/${CHIP_NAME}/out/${BOARD_NAME}/stdk_project
+	LOG_PATH=${PWD}/bsp/${CHIP_NAME}/out/${BOARD_NAME}/stdk_project/log
 	export OUTPUT_FILE_LIST="${BINARY_PATH}/mt7682_bootloader.bin ${BINARY_PATH}/mt768x_default_PerRate_TxPwr.bin ${BINARY_PATH}/stdk_project.bin ${BINARY_PATH}/flash_download.cfg"
-	export DEBUG_FILE_LIST="${BINARY_PATH}/stdk_project.map"
+	export DEBUG_FILE_LIST="${BINARY_PATH}/stdk_project.map ${LOG_PATH}/build.log ${LOG_PATH}/err.log ${LOG_PATH}/build_time.log"
 	${STDK_PATH}/tools/common/generate_output.sh
 fi

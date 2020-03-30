@@ -1,0 +1,63 @@
+From 7f06cb51d6249d9bdba925db5130950f455d3011 Mon Sep 17 00:00:00 2001
+From: "baojun.luo" <baojun.luo@samsung.com>
+Date: Tue, 31 Mar 2020 00:39:08 +0900
+Subject: [PATCH] Fixed compilation errors log could not be displayed
+
+Signed-off-by: baojun.luo <43360374+baojunluo@users.noreply.github.com>
+---
+ build.sh                                          | 2 +-
+ project/mt7682_hdk/apps/stdk_project/GCC/Makefile | 2 +-
+ tools/scripts/build/copy_firmware.sh              | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/build.sh b/build.sh
+index 2f9125d..df8ddb2 100755
+--- a/build.sh
++++ b/build.sh
+@@ -329,7 +329,7 @@ else
+     EXTRA_VAR+="$extra_opt"
+     #echo "make -C $TARGET_PATH BUILD_DIR=$OUT/obj OUTPATH=$OUT $EXTRA_VAR"
+ 	make -C $TARGET_PATH prerequriment
+-    make -C $TARGET_PATH BUILD_DIR=$OUT/obj OUTPATH=$OUT TARGET_BIN=$3 $EXTRA_VAR 2>> $OUT/err.log
++    make -C $TARGET_PATH BUILD_DIR=$OUT/obj OUTPATH=$OUT TARGET_BIN=$3 $EXTRA_VAR
+     BUILD_RESULT=$?
+     mkdir -p $OUT/lib
+     mv -f $OUT/*.a $OUT/lib/ 2> /dev/null
+diff --git a/project/mt7682_hdk/apps/stdk_project/GCC/Makefile b/project/mt7682_hdk/apps/stdk_project/GCC/Makefile
+index 897c379..0c57b8d 100644
+--- a/project/mt7682_hdk/apps/stdk_project/GCC/Makefile
++++ b/project/mt7682_hdk/apps/stdk_project/GCC/Makefile
+@@ -265,7 +265,7 @@ $(OUTPATH)/$(PROJ_NAME).elf: $(C_OBJS) $(CXX_OBJS) $(S_OBJS) $(LIBS) $(WIFI_ROM_
+ 	$(Q)if [ -e "$(OUTPATH)/$(PROJ_NAME).map" ]; then rm -f "$(OUTPATH)/$(PROJ_NAME).map"; fi
+ 	$(Q)if [ -e "$(OUTPATH)/$(PROJ_NAME).hex" ]; then rm -f "$(OUTPATH)/$(PROJ_NAME).hex"; fi
+ 	$(Q)if [ -e "$(OUTPATH)/$(PROJ_NAME).bin" ]; then rm -f "$(OUTPATH)/$(PROJ_NAME).bin"; fi
+-	$(Q)$(CXX) $(LDFLAGS) -Wl,--whole-archive -Wl,--start-group $^ -Wl,--end-group -Wl,--no-whole-archive -Wl,-Map=$(OUTPATH)/$(PROJ_NAME).map -lm -o $@ 2>>$(ERR_LOG)
++	$(Q)$(CXX) $(LDFLAGS) -Wl,--whole-archive -Wl,--start-group $^ -Wl,--end-group -Wl,--no-whole-archive -Wl,-Map=$(OUTPATH)/$(PROJ_NAME).map -lm -o $@
+ 	$(Q)$(OBJDUMP) -D $(OUTPATH)/$(PROJ_NAME).elf > $(OUTPATH)/$(PROJ_NAME).dis
+ 	$(Q)$(OBJCOPY) -O ihex $(OUTPATH)/$(PROJ_NAME).elf $(OUTPATH)/$(PROJ_NAME).hex
+ 	$(Q)$(OBJCOPY) -O binary $(OUTPATH)/$(PROJ_NAME).elf $(OUTPATH)/$(PROJ_NAME).bin
+diff --git a/tools/scripts/build/copy_firmware.sh b/tools/scripts/build/copy_firmware.sh
+index 05142d2..e7b458c 100755
+--- a/tools/scripts/build/copy_firmware.sh
++++ b/tools/scripts/build/copy_firmware.sh
+@@ -256,7 +256,7 @@ elif [ "$BOARD_CONFIG" == "mt7686_hdk" ] || [ "$BOARD_CONFIG" == "mt7682_hdk" ]
+     # copy prebuilt files
+     cp -f $SOURCE_DIR/prebuilt/driver/chip/mt7686/mt768x_default_PerRate_TxPwr.bin $OUTPUT/
+     # copy download config file
+-    if [ $COMPILE_TYPE == kernel ]; then
++    if [ "$COMPILE_TYPE" == "kernel" ]; then
+     	cp $SOURCE_DIR/tools/config/$BOARD_CONFIG/download/default/syscall_flash_download.cfg $OUTPUT/flash_download.cfg
+     else
+     	cp $SOURCE_DIR/tools/config/$BOARD_CONFIG/download/default/flash_download.cfg $OUTPUT/flash_download.cfg
+@@ -271,7 +271,7 @@ elif [ "$BOARD_CONFIG" == "mt7686_hdk" ] || [ "$BOARD_CONFIG" == "mt7682_hdk" ]
+ 
+     # copy bootloader
+     if [ ! -f "${OUTPUT}/${IC_CONFIG}_bootloader.bin" ]; then
+-    	if [ $COMPILE_TYPE == kernel ]; then
++	if [ "$COMPILE_TYPE" == "kernel" ]; then
+         	cp $SOURCE_DIR/project/$BOARD_CONFIG/apps/bootloader/GCC/syscall_bootloader.bin $OUTPUT/$IC_CONFIG'_bootloader.bin'
+ 		else
+ 			if [ "$SECURE_BOOT_EN" == "y" ]; then
+-- 
+2.7.4
+
