@@ -1,0 +1,2636 @@
+From d3c473af5da9b79f13e323d525a9418efac5dbc7 Mon Sep 17 00:00:00 2001
+From: "qiang3.zhang" <28670379+xiarihf@users.noreply.github.com>
+Date: Thu, 2 Apr 2020 14:15:24 +0800
+Subject: [PATCH 5/5] Add stdk build project & configurations
+
+Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
+Signed-off-by: feng.song <56996751+hisongfeng@users.noreply.github.com>
+---
+ .../stdk/CC3220SF_LAUNCHXL_FREERTOS.lds       | 142 ++++
+ .../rtos/CC3220SF_LAUNCHXL/stdk/config.mk     |  54 ++
+ .../stdk/freertos_portable_wrapper.c          | 129 ++++
+ .../stdk/freertos_portable_wrapper.h          |  29 +
+ .../CC3220SF_LAUNCHXL/stdk/main_freertos.c    | 208 ++++++
+ examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile | 239 ++++++
+ ...CC3220SF_LAUNCHXL_freertos_gcc.projectspec |  96 +++
+ .../rtos/CC3220SF_LAUNCHXL/stdk/stdk.syscfg   | 177 +++++
+ .../CC3220SF_LAUNCHXL/stdk/syscfg_c.rov.xs    |  15 +
+ .../stdk/ti_drivers_config.c                  | 690 ++++++++++++++++++
+ .../stdk/ti_drivers_config.h                  | 154 ++++
+ .../stdk/ti_drivers_net_wifi_config.c         |  39 +
+ .../CC3220SF_LAUNCHXL/stdk/ti_net_config.c    |  47 ++
+ .../rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c   | 235 ++++++
+ .../rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h   |  27 +
+ imports.mak                                   |  14 +-
+ .../release/FreeRTOSConfig.h                  |   4 +-
+ kernel/freertos/makefile                      |   8 -
+ kernel/makefile                               |  32 +-
+ source/ti/net/bsd/sys/select.h                |   2 -
+ source/ti/net/bsd/sys/socket.h                |  25 +
+ source/ti/net/slnetsock.h                     |   2 +-
+ 22 files changed, 2321 insertions(+), 47 deletions(-)
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/CC3220SF_LAUNCHXL_FREERTOS.lds
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.c
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.h
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/portableNative_CC3220SF_LAUNCHXL_freertos_gcc.projectspec
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/stdk.syscfg
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/syscfg_c.rov.xs
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.c
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.h
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_net_wifi_config.c
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_net_config.c
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c
+ create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h
+
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/CC3220SF_LAUNCHXL_FREERTOS.lds b/examples/rtos/CC3220SF_LAUNCHXL/stdk/CC3220SF_LAUNCHXL_FREERTOS.lds
+new file mode 100644
+index 00000000..e6e1f3a7
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/CC3220SF_LAUNCHXL_FREERTOS.lds
+@@ -0,0 +1,142 @@
++/*
++ * Copyright (c) 2016-2017, Texas Instruments Incorporated
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * *  Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * *  Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * *  Neither the name of Texas Instruments Incorporated nor the names of
++ *    its contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
++ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
++ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
++ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
++ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
++ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++STACKSIZE = 0x800;
++
++MEMORY
++{
++    FLASH_HDR (RX)  : ORIGIN = 0x01000000, LENGTH = 0x7FF
++    FLASH     (RX)  : ORIGIN = 0x01000800, LENGTH = 0x0FF800
++    SRAM      (RWX) : ORIGIN = 0x20000000, LENGTH = 0x00040000
++}
++
++REGION_ALIAS("REGION_HDR", FLASH_HDR);
++REGION_ALIAS("REGION_TEXT", FLASH);
++REGION_ALIAS("REGION_BSS", SRAM);
++REGION_ALIAS("REGION_DATA", SRAM);
++REGION_ALIAS("REGION_STACK", SRAM);
++REGION_ALIAS("REGION_HEAP", SRAM);
++REGION_ALIAS("REGION_ARM_EXIDX", FLASH);
++REGION_ALIAS("REGION_ARM_EXTAB", FLASH);
++
++SECTIONS {
++
++    .dbghdr : ALIGN (2048) {
++        KEEP (*(.dbghdr))
++    } > REGION_HDR
++
++    PROVIDE (_resetVecs_base_address =
++        DEFINED(_resetVecs_base_address) ? _resetVecs_base_address : 0x01000800);
++
++    .resetVecs (_resetVecs_base_address) : AT (_resetVecs_base_address) {
++        KEEP (*(.resetVecs))
++    } > REGION_TEXT
++
++    .ramVecs (NOLOAD) : ALIGN(1024) {
++        KEEP (*(.ramVecs))
++    } > REGION_DATA
++
++    .text : {
++        CREATE_OBJECT_SYMBOLS
++        *(.text)
++        *(.text.*)
++        . = ALIGN(0x4);
++        KEEP (*(.ctors))
++        . = ALIGN(0x4);
++        KEEP (*(.dtors))
++        . = ALIGN(0x4);
++        __init_array_start = .;
++        KEEP (*(.init_array*))
++        __init_array_end = .;
++        *(.init)
++        *(.fini*)
++    } > REGION_TEXT AT> REGION_TEXT
++
++    PROVIDE (__etext = .);
++    PROVIDE (_etext = .);
++    PROVIDE (etext = .);
++
++    .rodata : {
++        *(.rodata)
++        *(.rodata*)
++    } > REGION_TEXT AT> REGION_TEXT
++
++    .data : ALIGN (4) {
++        __data_load__ = LOADADDR (.data);
++        __data_start__ = .;
++        *(.data)
++        *(.data*)
++        . = ALIGN (4);
++        __data_end__ = .;
++    } > REGION_DATA AT> REGION_TEXT
++
++    .ARM.exidx : {
++        __exidx_start = .;
++        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
++        __exidx_end = .;
++    } > REGION_ARM_EXIDX AT> REGION_ARM_EXIDX
++
++    .ARM.extab : {
++        *(.ARM.extab* .gnu.linkonce.armextab.*)
++    } > REGION_ARM_EXTAB AT> REGION_ARM_EXTAB
++
++    .bss : {
++        __bss_start__ = .;
++        *(.shbss)
++        *(.bss)
++        *(.bss.*)
++        *(COMMON)
++        . = ALIGN (4);
++        __bss_end__ = .;
++    } > REGION_BSS AT> REGION_BSS
++
++    .heap : {
++        __heap_start__ = .;
++        end = __heap_start__;
++        _end = end;
++        __end = end;
++        KEEP(*(.heap))
++        __heap_end__ = .;
++        __HeapLimit = __heap_end__;
++    } > REGION_HEAP AT> REGION_HEAP
++
++    .stack (NOLOAD) : ALIGN(0x8) {
++        _stack = .;
++        __stack = .;
++        KEEP(*(.stack))
++        . += STACKSIZE;
++        _stack_end = .;
++        __stack_end = .;
++    } > REGION_STACK AT> REGION_STACK
++}
++
++ENTRY(resetISR)
+\ No newline at end of file
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk b/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
+new file mode 100644
+index 00000000..cce2137d
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
+@@ -0,0 +1,54 @@
++########################################
++# Config
++########################################
++
++#/* For STDK */
++CONFIG_STDK_IOT_CORE=y
++CONFIG_STDK_IOT_CORE_NET_MBEDTLS=y
++CONFIG_STDK_IOT_CORE_USE_MBEDTLS=y
++CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP=y
++CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP=y
++CONFIG_STDK_IOT_CORE_BSP_SUPPORT_CC3220SF=y
++CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS=y
++CONFIG_STDK_IOT_CORE_USE_LWIP=n
++
++
++ifeq ($(CONFIG_STDK_IOT_CORE),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_EASYSETUP_HTTP
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_USE_MBEDTLS),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_USE_MBEDTLS
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_BSP_SUPPORT_CC3220SF),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_BSP_SUPPORT_CC3220SF
++endif
++
++ifeq ($(CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP),y)
++CFLAGS += -DCONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP
++endif
++
++ifeq ($(CONFIG_SAMSUNG_BUILD_ENG),y)
++CFLAGS += -DCONFIG_SAMSUNG_BUILD_ENG
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_USE_LWIP),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_USE_LWIP
++endif
++
++
++
++ifeq ($(CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS
++endif
++
++CFLAGS += -DCONFIG_STDK_IOT_CORE_USE_MBEDTLS
+\ No newline at end of file
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.c
+new file mode 100644
+index 00000000..7b36bd8b
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.c
+@@ -0,0 +1,129 @@
++/* ***************************************************************************
++ *
++ * Copyright 2020 Samsung Electronics All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
++ * either express or implied. See the License for the specific
++ * language governing permissions and limitations under the License.
++ *
++ ****************************************************************************/
++#include "FreeRTOS.h"
++#include "task.h"
++#include "portable.h"
++
++void *pvPortCalloc( size_t nmemb, size_t size )
++{
++	void *pvReturn = pvPortMalloc(nmemb*size );
++	if (pvReturn) {
++		memset(pvReturn, 0, nmemb*size);
++	}
++
++	return pvReturn;
++}
++
++void *pvPortRealloc( void *pv,  size_t xWantedSize )
++{
++	return (void *)pvPortReAlloc(pv, xWantedSize);
++}
++
++void *pvPortsStrdup(char *src)
++{
++	int len = strlen(src);
++	void * dst = pvPortCalloc(1, len + 1);
++	if(dst) {
++		memcpy(dst, src, len);
++	}
++	return dst;
++}
++
++double pvPortsStrtod(const char* s, char** endptr)
++{
++	const char* p = s;
++	long double value = 0.L;
++
++	int sign = 0;
++
++	long double factor;
++
++	unsigned int expo;
++
++
++	while (isspace(*p) )
++		p++;
++
++	if(*p == '-' || *p == '+')
++		sign = *p++;
++
++
++	while ( (unsigned int)(*p - '0') < 10u )
++		value = value*10 + (*p++ - '0');
++
++	if ( *p == '.' )
++	{
++		factor = 1.;
++
++		p++;
++
++		while ( (unsigned int)(*p - '0') < 10u )
++		{
++			factor *= 0.1;
++			value += (*p++ - '0') * factor;
++		}
++	}
++
++	if ( (*p | 32) == 'e' )
++	{
++		expo = 0;
++		factor = 10.L;
++
++		switch (*++p)
++		{
++			case '-':
++				factor = 0.1;
++			case '+':
++				p++;
++				break;
++			case '0':
++			case '1':
++			case '2':
++			case '3':
++			case '4':
++			case '5':
++			case '6':
++			case '7':
++			case '8':
++			case '9':
++				break;
++			default:
++				value = 0.L;
++				p = s;
++				goto done;
++		}
++
++		while ( (unsigned int)(*p - '0') < 10u )
++			 expo = 10 * expo + (*p++ - '0');
++		while ( 1 )
++		{
++			if ( expo & 1 )
++				value *= factor;
++			if ( (expo >>= 1) == 0 )
++				break;
++
++			factor *= factor;
++		}
++	}
++
++done:
++	if ( endptr != 0 )
++		*endptr = (char*)p;
++
++	return (sign == '-' ? -value : value);
++}
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.h b/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.h
+new file mode 100644
+index 00000000..ed698ce7
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.h
+@@ -0,0 +1,29 @@
++/* ***************************************************************************
++ *
++ * Copyright 2020 Samsung Electronics All Rights Reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
++ * either express or implied. See the License for the specific
++ * language governing permissions and limitations under the License.
++ *
++ ****************************************************************************/
++
++#ifndef __FREERTOS_PORTABLE_WRAPPER_H
++#define __FREERTOS_PORTABLE_WRAPPER_H
++#include "portable.h"
++
++void *pvPortCalloc( size_t nmemb, size_t size );
++void *pvPortRealloc( void *pv,  size_t xWantedSize );
++void *pvPortsStrdup(char *src);
++double pvPortsStrtod(const char* s, char** endptr);
++
++
++#endif
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c
+new file mode 100644
+index 00000000..1b678e6d
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c
+@@ -0,0 +1,208 @@
++/*
++ * Copyright (c) 2016-2019, Texas Instruments Incorporated
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * *  Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * *  Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * *  Neither the name of Texas Instruments Incorporated nor the names of
++ *    its contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
++ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
++ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
++ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++
++ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
++ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
++ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++/*
++ *  ======== main_freertos.c ========
++ */
++#include <stdio.h>
++#include <stdint.h>
++
++/* RTOS header files */
++#include <FreeRTOS.h>
++#include <task.h>
++
++/* Driver header files */
++#include <ti/drivers/GPIO.h>
++
++/* Driver configuration */
++#include <ti/drivers/Board.h>
++#include "uart_term.h"
++#include "iot_error.h"
++#include "iot_debug.h"
++#include <ti/drivers/net/wifi/simplelink.h>
++
++
++extern void app_main(void);
++
++/* Stack size in 16-bit words */
++#define THREADSTACKSIZE    768 / sizeof(portSTACK_TYPE)
++#define SPAWN_TASK_PRIORITY (9)
++#define SPAWN_STACK_SIZE (2048)
++
++void _sl_task_stub(void *arg0)
++{
++	void * xstat;
++	/* invoke thread start-routine */
++	xstat = sl_Task(NULL);
++	/* thread must self-terminate */
++	vTaskDelete(NULL);
++}
++
++static iot_error_t iot_bsp_env_init()
++{
++	bool schedulerStarted;
++	TaskHandle_t stdkHandle;
++	BaseType_t retc;
++	int32_t RetVal;
++
++	/* Initialize SlNetSock layer with CC3x20 interface*/
++	RetVal = ti_net_SlNet_initConfig();
++	if (0 != RetVal) {
++		IOT_ERROR("Failed to initialize SlNetSock");
++	}
++	
++	/* Create the sl_Task internal spawn thread */
++	/* The SimpleLink host driver architecture mandate spawn
++	   thread to be created prior to calling Sl_start (turning the NWP on). */
++	/* The purpose of this thread is to handle
++	   asynchronous events sent from the NWP.
++	 * Every event is classified and later handled
++	   by the Host driver event handlers. */
++	
++	void *threadid = pvPortMalloc(sizeof(TaskHandle_t));
++	schedulerStarted = (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) ? false : true;
++
++	if (schedulerStarted) {
++		/* Disable the scheduler */
++		vTaskSuspendAll();
++	}
++
++	retc = xTaskCreate((TaskFunction_t)_sl_task_stub,	// pvTaskCode
++						"_sl_task_stub", 				// pcName
++						SPAWN_STACK_SIZE / sizeof(portSTACK_TYPE),	// usStackDepth
++						NULL,							// pvParameters
++						SPAWN_TASK_PRIORITY,			// uxPriority
++						&stdkHandle);					// pxCreatedTask
++	if (retc == pdPASS) {
++		vTaskSetApplicationTaskTag(stdkHandle,
++		(TaskHookFunction_t)threadid);
++	} else {
++		/* Handle Error */
++		IOT_ERROR("[IOT_BSP_WIFI] Network Terminal - Unable to create spawn thread");
++		return IOT_ERROR_UNINITIALIZED;
++	}
++	if (schedulerStarted) {
++		/* Re-enable the scheduler */
++		xTaskResumeAll();
++	}
++
++	/* Turn NWP on */
++	RetVal = sl_Start(NULL, NULL, NULL);
++	if(RetVal < 0)
++	{
++		/* Handle Error */
++		IOT_ERROR("[IOT_BSP_WIFI] sl_start failed - %d", RetVal);
++		return IOT_ERROR_UNINITIALIZED;
++	}
++
++	return IOT_ERROR_NONE;
++}
++
++static void *user_init_entry(void *arg0)
++{
++	IOT_DEBUG("user_init_entry...");
++
++	// Call app_main() to start user application
++	iot_bsp_env_init();
++	app_main();
++
++	vTaskDelete(NULL);
++	return NULL;
++}
++
++/*
++ *  ======== main ========
++ */
++int main(void)
++{
++	TaskHandle_t stdkHandle;
++	BaseType_t   retc;
++
++	/* Call driver init functions */
++	Board_init();
++	/* Initialize the GPIO since multiple threads are using it */
++	SPI_init();
++	GPIO_init();
++	InitTerm();
++
++	retc = xTaskCreate((TaskFunction_t)user_init_entry,   // pvTaskCode
++						"user_init_entry",                 // pcName
++						THREADSTACKSIZE,                   // usStackDepth
++						NULL,                              // pvParameters
++						2,                                 // uxPriority
++						&stdkHandle);                      // pxCreatedTask
++	if (retc != pdPASS) {
++		/* xTaskCreate() failed */
++		while (1);
++	}
++	/* Start the FreeRTOS scheduler */
++	vTaskStartScheduler();
++
++	return (0);
++}
++
++//*****************************************************************************
++//
++//! \brief Application defined malloc failed hook
++//!
++//! \param  none
++//!
++//! \return none
++//!
++//*****************************************************************************
++void vApplicationMallocFailedHook()
++{
++	/* Handle Memory Allocation Errors */
++	IOT_ERROR("vApplicationMallocFailedHook!");
++	while(1) {
++		usleep(100);
++	}
++}
++
++//*****************************************************************************
++//
++//! \brief Application defined stack overflow hook
++//!
++//! \param  none
++//!
++//! \return none
++//!
++//*****************************************************************************
++void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
++{
++	//Handle FreeRTOS Stack Overflow
++	IOT_ERROR("vApplicationStackOverflowHook!");
++	while(1) {
++		usleep(100);
++	}
++}
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile b/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile
+new file mode 100644
+index 00000000..3e3f8fac
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile
+@@ -0,0 +1,239 @@
++SIMPLELINK_CC32XX_SDK_INSTALL_DIR ?= $(abspath ../../../../)
++
++include $(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/imports.mak
++include config.mk
++KERNEL_BUILD := $(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/kernel/freertos/builds/CC3220SF_LAUNCHXL/release
++
++CC = "$(GCC_ARMCOMPILER)/bin/arm-none-eabi-gcc"
++LNK = "$(GCC_ARMCOMPILER)/bin/arm-none-eabi-gcc"
++
++OBJ_DIR=$(TARGET)/Debug/obj
++OBJCOPY = "$(GCC_ARMCOMPILER)/bin/arm-none-eabi-objcopy"
++OBJDUMP = "$(GCC_ARMCOMPILER)/bin/arm-none-eabi-objdump"
++
++OBJECTS = freertos_main_freertos.obj ti_drivers_config.obj uart_term.obj ti_drivers_net_wifi_config.obj ti_net_config.obj freertos_portable_wrapper.obj
++NAME = stdk
++
++CFLAGS += -I../.. \
++    -I. \
++    -DCC32XX \
++    "-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/net/utils/" \
++    "-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/drivers/utils/" \
++    "-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/drivers/" \
++    "-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source" \
++    "-I$(FREERTOS_INSTALL_DIR)/FreeRTOS/Source/include" \
++    "-I$(FREERTOS_INSTALL_DIR)/FreeRTOS/Source/portable/GCC/ARM_CM3" \
++    "-I$(KERNEL_BUILD)" \
++    -mcpu=cortex-m4 \
++    -march=armv7e-m \
++    -mthumb \
++    -std=c99 \
++    -mfloat-abi=soft \
++    -ffunction-sections \
++    -fdata-sections \
++    -g \
++    -gstrict-dwarf \
++    -Wall \
++    "-I$(GCC_ARMCOMPILER)/arm-none-eabi/include/newlib-nano" \
++    "-I$(GCC_ARMCOMPILER)/arm-none-eabi/include" \
++    "-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/drivers/utils"
++    #"-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/posix/gcc/"
++
++ifneq ($(CONFIG_STDK_IOT_CORE_USE_LWIP),y)
++CFLAGS +="-D__unix__"
++CFLAGS +="-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/net/bsd"
++endif
++
++
++
++LFLAGS += -Wl,-wrap,puts \
++    -Wl,-wrap,putchar \
++    -Wl,-wrap,putc \
++    -Wl,-wrap,vprintf \
++    -Wl,-wrap,printf \
++    -Wl,-T,CC3220SF_LAUNCHXL_FREERTOS.lds \
++    "-Wl,-Map,$(NAME).map" \
++    -Wl,--start-group \
++    "-L$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/net/utils" \
++    -l:gcc/Release/net_utils.a \
++    "-L$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/net/sntp/lib" \
++    -l:gcc/m4/sntp_release.a \
++    "-L$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/net/lib" \
++    -l:gcc/m4/slnetsock_release.a \
++    "-L$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source" \
++    -l:ti/display/lib/display.am4g \
++    -l:ti/grlib/lib/gcc/m4/grlib.a \
++    -l:third_party/spiffs/lib/gcc/m4/spiffs.a \
++    -l:ti/drivers/lib/drivers_cc32xx.am4g \
++    -l:third_party/fatfs/lib/gcc/m4/fatfs.a \
++    -l:ti/net/lib/gcc/m4/slnetsock_debug.a \
++    "-L$(KERNEL_BUILD)/gcc" \
++    -l:freertos.lib \
++    -l:ti/devices/cc32xx/driverlib/gcc/Release/driverlib.a \
++    -l:ti/drivers/net/wifi/gcc/rtos/simplelink.a \
++    -l:/ti/drivers/net/wifi/slnetif/gcc/Release/slnetifwifi.a \
++    -Wl,--end-group \
++    -march=armv7e-m \
++    -mthumb \
++    -nostartfiles \
++    -static \
++    -Wl,--gc-sections \
++    "-L$(GCC_ARMCOMPILER)/arm-none-eabi/lib/thumb/v7e-m" \
++    -lgcc \
++    -lc \
++    -lm \
++    -lnosys \
++    --specs=nano.specs
++
++#cjson
++CJSON_PATH  = $(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/third_party/cjson
++include $(CJSON_PATH)/component.mk
++STDK_CJSON = $(CJSON_C)
++STDK_CJSON_O = $(patsubst %.c,%.o,$(STDK_CJSON))
++
++#libsodium
++SODIUM_DIR = $(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/third_party/libsodium
++include $(SODIUM_DIR)/component.mk
++STDK_LIBSODIUM = $(LIBSODIUM_C)
++STDK_LIBSODIUM_O = $(patsubst %.c,%.o,$(STDK_LIBSODIUM))
++
++#liblwip
++LWIP_PATH  = $(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/third_party/lwip/lwip_v1.4.1
++include $(LWIP_PATH)/component.mk
++STDK_LIBLWIP = $(LIBLWIP_C)
++STDK_LIBLWIP_O = $(patsubst %.c,%.o,$(STDK_LIBLWIP))
++
++#mbedtls
++MBEDTLS_PATH  = $(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/third_party/ssl/mbedtls-2.4.0
++include $(MBEDTLS_PATH)/component.mk
++STDK_LIBMBEDTLS = $(LIBMBEDTLS_C)
++STDK_LIBMBEDTLS_O = $(patsubst %.c,%.o,$(STDK_LIBMBEDTLS))
++
++#FreeRTOS
++FREERTOS_PATH ?= $(abspath ../../../../)/FreeRTOS-10.1.1/FreeRTOS
++CFLAGS += -I$(FREERTOS_PATH)/Source/include
++$(info "freertos:$(FREERTOS_PATH)")
++
++#st_iot_core
++ST_IOT_CORE_DIR ?= $(abspath ../../../../../../)/iot-core/src
++COMPONENT_PATH = $(ST_IOT_CORE_DIR)
++
++PROJECT_PATH ?= $(abspath ../../../../../../)/apps/cc3220sf/st_switch
++
++include $(ST_IOT_CORE_DIR)/component.mk
++INCLUDES += $(CPPFLAGS)
++INCLUDES += -I$(PROJECT_PATH)
++IOT_CORE_EXCLUDE_C += $(ST_IOT_CORE_DIR)/easysetup/http/lwip_httpd/fsdata_custom.c
++IOT_CORE_C += $(foreach srcdir,$(COMPONENT_SRCDIRS),$(wildcard $(ST_IOT_CORE_DIR)/$(srcdir)/*.c))
++IOT_CORE_TEST_C += $(filter-out $(IOT_CORE_EXCLUDE_C), $(IOT_CORE_C))
++INCLUDES += $(foreach inc,$(COMPONENT_ADD_INCLUDEDIRS), -I$(ST_IOT_CORE_DIR)/$(inc))
++CFLAGS += $(INCLUDES)
++
++IOT_CORE_C_O = $(patsubst %.c,%.o,$(IOT_CORE_TEST_C))
++
++#stdk app 
++IOT_APP_C += $(wildcard $(PROJECT_PATH)/main/*.c)
++IOT_APP_C_O = $(patsubst %.c,%.o,$(IOT_APP_C))
++
++all: $(NAME).out
++
++$(KERNEL_BUILD)/gcc/freertos.lib:
++	@ $(ECHOBLANKLINE)
++	@ echo $@ is not built.
++	@ echo You can build it by issuing $(MAKE) in $(dir $@).
++	@ $(ECHOBLANKLINE)
++
++.INTERMEDIATE: syscfg
++ti_drivers_config.c ti_drivers_config.h: syscfg
++	@ echo generation complete
++
++syscfg: stdk.syscfg
++	@ echo Generating configuration files...
++	@ $(SYSCONFIG_TOOL) --product $(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/.metadata/product.json --output $(@D) $<
++
++freertos_main_freertos.obj: main_freertos.c ti_drivers_config.h
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++freertos_portable_wrapper.obj: freertos_portable_wrapper.c freertos_portable_wrapper.h
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++
++ti_drivers_config.obj: ti_drivers_config.c ti_drivers_config.h
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++ti_drivers_net_wifi_config.obj: ti_drivers_net_wifi_config.c ti_drivers_config.h
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++ti_net_config.obj: ti_net_config.c ti_drivers_config.h
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++uart_term.obj: uart_term.c uart_term.h
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++$(STDK_LIBLWIP_O): %.o : %.c
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++$(STDK_CJSON_O): %.o : %.c
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++$(STDK_LIBSODIUM_O): %.o : %.c
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) $< -c -o $@
++
++$(STDK_LIBMBEDTLS_O): %.o : %.c
++	@ echo Building $@
++	@ $(CC) $(CFLAGS) -c $< -o $@
++
++$(IOT_APP_C_O): %.o : %.c
++	@ echo Building $@
++	$(CC) $(CFLAGS) -c $< -o $@
++
++$(IOT_CORE_C_O): %.o : %.c 
++	@ echo Building $@
++	$(CC) $(CFLAGS) -c $< -o $@
++	cp $(PROJECT_PATH)/main/onboarding_config.json ./
++	$(OBJCOPY) -I binary -O elf32-littlearm -B arm onboarding_config.json $(PROJECT_PATH)/main/onboarding_config.json.o
++	cp $(PROJECT_PATH)/main/device_info.json ./
++	$(OBJCOPY) -I binary -O elf32-littlearm -B arm device_info.json $(PROJECT_PATH)/main/device_info.json.o
++	rm ./onboarding_config.json
++	rm ./device_info.json
++
++OUT_DEPENDENCE = $(OBJECTS)
++OUT_DEPENDENCE += $(IOT_CORE_C_O)
++OUT_DEPENDENCE += $(STDK_LIBMBEDTLS_O)
++OUT_DEPENDENCE += $(STDK_LIBSODIUM_O)
++OUT_DEPENDENCE += $(STDK_CJSON_O)
++ifeq ($(CONFIG_STDK_IOT_CORE_USE_LWIP),y)
++OUT_DEPENDENCE += $(STDK_LIBLWIP_O)
++endif
++OUT_DEPENDENCE += $(IOT_APP_C_O)
++OUT_DEPENDENCE += $(PROJECT_PATH)/main/onboarding_config.json.o $(PROJECT_PATH)/main/device_info.json.o
++
++$(NAME).out: $(OUT_DEPENDENCE)
++	@ echo linking $@
++	@ $(LNK) $(OUT_DEPENDENCE) $(LFLAGS) -o $(NAME).out
++	@ $(OBJCOPY) -O binary $(NAME).out $(NAME).bin
++
++clean:
++	@ echo Cleaning...
++	@ $(RM) $(STDK_CJSON_O) > $(DEVNULL) 2>&1
++	@ $(RM) $(STDK_LIBSODIUM_O) > $(DEVNULL) 2>&1
++	@ $(RM) $(STDK_LIBLWIP_O) > $(DEVNULL) 2>&1
++	@ $(RM) $(STDK_LIBMBEDTLS_O) > $(DEVNULL) 2>&1
++	@ $(RM) $(IOT_APP_C_O) > $(DEVNULL) 2>&1
++	@ $(RM) $(IOT_CORE_C_O) > $(DEVNULL) 2>&1
++	@ $(RM) $(PROJECT_PATH)/main/onboarding_config.json.o > $(DEVNULL) 2>&1
++	@ $(RM) $(PROJECT_PATH)/main/device_info.json.o > $(DEVNULL) 2>&1
++	@ $(RM) $(OBJECTS) > $(DEVNULL) 2>&1
++	@ $(RM) $(NAME).out > $(DEVNULL) 2>&1
++	@ $(RM) $(NAME).map > $(DEVNULL) 2>&1
++	@ $(RM) $(NAME).bin > $(DEVNULL) 2>&1
++	@ $(RM) ti_drivers_config.c ti_drivers_config.h > $(DEVNULL) 2>&1
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/portableNative_CC3220SF_LAUNCHXL_freertos_gcc.projectspec b/examples/rtos/CC3220SF_LAUNCHXL/stdk/portableNative_CC3220SF_LAUNCHXL_freertos_gcc.projectspec
+new file mode 100644
+index 00000000..5ad24091
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/portableNative_CC3220SF_LAUNCHXL_freertos_gcc.projectspec
+@@ -0,0 +1,96 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<projectSpec>
++    <applicability>
++        <when>
++            <context
++                deviceFamily="ARM"
++                deviceId="Cortex M.CC3220SF"
++            />
++        </when>
++    </applicability>
++
++    <import spec="${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/gcc/freertos_builds_CC3220SF_LAUNCHXL_release_gcc.projectspec"/>
++
++    <project
++        title="Portability (with native RTOS) Tutorial"
++        name="portableNative_CC3220SF_LAUNCHXL_freertos_gcc"
++        configurations="Debug"
++        toolChain="GNU"
++        connection="TIXDS110_Connection.xml"
++        device="Cortex M.CC3220SF"
++        ignoreDefaultDeviceSettings="true"
++        ignoreDefaultCCSSettings="true"
++        references="freertos_builds_CC3220SF_LAUNCHXL_release_gcc"
++        requiredVariables="FREERTOS_INSTALL_DIR"
++        compilerBuildOptions="
++            -I${PROJECT_ROOT}
++            -I${PROJECT_ROOT}/${ConfigName}
++            -DCC32XX
++            -I${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source
++            -I${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/posix/gcc
++            -I${FREERTOS_INSTALL_DIR}/FreeRTOS/Source/include
++            -I${FREERTOS_INSTALL_DIR}/FreeRTOS/Source/portable/GCC/ARM_CM3
++            -I${WORKSPACE_LOC}/freertos_builds_CC3220SF_LAUNCHXL_release_gcc
++            -mcpu=cortex-m4
++            -march=armv7e-m
++            -mthumb
++            -std=c99
++            -std=c++11
++            -mfloat-abi=soft
++            -ffunction-sections
++            -fdata-sections
++            -g
++            -gstrict-dwarf
++            -Wall
++            -I${CG_TOOL_ROOT}/arm-none-eabi/include/newlib-nano
++            -I${CG_TOOL_ROOT}/arm-none-eabi/include
++        "
++        linkerBuildOptions="
++            -L${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source
++            -l:ti/display/lib/display.am4g
++            -l:ti/grlib/lib/gcc/m4/grlib.a
++            -l:third_party/spiffs/lib/gcc/m4/spiffs.a
++            -l:ti/drivers/lib/drivers_cc32xx.am4g
++            -l:third_party/fatfs/lib/gcc/m4/fatfs.a
++            -L${WORKSPACE_LOC}/freertos_builds_CC3220SF_LAUNCHXL_release_gcc/Debug
++            -l:libfreertos_builds_CC3220SF_LAUNCHXL_release_gcc.a
++            -l:ti/devices/cc32xx/driverlib/gcc/Release/driverlib.a
++            -march=armv7e-m
++            -mthumb
++            -nostartfiles
++            -static
++            -Wl,--gc-sections
++            -L${CG_TOOL_ROOT}/arm-none-eabi/lib/thumb/v7e-m
++            -lgcc
++            -lc
++            -lm
++            -lnosys
++            --specs=nano.specs
++        "
++        enableSysConfigTool="true"
++        sysConfigBuildOptions="
++            --product ${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/.metadata/product.json
++        "
++        description="A tutorial to show portability across devices and compilers">
++
++        <property name="buildProfile" value="release"/>
++        <property name="isHybrid" value="true"/>
++        <group id="portableNative.SIMPLELINK_CC32XX_SDK.CC3220SF_LAUNCHXL.demos.GCC"/>
++        <file path="../../README.md" openOnCreation="false" excludeFromBuild="false" action="copy">
++        </file>
++        <file path="../../README.html" openOnCreation="false" excludeFromBuild="false" action="copy">
++        </file>
++        <file path="../../freertos/main_freertos.c" openOnCreation="false" excludeFromBuild="false" action="copy">
++        </file>
++        <file path="../../freertos/console_freertos.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="freertos">
++        </file>
++        <file path="../../freertos/temperature_freertos.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="freertos">
++        </file>
++        <file path="../../freertos/portableNative.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy">
++        </file>
++        <file path="${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/boards/CC3220SF_LAUNCHXL/Board.html" openOnCreation="false" excludeFromBuild="false" action="link">
++        </file>
++        <file path="../../freertos/gcc/CC3220SF_LAUNCHXL_FREERTOS.lds" openOnCreation="false" excludeFromBuild="false" action="copy">
++        </file>
++    </project>
++</projectSpec>
+\ No newline at end of file
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/stdk.syscfg b/examples/rtos/CC3220SF_LAUNCHXL/stdk/stdk.syscfg
+new file mode 100644
+index 00000000..4958b818
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/stdk.syscfg
+@@ -0,0 +1,177 @@
++/*
++ * Copyright (c) 2018-2019, Texas Instruments Incorporated
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * *  Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * *  Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * *  Neither the name of Texas Instruments Incorporated nor the names of
++ *    its contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
++ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
++ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
++ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
++ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
++ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++// @cliArgs --board /ti/boards/CC3220SF_LAUNCHXL
++
++/*
++ *  stdk.syscfg
++ */
++/* ======== Board ======== */
++var board = system.deviceData.board.name;
++
++/* ======== Components ======== */
++var Components = system.deviceData.board.components;
++
++var SimpleLinkWifi = scripting.addModule("/ti/drivers/net/wifi/SimpleLinkWifi");
++var Crypto = scripting.addModule("/ti/drivers/Crypto");
++var Crypto1 = Crypto.addInstance();
++var Power = scripting.addModule("/ti/drivers/Power");
++var Board = scripting.addModule("/ti/drivers/Board");
++var DriverLib = scripting.addModule("/ti/devices/DriverLib");
++var Display = scripting.addModule("/ti/display/Display");
++var Display1 = Display.addInstance();
++var DMA = scripting.addModule("/ti/drivers/DMA");
++
++var SPI = scripting.addModule("/ti/drivers/SPI");
++var SPI1 = SPI.addInstance();
++var Timer = scripting.addModule("/ti/drivers/Timer");
++var Timer1 = Timer.addInstance();
++var Timer2 = Timer.addInstance();
++var Timer3 = Timer.addInstance();
++var Watchdog = scripting.addModule("/ti/drivers/Watchdog");
++var Watchdog1 = Watchdog.addInstance();
++var SlNet = scripting.addModule("/ti/net/SlNet");
++var SlNet1 = SlNet.addInstance();
++// Name - The C/C++ identifier used in applications as the index parameter passed to Crypto runtime APIs
++Crypto1.$name = "CONFIG_Crypto_0";
++// IO Retention Shutdown - IO groups to be retained during Shutdown
++Power.ioRetentionShutdown = ["GRP_1"];
++// Name
++Power.parkPins.$name = "ti_drivers_power_PowerCC32XXPins0";
++// Name - The C/C++ identifier used in applications as the index parameter passed to Display runtime APIs
++Display1.$name = "CONFIG_Display_0";
++// Use Hardware - Select the hardware to use, or 'None' to use available header pins
++Display1.$hardware = system.deviceData.board.components.XDS110UART;
++// Name - The C/C++ identifier used in applications as the index parameter passed to UART runtime APIs
++Display1.uart.$name = "CONFIG_UART_0";
++// Use DMA
++Display1.uart.useDMA = true;
++// Name
++Display1.uart.uart.$name = "MyUART1";
++// Use Peripheral
++Display1.uart.uart.$assign = "UART0";
++// Assign pin
++Display1.uart.uart.txPin.$assign = "GP01"; // pin number - 55
++// Assign pin
++Display1.uart.uart.rxPin.$assign = "GP02"; // pin number - 57
++// Assign pin
++Display1.uart.uart.txDmaChannel.$assign = "UDMA_CH9";
++// Assign pin
++Display1.uart.uart.rxDmaChannel.$assign = "UDMA_CH8";
++// Name - The C/C++ identifier used in applications as the index parameter passed to SPI runtime APIs
++SPI1.$name = "CONFIG_SPI_0";
++// Mode - In three pin mode the SS signal is not used.
++SPI1.mode = "Four Pin SS Active Low";
++// Default TX Buffer Value - Specifies the default transmit buffer value.
++SPI1.defaultTxBufferValue = "0";
++// Name
++SPI1.spi.$name = "MySPI1";
++// Use Peripheral
++SPI1.spi.$assign = "SPI0";
++// Assign pin
++SPI1.spi.sclkPin.$assign = "boosterpack.7"; // P05
++// Assign pin
++SPI1.spi.misoPin.$assign = "boosterpack.14"; // P06
++// Assign pin
++SPI1.spi.mosiPin.$assign = "boosterpack.15"; // P07
++// Assign pin
++SPI1.spi.ssPin.$assign = "boosterpack.18"; // P08
++// Assign pin
++SPI1.spi.dmaRxChannel.$assign = "UDMA_CH6";
++// Assign pin
++SPI1.spi.dmaTxChannel.$assign = "UDMA_CH7";
++// Name - The C/C++ identifier used in applications as the index parameter passed to Timer runtime APIs
++Timer1.$name = "CONFIG_TIMER_0";
++// Timer Type
++Timer1.timerType = "32 Bits";
++// Name
++Timer1.timer.$name = "MyTimer1";
++// Use Peripheral
++Timer1.timer.$assign = "Timer0";
++// Name - The C/C++ identifier used in applications as the index parameter passed to Timer runtime APIs
++Timer2.$name = "CONFIG_TIMER_1";
++// Name
++Timer2.timer.$name = "MyTimer1";
++// Use Peripheral
++Timer2.timer.$assign = "Timer1";
++// Name - The C/C++ identifier used in applications as the index parameter passed to Timer runtime APIs
++Timer3.$name = "CONFIG_TIMER_2";
++// Name
++Timer3.timer.$name = "MyTimer1";
++// Use Peripheral
++Timer3.timer.$assign = "Timer1";
++// Name - The C/C++ identifier used in applications as the index parameter passed to Watchdog runtime APIs
++Watchdog1.$name = "CONFIG_WATCHDOG_0";
++// Name
++Watchdog1.watchdog.$name = "MyWATCHDOG1";
++// Use Peripheral
++Watchdog1.watchdog.$assign = "WATCHDOG0";
++// Name
++SlNet1.$name = "CONFIG_SLNET";
++// Interface Name - Specifies the name for this interface"
++SlNet1.ifName = "CC32xx";
++
++/* ======== LED ======== */
++var LED = scripting.addModule("/ti/drivers/apps/LED");
++var led0 = LED.addInstance();
++led0.$hardware = Components.LED0;
++var led1 = LED.addInstance();
++led1.$hardware = Components.LED1;
++
++/* Add PWM LEDs for boards that have one */
++if(board.match(/MSP.EXP432P/))
++{
++    var led2 = LED.addInstance();
++    led2.$hardware = Components.LED2_PWM;
++    led2.dimmable = true;
++}
++else if(board.match(/CC32/))
++{
++    var led2 = LED.addInstance();
++    led2.$hardware = Components.LED0_PWM;
++    led2.dimmable = true;
++}
++
++/* ======== Button ======== */
++var Button = scripting.addModule("/ti/drivers/apps/Button");
++var button0 = Button.addInstance();
++button0.$hardware = Components.BUTTON0;
++var button1 = Button.addInstance();
++button1.$hardware = Components.BUTTON1;
++
++/* Set button HW configs */
++button0.hwConfig = "Active Low No Pull";
++button1.hwConfig = "Active Low No Pull";
++if(board.match(/CC32/))
++{
++    button0.hwConfig = "Active High Pull Down";
++    button1.hwConfig = "Active High Pull Down";
++}
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/syscfg_c.rov.xs b/examples/rtos/CC3220SF_LAUNCHXL/stdk/syscfg_c.rov.xs
+new file mode 100644
+index 00000000..bcc10200
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/syscfg_c.rov.xs
+@@ -0,0 +1,15 @@
++/*
++ *  ======== syscfg_c.rov.xs ========
++ *  This file contains the information needed by the Runtime Object
++ *  View (ROV) tool.
++ *
++ *  Specifically, this file names the C-ROV implementation files declared
++ *  by the modules that are part of the app's configuration.  In the
++ *  future this file will also contain a serialization of corresponding 
++ *  module configuration parameters which can be used by the ROV provided
++ *  views.
++ *
++ *  DO NOT EDIT - This file is generated by the SysConfig tool.
++ */
++var crovFiles = [
++];
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.c
+new file mode 100644
+index 00000000..288bb556
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.c
+@@ -0,0 +1,690 @@
++/*
++ *  ======== ti_drivers_config.c ========
++ *  Configured TI-Drivers module definitions
++ *
++ *  DO NOT EDIT - This file is generated for the CC3220SF_LAUNCHXL
++ *  by the SysConfig tool.
++ */
++
++#include <stddef.h>
++
++#ifndef DeviceFamily_CC3220
++#define DeviceFamily_CC3220
++#endif
++
++#include <ti/devices/DeviceFamily.h>
++
++#include "ti_drivers_config.h"
++
++/*
++ *  ============================= Display =============================
++ */
++
++#include <ti/display/Display.h>
++#include <ti/display/DisplayUart.h>
++
++#define Display_UARTBUFFERSIZE 1024
++static char displayUARTBuffer[Display_UARTBUFFERSIZE];
++
++DisplayUart_Object displayUartObject;
++
++const DisplayUart_HWAttrs displayUartHWAttrs = {
++    .uartIdx      = CONFIG_UART_0,
++    .baudRate     = 115200,
++    .mutexTimeout = (unsigned int)(-1),
++    .strBuf       = displayUARTBuffer,
++    .strBufLen    = Display_UARTBUFFERSIZE
++};
++
++const Display_Config Display_config[] = {
++    /* CONFIG_Display_0 */
++    /* XDS110 UART */
++    {
++        .fxnTablePtr = &DisplayUartMin_fxnTable,
++        .object      = &displayUartObject,
++        .hwAttrs     = &displayUartHWAttrs
++    },
++};
++
++const uint_least8_t Display_count = 1;
++
++
++/*
++ *  =============================== Crypto ===============================
++ */
++
++#include <ti/drivers/crypto/CryptoCC32XX.h>
++
++/*
++ *  ======== CryptoCC32XXObjects ========
++ */
++#define CONFIG_Crypto_COUNT 1
++
++CryptoCC32XX_Object cryptoCC32XXObjects[CONFIG_Crypto_COUNT];
++
++/*
++ *  ======== Crypto_config ========
++ */
++const CryptoCC32XX_Config CryptoCC32XX_config[CONFIG_Crypto_COUNT] = {
++    /* CONFIG_Crypto_0 */
++    {
++        .object = &cryptoCC32XXObjects[CONFIG_Crypto_0],
++    },
++};
++
++const uint_least8_t CryptoCC32XX_count = CONFIG_Crypto_COUNT;
++
++
++
++/*
++ *  =============================== DMA ===============================
++ */
++
++#include <ti/drivers/dma/UDMACC32XX.h>
++#include <ti/devices/cc32xx/inc/hw_ints.h>
++#include <ti/devices/cc32xx/inc/hw_types.h>
++#include <ti/devices/cc32xx/driverlib/rom_map.h>
++#include <ti/devices/cc32xx/driverlib/udma.h>
++
++/* Ensure DMA control table is aligned as required by the uDMA Hardware */
++static tDMAControlTable dmaControlTable[64] __attribute__ ((aligned (1024)));
++
++/* This is the handler for the uDMA error interrupt. */
++static void dmaErrorFxn(uintptr_t arg)
++{
++    int status = MAP_uDMAErrorStatusGet();
++    MAP_uDMAErrorStatusClear();
++
++    /* Suppress unused variable warning */
++    (void)status;
++
++    while (1);
++}
++
++UDMACC32XX_Object udmaCC3220SObject;
++
++const UDMACC32XX_HWAttrs udmaCC3220SHWAttrs = {
++    .controlBaseAddr = (void *)dmaControlTable,
++    .dmaErrorFxn     = (UDMACC32XX_ErrorFxn)dmaErrorFxn,
++    .intNum          = INT_UDMAERR,
++    .intPriority     = (~0)
++};
++
++const UDMACC32XX_Config UDMACC32XX_config = {
++    .object  = &udmaCC3220SObject,
++    .hwAttrs = &udmaCC3220SHWAttrs
++};
++
++
++/*
++ *  =============================== GPIO ===============================
++ */
++
++#include <ti/drivers/GPIO.h>
++#include <ti/drivers/gpio/GPIOCC32XX.h>
++
++/*
++ *  ======== gpioPinConfigs ========
++ *  Array of Pin configurations
++ */
++GPIO_PinConfig gpioPinConfigs[] = {
++    /* CONFIG_LED_0_GPIO : LaunchPad LED D10 (Red) */
++    GPIOCC32XX_GPIO_09 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_MED | GPIO_CFG_OUT_LOW,
++    /* CONFIG_LED_1_GPIO : LaunchPad LED D8 (Green) */
++    GPIOCC32XX_GPIO_11 | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_MED | GPIO_CFG_OUT_LOW,
++    /* CONFIG_GPIO_0 : LaunchPad User Button SW2 (left) */
++    GPIOCC32XX_GPIO_13 | GPIO_CFG_IN_NOPULL | GPIO_CFG_IN_INT_RISING,
++    /* CONFIG_GPIO_1 : LaunchPad User Button SW3 (right) */
++    GPIOCC32XX_GPIO_22 | GPIO_CFG_IN_NOPULL | GPIO_CFG_IN_INT_RISING,
++};
++
++/*
++ *  ======== gpioCallbackFunctions ========
++ *  Array of callback function pointers
++ *
++ *  NOTE: Unused callback entries can be omitted from the callbacks array to
++ *  reduce memory usage by enabling callback table optimization
++ *  (GPIO.optimizeCallbackTableSize = true)
++ */
++GPIO_CallbackFxn gpioCallbackFunctions[] = {
++    /* CONFIG_LED_0_GPIO : LaunchPad LED D10 (Red) */
++    NULL,
++    /* CONFIG_LED_1_GPIO : LaunchPad LED D8 (Green) */
++    NULL,
++    /* CONFIG_GPIO_0 : LaunchPad User Button SW2 (left) */
++    NULL,
++    /* CONFIG_GPIO_1 : LaunchPad User Button SW3 (right) */
++    NULL,
++};
++
++/*
++ *  ======== GPIOCC32XX_config ========
++ */
++const GPIOCC32XX_Config GPIOCC32XX_config = {
++    .pinConfigs = (GPIO_PinConfig *)gpioPinConfigs,
++    .callbacks = (GPIO_CallbackFxn *)gpioCallbackFunctions,
++    .numberOfPinConfigs = 4,
++    .numberOfCallbacks = 4,
++    .intPriority = (~0)
++};
++
++
++/*
++ *  =============================== PWM ===============================
++ */
++
++#include <ti/drivers/PWM.h>
++#include <ti/drivers/pwm/PWMTimerCC32XX.h>
++
++#define CONFIG_PWM_COUNT 1
++
++/*
++ *  ======== pwmTimerCC32XXObjects ========
++ */
++PWMTimerCC32XX_Object pwmTimerCC32XXObjects[CONFIG_PWM_COUNT];
++
++/*
++ *  ======== pwmTimerCC32XXHWAttrs ========
++ */
++const PWMTimerCC32XX_HWAttrsV2 pwmTimerCC32XXHWAttrs[CONFIG_PWM_COUNT] = {
++    /* CONFIG_LED_2_PWM */
++    /* LaunchPad LED D9 (Yellow) */
++    {
++        .pwmPin = PWMTimerCC32XX_PIN_01, /* 01 */
++    },
++};
++
++/*
++ *  ======== PWM_config ========
++ */
++const PWM_Config PWM_config[CONFIG_PWM_COUNT] = {
++    /* CONFIG_LED_2_PWM */
++    /* LaunchPad LED D9 (Yellow) */
++    {
++        .fxnTablePtr = &PWMTimerCC32XX_fxnTable,
++        .object = &pwmTimerCC32XXObjects[CONFIG_LED_2_PWM],
++        .hwAttrs = &pwmTimerCC32XXHWAttrs[CONFIG_LED_2_PWM]
++    },
++};
++
++const uint_least8_t PWM_count = CONFIG_PWM_COUNT;
++
++
++/*
++ *  =============================== Power ===============================
++ */
++#include <ti/drivers/Power.h>
++#include <ti/drivers/power/PowerCC32XX.h>
++#include <ti/devices/cc32xx/driverlib/prcm.h>
++#include "ti_drivers_config.h"
++
++extern void PowerCC32XX_initPolicy(void);
++extern void PowerCC32XX_sleepPolicy(void);
++PowerCC32XX_ParkInfo parkInfo[];
++/*
++ *  This structure defines the configuration for the Power Manager.
++ */
++const PowerCC32XX_ConfigV1 PowerCC32XX_config = {
++    .policyInitFxn             = PowerCC32XX_initPolicy,
++    .policyFxn                 = PowerCC32XX_sleepPolicy,
++    .enterLPDSHookFxn          = NULL,
++    .resumeLPDSHookFxn         = NULL,
++    .enablePolicy              = false,
++    .enableGPIOWakeupLPDS      = true,
++    .enableGPIOWakeupShutdown  = true,
++    .enableNetworkWakeupLPDS   = true,
++    .wakeupGPIOSourceLPDS      = PRCM_LPDS_GPIO13,
++    .wakeupGPIOTypeLPDS        = PRCM_LPDS_FALL_EDGE,
++    .wakeupGPIOFxnLPDS         = NULL,
++    .wakeupGPIOFxnLPDSArg      = 0,
++    .wakeupGPIOSourceShutdown  = PRCM_HIB_GPIO13,
++    .wakeupGPIOTypeShutdown    = PRCM_HIB_RISE_EDGE,
++    .ramRetentionMaskLPDS      = PRCM_SRAM_COL_1|PRCM_SRAM_COL_2|PRCM_SRAM_COL_3|PRCM_SRAM_COL_4,
++    .keepDebugActiveDuringLPDS = false,
++    .ioRetentionShutdown       = PRCM_IO_RET_GRP_1,
++    .pinParkDefs               = parkInfo,
++    .numPins                   = 31
++};
++
++
++/*
++ *  =============================== SPI ===============================
++ */
++
++#include <ti/drivers/SPI.h>
++#include <ti/drivers/spi/SPICC32XXDMA.h>
++
++#include <ti/devices/cc32xx/inc/hw_ints.h>
++#include <ti/devices/cc32xx/inc/hw_memmap.h>
++#include <ti/devices/cc32xx/inc/hw_types.h>
++#include <ti/devices/cc32xx/driverlib/prcm.h>
++#include <ti/devices/cc32xx/driverlib/spi.h>
++#include <ti/devices/cc32xx/driverlib/udma.h>
++
++#define CONFIG_SPI_COUNT 2
++
++/*
++ *  ======== spiCC32XXDMAObjects ========
++ */
++SPICC32XXDMA_Object spiCC32XXDMAObjects[CONFIG_SPI_COUNT];
++
++uint32_t spiCC32XXSDMAscratchBuf[CONFIG_SPI_COUNT];
++
++/*
++ *  ======== spiCC32XXDMAHWAttrs ========
++ */
++const SPICC32XXDMA_HWAttrsV1 spiCC32XXDMAHWAttrs[CONFIG_SPI_COUNT] = {
++    /* CONFIG_NWP_SPI */
++    /* Network Processor SPI Bus */
++    {
++        .baseAddr = LSPI_BASE,
++        .intNum = INT_LSPI,
++        .intPriority = (~0),
++        .spiPRCM = PRCM_LSPI,
++        .csControl = SPI_SW_CTRL_CS,
++        .csPolarity = SPI_CS_ACTIVEHIGH,
++        .pinMode = SPI_4PIN_MODE,
++        .turboMode = SPI_TURBO_OFF,
++        .scratchBufPtr = &spiCC32XXSDMAscratchBuf[0],
++        .defaultTxBufValue = 0,
++        .rxChannelIndex = UDMA_CH12_LSPI_RX,
++        .txChannelIndex = UDMA_CH13_LSPI_TX,
++        .minDmaTransferSize = 100,
++        .mosiPin = SPICC32XXDMA_PIN_NO_CONFIG,
++        .misoPin = SPICC32XXDMA_PIN_NO_CONFIG,
++        .clkPin  = SPICC32XXDMA_PIN_NO_CONFIG,
++        .csPin  = SPICC32XXDMA_PIN_NO_CONFIG
++    },
++    /* GSPI */
++    {
++        .baseAddr = GSPI_BASE,
++        .intNum = INT_GSPI,
++        .intPriority = (~0),
++        .spiPRCM = PRCM_GSPI,
++        .csControl = SPI_HW_CTRL_CS,
++        .csPolarity = SPI_CS_ACTIVELOW,
++        .pinMode = SPI_4PIN_MODE,
++        .turboMode = SPI_TURBO_OFF,
++        .scratchBufPtr = &spiCC32XXSDMAscratchBuf[1],
++        .defaultTxBufValue = 0,
++        .rxChannelIndex = UDMA_CH6_GSPI_RX,
++        .txChannelIndex = UDMA_CH7_GSPI_TX,
++        .minDmaTransferSize = 10,
++        .mosiPin = SPICC32XXDMA_PIN_07_MOSI,
++        .misoPin = SPICC32XXDMA_PIN_06_MISO,
++        .clkPin  = SPICC32XXDMA_PIN_05_CLK,
++        .csPin  = SPICC32XXDMA_PIN_08_CS
++    },
++};
++
++/*
++ *  ======== SPI_config ========
++ */
++const SPI_Config SPI_config[CONFIG_SPI_COUNT] = {
++    /* CONFIG_NWP_SPI */
++    {
++        .fxnTablePtr = &SPICC32XXDMA_fxnTable,
++        .object = &spiCC32XXDMAObjects[CONFIG_NWP_SPI],
++        .hwAttrs = &spiCC32XXDMAHWAttrs[CONFIG_NWP_SPI]
++    },
++    /* CONFIG_SPI_0 */
++    {
++        .fxnTablePtr = &SPICC32XXDMA_fxnTable,
++        .object = &spiCC32XXDMAObjects[CONFIG_SPI_0],
++        .hwAttrs = &spiCC32XXDMAHWAttrs[CONFIG_SPI_0]
++    },
++};
++
++const uint_least8_t SPI_count = CONFIG_SPI_COUNT;
++
++
++/*
++ *  =============================== Timer ===============================
++ */
++
++#include <ti/drivers/Timer.h>
++#include <ti/devices/cc32xx/inc/hw_memmap.h>
++#include <ti/devices/cc32xx/inc/hw_ints.h>
++#include <ti/drivers/timer/TimerCC32XX.h>
++
++#define CONFIG_TIMER_COUNT 3
++
++/*
++ *  ======== timerCC32XXObjects ========
++ */
++TimerCC32XX_Object timerCC32XXObjects[CONFIG_TIMER_COUNT];
++
++/*
++ *  ======== timerCC32XXHWAttrs ========
++ */
++const TimerCC32XX_HWAttrs timerCC32XXHWAttrs[CONFIG_TIMER_COUNT] = {
++    /* CONFIG_TIMER_0 */
++    {
++        .baseAddress = TIMERA0_BASE,
++        .subTimer    = TimerCC32XX_timer32,
++        .intNum      = INT_TIMERA0A,
++        .intPriority = (~0)
++    },
++    /* CONFIG_TIMER_1 */
++    {
++        .baseAddress = TIMERA1_BASE,
++        .subTimer    = TimerCC32XX_timer16A,
++        .intNum      = INT_TIMERA1A,
++        .intPriority = (~0)
++    },
++    /* CONFIG_TIMER_2 */
++    {
++        .baseAddress = TIMERA1_BASE,
++        .subTimer    = TimerCC32XX_timer16B,
++        .intNum      = INT_TIMERA1B,
++        .intPriority = (~0)
++    },
++};
++
++/*
++ *  ======== Timer_config ========
++ */
++const Timer_Config Timer_config[CONFIG_TIMER_COUNT] = {
++    /* CONFIG_TIMER_0 */
++    {
++        .fxnTablePtr = &TimerCC32XX_fxnTable,
++        .object      = &timerCC32XXObjects[CONFIG_TIMER_0],
++        .hwAttrs     = &timerCC32XXHWAttrs[CONFIG_TIMER_0]
++    },
++    /* CONFIG_TIMER_1 */
++    {
++        .fxnTablePtr = &TimerCC32XX_fxnTable,
++        .object      = &timerCC32XXObjects[CONFIG_TIMER_1],
++        .hwAttrs     = &timerCC32XXHWAttrs[CONFIG_TIMER_1]
++    },
++    /* CONFIG_TIMER_2 */
++    {
++        .fxnTablePtr = &TimerCC32XX_fxnTable,
++        .object      = &timerCC32XXObjects[CONFIG_TIMER_2],
++        .hwAttrs     = &timerCC32XXHWAttrs[CONFIG_TIMER_2]
++    },
++};
++
++const uint_least8_t Timer_count = CONFIG_TIMER_COUNT;
++
++
++/*
++ *  =============================== UART ===============================
++ */
++
++#include <ti/drivers/UART.h>
++#include <ti/devices/cc32xx/inc/hw_ints.h>
++#include <ti/devices/cc32xx/inc/hw_memmap.h>
++#include <ti/drivers/uart/UARTCC32XXDMA.h>
++
++#define CONFIG_UART_COUNT 1
++
++#define UART0_BASE UARTA0_BASE
++#define UART1_BASE UARTA1_BASE
++#define INT_UART0  INT_UARTA0
++#define INT_UART1  INT_UARTA1
++
++
++UARTCC32XXDMA_Object uartCC32XXObjects0;
++
++static const UARTCC32XXDMA_HWAttrsV1 uartCC32XXHWAttrs0 = {
++    .baseAddr           = UART0_BASE,
++    .intNum             = INT_UART0,
++    .intPriority        = (~0),
++    .flowControl        = UARTCC32XXDMA_FLOWCTRL_NONE,
++    .rxChannelIndex     = UDMA_CH8_UARTA0_RX,
++    .txChannelIndex     = UDMA_CH9_UARTA0_TX,
++    .rxPin              = UARTCC32XXDMA_PIN_57_UART0_RX,
++    .txPin              = UARTCC32XXDMA_PIN_55_UART0_TX,
++    .ctsPin             = UARTCC32XXDMA_PIN_UNASSIGNED,
++    .rtsPin             = UARTCC32XXDMA_PIN_UNASSIGNED,
++    .errorFxn           = NULL
++  };
++
++const UART_Config UART_config[CONFIG_UART_COUNT] = {
++    {   /* CONFIG_UART_0 */
++        .fxnTablePtr = &UARTCC32XXDMA_fxnTable,
++        .object      = &uartCC32XXObjects0,
++        .hwAttrs     = &uartCC32XXHWAttrs0
++    },
++};
++
++const uint_least8_t UART_count = CONFIG_UART_COUNT;
++
++
++
++/*
++ *  =============================== Watchdog ===============================
++ */
++
++#include <ti/drivers/Watchdog.h>
++#include <ti/drivers/watchdog/WatchdogCC32XX.h>
++#include <ti/devices/cc32xx/inc/hw_memmap.h>
++#include <ti/devices/cc32xx/inc/hw_ints.h>
++#include <ti/devices/cc32xx/inc/hw_types.h>
++#include <ti/devices/cc32xx/driverlib/wdt.h>
++
++#define CONFIG_WATCHDOG_COUNT 1
++
++WatchdogCC32XX_Object watchdogCC32XXObjects[CONFIG_WATCHDOG_COUNT];
++
++const WatchdogCC32XX_HWAttrs
++    watchdogCC32XXHWAttrs[CONFIG_WATCHDOG_COUNT] = {
++    /* CONFIG_WATCHDOG_0: period = 1000 */
++    {
++        .baseAddr    = WDT_BASE,
++        .intNum      = INT_WDT,
++        .intPriority = 0x20,
++        .reloadValue = 80000000
++    },
++};
++
++const Watchdog_Config Watchdog_config[CONFIG_WATCHDOG_COUNT] = {
++    /* CONFIG_WATCHDOG_0 */
++    {
++        .fxnTablePtr = &WatchdogCC32XX_fxnTable,
++        .object      = &watchdogCC32XXObjects[0],
++        .hwAttrs     = &watchdogCC32XXHWAttrs[0]
++    }
++};
++
++const uint_least8_t Watchdog_count = CONFIG_WATCHDOG_COUNT;
++
++
++/*
++ *  =============================== Button ===============================
++ */
++#include <ti/drivers/apps/Button.h>
++
++Button_Object ButtonObjects[2];
++
++static const Button_HWAttrs ButtonHWAttrs[2] = {
++    /* CONFIG_BUTTON_0 */
++    /* LaunchPad User Button SW2 (left) */
++    {
++        .gpioIndex = CONFIG_GPIO_0
++    },
++    /* CONFIG_BUTTON_1 */
++    /* LaunchPad User Button SW3 (right) */
++    {
++        .gpioIndex = CONFIG_GPIO_1
++    },
++};
++
++const Button_Config Button_config[2] = {
++    /* CONFIG_BUTTON_0 */
++    /* LaunchPad User Button SW2 (left) */
++    {
++        .object = &ButtonObjects[CONFIG_BUTTON_0],
++        .hwAttrs = &ButtonHWAttrs[CONFIG_BUTTON_0]
++    },
++    /* CONFIG_BUTTON_1 */
++    /* LaunchPad User Button SW3 (right) */
++    {
++        .object = &ButtonObjects[CONFIG_BUTTON_1],
++        .hwAttrs = &ButtonHWAttrs[CONFIG_BUTTON_1]
++    },
++};
++
++const uint_least8_t Button_count = 2;
++
++
++/*
++ *  =============================== LED ===============================
++ */
++#include <ti/drivers/apps/LED.h>
++
++LED_Object LEDObjects[3];
++
++static const LED_HWAttrs LEDHWAttrs[3] = {
++    /* CONFIG_LED_0 */
++    /* LaunchPad LED D10 (Red) */
++    {
++        .type = LED_GPIO_CONTROLLED,
++        .index = CONFIG_LED_0_GPIO,
++    },
++    /* CONFIG_LED_1 */
++    /* LaunchPad LED D8 (Green) */
++    {
++        .type = LED_GPIO_CONTROLLED,
++        .index = CONFIG_LED_1_GPIO,
++    },
++    /* CONFIG_LED_2 */
++    /* LaunchPad LED D9 (Yellow) */
++    {
++        .type = LED_PWM_CONTROLLED,
++        .index = CONFIG_LED_2_PWM,
++    },
++};
++
++const LED_Config LED_config[3] = {
++    /* CONFIG_LED_0 */
++    /* LaunchPad LED D10 (Red) */
++    {
++        .object = &LEDObjects[CONFIG_LED_0],
++        .hwAttrs = &LEDHWAttrs[CONFIG_LED_0]
++    },
++    /* CONFIG_LED_1 */
++    /* LaunchPad LED D8 (Green) */
++    {
++        .object = &LEDObjects[CONFIG_LED_1],
++        .hwAttrs = &LEDHWAttrs[CONFIG_LED_1]
++    },
++    /* CONFIG_LED_2 */
++    /* LaunchPad LED D9 (Yellow) */
++    {
++        .object = &LEDObjects[CONFIG_LED_2],
++        .hwAttrs = &LEDHWAttrs[CONFIG_LED_2]
++    },
++};
++
++const uint_least8_t LED_count = 3;
++
++
++#include <ti/drivers/power/PowerCC32XX.h>
++
++/*
++ * This table defines the parking state to be set for each parkable pin
++ * during LPDS. (Device resources must be parked during LPDS to achieve maximum
++ * power savings.)  If the pin should be left unparked, specify the state
++ * PowerCC32XX_DONT_PARK.  For example, for a UART TX pin, the device
++ * will automatically park the pin in a high state during transition to LPDS,
++ * so the Power Manager does not need to explictly park the pin.  So the
++ * corresponding entries in this table should indicate PowerCC32XX_DONT_PARK.
++ */
++PowerCC32XX_ParkInfo parkInfo[] = {
++/*        PIN                    PARK STATE              Pin Alias
++   -----------------  ------------------------------     ---------------*/
++
++  {PowerCC32XX_PIN01, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP10 */
++  {PowerCC32XX_PIN02, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP11 */
++  {PowerCC32XX_PIN03, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP12 */
++  {PowerCC32XX_PIN04, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP13 */
++  {PowerCC32XX_PIN05, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP14 */
++  {PowerCC32XX_PIN06, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP15 */
++  {PowerCC32XX_PIN07, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP16 */
++  {PowerCC32XX_PIN08, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP17 */
++  {PowerCC32XX_PIN13, PowerCC32XX_WEAK_PULL_DOWN_STD},
++  {PowerCC32XX_PIN15, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP22 */
++  {PowerCC32XX_PIN16, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* TDI */
++  {PowerCC32XX_PIN17, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* TDO */
++  {PowerCC32XX_PIN18, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP28 */
++  {PowerCC32XX_PIN19, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* TCK */
++  {PowerCC32XX_PIN20, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* TMS */
++  {PowerCC32XX_PIN21, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* SOP2 */
++  {PowerCC32XX_PIN29, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP26 */
++  {PowerCC32XX_PIN30, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP27 */
++  {PowerCC32XX_PIN45, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP31 */
++  {PowerCC32XX_PIN50, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP00 */
++  {PowerCC32XX_PIN52, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP32 */
++  {PowerCC32XX_PIN53, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP30 */
++  {PowerCC32XX_PIN55, PowerCC32XX_WEAK_PULL_UP_STD},   /* GP01 */
++  {PowerCC32XX_PIN57, PowerCC32XX_WEAK_PULL_UP_STD},   /* GP02 */
++  {PowerCC32XX_PIN58, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP03 */
++  {PowerCC32XX_PIN59, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP04 */
++  {PowerCC32XX_PIN60, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP05 */
++  {PowerCC32XX_PIN61, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP06 */
++  {PowerCC32XX_PIN62, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP07 */
++  {PowerCC32XX_PIN63, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP08 */
++  {PowerCC32XX_PIN64, PowerCC32XX_WEAK_PULL_DOWN_STD},   /* GP09 */
++};
++
++
++#include <ti/drivers/Board.h>
++
++/*
++ *  ======== Board_initHook ========
++ *  Perform any board-specific initialization needed at startup.  This
++ *  function is declared weak to allow applications to override it if needed.
++ */
++void __attribute__((weak)) Board_initHook(void)
++{
++}
++
++/*
++ *  ======== Board_init ========
++ *  Perform any initialization needed before using any board APIs
++ */
++void Board_init(void)
++{
++    /* ==== /ti/drivers/Power initialization ==== */
++    PRCMCC3200MCUInit();
++    Power_init();
++
++    Board_initHook();
++}
++
++/*
++ *  ======== Board_debugHeader ========
++ *  This structure prevents the CC32XXSF bootloader from overwriting the
++ *  internal FLASH; this allows us to flash a program that will not be
++ *  overwritten by the bootloader with the encrypted program saved in
++ *  "secure/serial flash".
++ *
++ *  This structure must be placed at the beginning of internal FLASH (so
++ *  the bootloader is able to recognize that it should not overwrite
++ *  internal FLASH).
++ */
++#if defined (__SF_DEBUG__) || defined(__SF_NODEBUG__)
++#if defined(__TI_COMPILER_VERSION__)
++#pragma DATA_SECTION(Board_debugHeader, ".dbghdr")
++#pragma RETAIN(Board_debugHeader)
++#elif defined(__IAR_SYSTEMS_ICC__)
++#pragma location=".dbghdr"
++#elif defined(__GNUC__)
++__attribute__ ((section (".dbghdr")))
++#endif
++#if defined(__SF_DEBUG__)
++const uint32_t Board_debugHeader[] = {
++    0x5AA5A55A,
++    0x000FF800,
++    0xEFA3247D
++};
++#elif defined (__SF_NODEBUG__)
++const uint32_t Board_debugHeader[] = {
++    0xFFFFFFFF,
++    0xFFFFFFFF,
++    0xFFFFFFFF
++};
++#endif
++#endif
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.h b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.h
+new file mode 100644
+index 00000000..123ccd19
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.h
+@@ -0,0 +1,154 @@
++/*
++ *  ======== ti_drivers_config.h ========
++ *  Configured TI-Drivers module declarations
++ *
++ *  DO NOT EDIT - This file is generated for the CC3220SF_LAUNCHXL
++ *  by the SysConfig tool.
++ */
++#ifndef ti_drivers_config_h
++#define ti_drivers_config_h
++
++#define CONFIG_SYSCONFIG_PREVIEW
++
++#define CONFIG_CC3220SF_LAUNCHXL
++
++#ifndef DeviceFamily_CC3220
++#define DeviceFamily_CC3220
++#endif
++
++#include <ti/devices/DeviceFamily.h>
++
++#include <stdint.h>
++
++/* support C++ sources */
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++
++/*
++ *  ======== Crypto ========
++ */
++
++#define CONFIG_Crypto_0             0
++
++/*
++ *  ======== GPIO ========
++ */
++
++/* P64, LaunchPad LED D10 (Red) */
++#define CONFIG_LED_0_GPIO           0
++/* P02, LaunchPad LED D8 (Green) */
++#define CONFIG_LED_1_GPIO           1
++/* P04, LaunchPad User Button SW2 (left) */
++#define CONFIG_GPIO_0               2
++/* P15, LaunchPad User Button SW3 (right) */
++#define CONFIG_GPIO_1               3
++
++/* LEDs are active high */
++#define CONFIG_GPIO_LED_ON  (1)
++#define CONFIG_GPIO_LED_OFF (0)
++
++#define CONFIG_LED_ON  (CONFIG_GPIO_LED_ON)
++#define CONFIG_LED_OFF (CONFIG_GPIO_LED_OFF)
++
++
++/*
++ *  ======== PWM ========
++ */
++
++/* P1, LaunchPad LED D9 (Yellow) */
++#define CONFIG_LED_2_PWM            0
++
++
++/*
++ *  ======== SPI ========
++ */
++
++#define CONFIG_NWP_SPI               0
++
++/*
++ *  MOSI: 07
++ *  MISO: 06
++ *  SCLK: 05
++ *  SS: 08
++ */
++#define CONFIG_SPI_0                  1
++
++
++/*
++ *  ======== Timer ========
++ */
++
++#define CONFIG_TIMER_0              0
++#define CONFIG_TIMER_1              1
++#define CONFIG_TIMER_2              2
++
++/*
++ *  ======== UART ========
++ */
++
++/*
++ *  TX: P55
++ *  RX: P57
++ *  XDS110 UART
++ */
++#define CONFIG_UART_0               0
++
++
++/*
++ *  ======== Watchdog ========
++ */
++
++#define CONFIG_WATCHDOG_0           0
++
++
++/*
++ *  ======== Button ========
++ */
++
++/* P04, LaunchPad User Button SW2 (left) */
++#define CONFIG_BUTTON_0             0
++/* P15, LaunchPad User Button SW3 (right) */
++#define CONFIG_BUTTON_1             1
++
++
++/*
++ *  ======== LED ========
++ */
++
++/* P64, LaunchPad LED D10 (Red) */
++#define CONFIG_LED_0                0
++/* P02, LaunchPad LED D8 (Green) */
++#define CONFIG_LED_1                1
++/* P1, LaunchPad LED D9 (Yellow) */
++#define CONFIG_LED_2                2
++
++
++/*
++ *  ======== Board_init ========
++ *  Perform all required TI-Drivers initialization
++ *
++ *  This function should be called once at a point before any use of
++ *  TI-Drivers.
++ */
++extern void Board_init(void);
++
++/*
++ *  ======== Board_initGeneral ========
++ *  (deprecated)
++ *
++ *  Board_initGeneral() is defined purely for backward compatibility.
++ *
++ *  All new code should use Board_init() to do any required TI-Drivers
++ *  initialization _and_ use <Driver>_init() for only where specific drivers
++ *  are explicitly referenced by the application.  <Driver>_init() functions
++ *  are idempotent.
++ */
++#define Board_initGeneral Board_init
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* include guard */
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_net_wifi_config.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_net_wifi_config.c
+new file mode 100644
+index 00000000..fe0c84e3
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_net_wifi_config.c
+@@ -0,0 +1,39 @@
++/*
++ *  ======== ti_drivers_net_wifi_Config.c ========
++ *  Configured SimpleLink Wifi module definitions
++ *
++ *  DO NOT EDIT - This file is generated for the CC32XX
++ *  by the SysConfig tool.
++ */
++
++/* TI-DRIVERS Header files */
++#include <ti/drivers/net/wifi/simplelink.h>
++
++/*
++ *  =============================== SimpleLink Wifi ===============================
++ */
++
++/*
++ *  ======== SimpleLinkWifi_config ========
++ */
++const SlWifiCC32XXConfig_t SimpleLinkWifiCC32XX_config = {
++
++        .Mode = ROLE_STA,
++        .Ipv4Mode = SL_NETCFG_IPV4_STA_ADDR_MODE,
++        .ConnectionPolicy = SL_WLAN_CONNECTION_POLICY(1,0,0,0),
++        .PMPolicy = SL_WLAN_NORMAL_POLICY,
++        .MaxSleepTimeMS = 0,
++        .ScanPolicy = SL_WLAN_SCAN_POLICY(0,0),
++        .ScanIntervalInSeconds = 0,
++        .Ipv4Config = SL_NETCFG_ADDR_DHCP,
++        .Ipv4 = 0,
++        .IpMask = 0,
++        .IpGateway = 0,
++        .IpDnsServer = 0,
++        .DHCPServer = 0,
++        .StartAddress = 0,
++        .LastAddress = 0,
++        .LeaseTime = 0,
++        .ProvisioningStop = 1,
++        .DeleteAllProfile = 0
++};
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_net_config.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_net_config.c
+new file mode 100644
+index 00000000..b3c0ad7e
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_net_config.c
+@@ -0,0 +1,47 @@
++/*
++ *  ======== ti_net_config.c ========
++ *  Configured module definitions for NS
++ *
++ *  DO NOT EDIT - This file is generated by the SysConfig tool.
++ */
++
++
++/*
++ *  ======== ti.net/SlNet ========
++ */
++#include <stdint.h>
++#include <stdlib.h>
++#include "string.h"
++
++#include <ti/net/slnetif.h>
++#include <ti/net/slnetutils.h>
++#include <ti/net/slnetsock.h>
++#include <ti/net/slnet.h>
++#include <ti/drivers/net/wifi/slnetifwifi.h>
++
++/* This generated function must be called after the network stack(s) are
++ * initialized.
++ */
++int32_t ti_net_SlNet_initConfig() {
++    int32_t status;
++
++    status = SlNetIf_init(0);
++
++    if (status == 0) {
++        status = SlNetSock_init(0);
++    }
++
++    if (status == 0) {
++        SlNetUtil_init(0);
++    }
++
++    /* add CONFIG_SLNET interface */
++    if (status == 0) {
++        status = SlNetIf_add(SLNETIF_ID_1, "CC32xx",
++                (const SlNetIf_Config_t *)&SlNetIfConfigWifi,
++                5);
++    }
++
++    return (status);
++}
++
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c
+new file mode 100644
+index 00000000..0dcab4d8
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c
+@@ -0,0 +1,235 @@
++/*
++ * Copyright (c) 2016, Texas Instruments Incorporated
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * *  Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * *  Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * *  Neither the name of Texas Instruments Incorporated nor the names of
++ *    its contributors may be used to endorse or promote products derived
++ *    from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
++ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
++ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
++ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
++ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
++ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
++ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++ /*
++ *  Terminal
++ */
++
++// Standard includes
++#include <stdio.h>
++#include <stdarg.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "uart_term.h"
++
++extern int vsnprintf(char * s,
++                     size_t n,
++                     const char * format,
++                     va_list arg);
++
++//*****************************************************************************
++//                          LOCAL DEFINES
++//*****************************************************************************
++#define IS_SPACE(x)       (x == 32 ? 1 : 0)
++
++//*****************************************************************************
++//                 GLOBAL VARIABLES
++//*****************************************************************************
++static UART_Handle uartHandle;
++
++//*****************************************************************************
++//
++//! Initialization
++//!
++//! This function
++//!        1. Configures the UART to be used.
++//!
++//! \param  none
++//!
++//! \return none
++//
++//*****************************************************************************
++UART_Handle InitTerm(void)
++{
++    UART_Params uartParams;
++
++    UART_init();
++    UART_Params_init(&uartParams);
++
++    uartParams.writeDataMode = UART_DATA_BINARY;
++    uartParams.readDataMode = UART_DATA_BINARY;
++    uartParams.readReturnMode = UART_RETURN_FULL;
++    uartParams.readEcho = UART_ECHO_OFF;
++    uartParams.baudRate = 115200;
++
++    uartHandle = UART_open(CONFIG_UART_0, &uartParams);
++    /* remove uart receive from LPDS dependency */
++    UART_control(uartHandle, UART_CMD_RXENABLE, NULL);
++
++    return(uartHandle);
++}
++
++//*****************************************************************************
++//
++//! prints the formatted string on to the console
++//!
++//! \param[in]  format  - is a pointer to the character string specifying the
++//!                       format in the following arguments need to be
++//!                       interpreted.
++//! \param[in]  [variable number of] arguments according to the format in the
++//!             first parameters
++//!
++//! \return count of characters printed
++//
++//*****************************************************************************
++int __wrap_vprintf(const char *pcFormat,
++           va_list args)
++{   
++    int iRet = 0;
++    char        *pcBuff;
++    char        *pcTemp;
++    int iSize = 256;
++
++    pcBuff = (char*)malloc(iSize);
++    if(pcBuff == NULL)
++    {
++        return(-1);
++    }
++    while(1)
++    {
++        iRet = vsnprintf(pcBuff, iSize, pcFormat, args);
++        if((iRet > -1) && (iRet < iSize))
++        {
++            break;
++        }
++        else
++        {
++            iSize *= 2;
++            if((pcTemp = realloc(pcBuff, iSize)) == NULL)
++            {
++                Message("Could not reallocate memory\n\r");
++                iRet = -1;
++                break;
++            }
++            else
++            {
++                pcBuff = pcTemp;
++            }
++        }
++    }
++    Message(pcBuff);
++    free(pcBuff);
++
++    return(iRet);
++}
++
++int __wrap_printf(const char *format, ...)
++{
++   va_list args;
++
++   va_start(args, format);
++   vprintf(format, args);
++   va_end(args);
++}
++
++//*****************************************************************************
++//
++//! Outputs a character string to the console
++//!
++//! This function
++//!        1. prints the input string character by character on to the console.
++//!
++//! \param[in]  str - is the pointer to the string to be printed
++//!
++//! \return none
++//!
++//! \note If UART_NONPOLLING defined in than Message or UART write should be
++//!       called in task/thread context only.
++//
++//*****************************************************************************
++void Message(const char *str)
++{
++#ifdef UART_NONPOLLING
++    UART_write(uartHandle, str, strlen(str));
++#else
++    UART_writePolling(uartHandle, str, strlen(str));
++#endif
++}
++
++//*****************************************************************************
++//
++//! Read a character from the console
++//!
++//! \param none
++//!
++//! \return Character
++//
++//*****************************************************************************
++char getch(void)
++{
++    char ch;
++
++    UART_read(uartHandle, &ch, 1);
++    return(ch);
++}
++
++
++//*****************************************************************************
++//
++//! Outputs a character to the console
++//!
++//! \param[in]  char    - A character to be printed
++//!
++//! \return none
++//
++//*****************************************************************************
++void putch(char ch)
++{
++    UART_writePolling(uartHandle, &ch, 1);
++}
++
++int __wrap_putc(int ch, FILE *f)
++{
++    putch(ch);
++    return ch;
++}
++
++int __wrap_putchar(int ch)
++{
++    return __wrap_putc(ch,NULL);
++}
++
++int __wrap_puts(const char *_ptr)
++{
++    int len=0;
++
++    char *s=(char*)_ptr;
++    while(*s!='\0')
++    {
++        __wrap_putchar(*s++);
++        len++;
++    }
++    putch('\r');
++    putch('\n');
++    return len;
++}
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h b/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h
+new file mode 100644
+index 00000000..c38019ca
+--- /dev/null
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h
+@@ -0,0 +1,27 @@
++#ifndef __UART_IF_H__
++#define __UART_IF_H__
++
++// TI-Driver includes
++#include <ti/drivers/UART.h>
++#include "ti_drivers_config.h"
++
++//Defines
++
++#define UART_PRINT Report
++#define DBG_PRINT  Report
++#define ERR_PRINT(x) Report("Error [%d] at line [%d] in function [%s]  \n\r",\
++                                                                x, __LINE__, \
++                                                                 __FUNCTION__)
++
++/* API */
++
++UART_Handle InitTerm(void);
++
++void Message(const char *str);
++
++
++char getch(void);
++
++void putch(char ch);
++
++#endif // __UART_IF_H__
+diff --git a/imports.mak b/imports.mak
+index ad678662..e9313ed7 100644
+--- a/imports.mak
++++ b/imports.mak
+@@ -17,14 +17,18 @@
+ # that if multiple *_ARMCOMPILER cgtool variables are set, the sub-makes
+ # will build using each non-empty *_ARMCOMPILER cgtool.
+ #
++TOOL_PATH = /opt/ti#modify it by your system
+ 
+-XDC_INSTALL_DIR        ?= /home/username/ti/xdctools_3_60_02_34_core
+-SYSCONFIG_TOOL         ?= /home/username/ti/ccs930/ccs/utils/sysconfig/sysconfig_cli.sh
++IMPORT_MK_FILE_PATH    ?= $(abspath $(lastword $(MAKEFILE_LIST)))
++IMPORT_MK_FILE_DIR     ?= $(patsubst %/, %, $(dir $(IMPORT_MK_FILE_PATH)))
++$(eval BSP_PATH        ?= $(patsubst %/, %, $(dir $(IMPORT_MK_FILE_DIR))))
+ 
+-FREERTOS_INSTALL_DIR   ?= /home/username/FreeRTOSv10.1.1
++FREERTOS_INSTALL_DIR   ?= $(BSP_PATH)/cc3220sf/FreeRTOS-10.1.1
++XDC_INSTALL_DIR        ?= $(TOOL_PATH)/ccs930/xdctools_3_60_02_34_core
++SYSCONFIG_TOOL         ?= $(TOOL_PATH)/ccs930/ccs/utils/sysconfig/sysconfig_cli.sh
+ 
+-CCS_ARMCOMPILER        ?= /home/username/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_18.12.4.LTS
+-GCC_ARMCOMPILER        ?= /home/username/ti/ccs930/ccs/tools/compiler/gcc-arm-none-eabi-7-2017-q4-major
++CCS_ARMCOMPILER        ?= $(TOOL_PATH)/ccs930/ccs/tools/compiler/ti-cgt-arm_18.12.4.LTS
++GCC_ARMCOMPILER        ?= $(TOOL_PATH)/ccs930/ccs/tools/compiler/gcc-arm-none-eabi-7-2017-q4-major
+ 
+ # The IAR compiler is not supported on Linux
+ # IAR_ARMCOMPILER      ?=
+diff --git a/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/FreeRTOSConfig.h b/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/FreeRTOSConfig.h
+index 6e7fc379..bf7a703e 100644
+--- a/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/FreeRTOSConfig.h
++++ b/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/FreeRTOSConfig.h
+@@ -66,7 +66,7 @@ supported, or if both static and dynamic allocation are supported. */
+ #define configMINIMAL_STACK_SIZE        ( ( unsigned short ) 256 )
+ #define configMAX_TASK_NAME_LEN         ( 12 )
+ 
+-#define configTOTAL_HEAP_SIZE           ( ( size_t ) ( 0x8000 ) )
++#define configTOTAL_HEAP_SIZE           ( ( size_t ) ( 0x20000 ) )
+ 
+ /* Default stack size for TI-POSIX threads (in words) */
+ #define configPOSIX_STACK_SIZE          ( ( unsigned short ) 512 )
+@@ -103,7 +103,7 @@ supported, or if both static and dynamic allocation are supported. */
+ #define configTIMER_QUEUE_LENGTH        (20)
+ #define configTIMER_TASK_STACK_DEPTH    (configMINIMAL_STACK_SIZE * 2)
+ 
+-#define configENABLE_BACKWARD_COMPATIBILITY 0
++#define configENABLE_BACKWARD_COMPATIBILITY 1
+ 
+ #if defined(__TI_COMPILER_VERSION__)
+ #include <ti/posix/freertos/PTLS.h>
+diff --git a/kernel/freertos/makefile b/kernel/freertos/makefile
+index edbce1e3..ec5b9be0 100644
+--- a/kernel/freertos/makefile
++++ b/kernel/freertos/makefile
+@@ -19,22 +19,14 @@
+ BOARDNAME ?= *
+ 
+ # Find subdirectories
+-RELEASE-CCS-SUBDIRS   = $(wildcard builds/$(BOARDNAME)/release/ccs/.)
+ RELEASE-GCC-SUBDIRS   = $(wildcard builds/$(BOARDNAME)/release/gcc/.)
+-RELEASE-IAR-SUBDIRS   = $(wildcard builds/$(BOARDNAME)/release/iar/.)
+ 
+ include ../../imports.mak
+ 
+ RELEASE-SUBDIRS =
+-ifneq ($(CCS_ARMCOMPILER),)
+-	RELEASE-SUBDIRS += $(RELEASE-CCS-SUBDIRS)
+-endif
+ ifneq ($(GCC_ARMCOMPILER),)
+ 	RELEASE-SUBDIRS += $(RELEASE-GCC-SUBDIRS)
+ endif
+-ifneq ($(IAR_ARMCOMPILER),)
+-	RELEASE-SUBDIRS += $(RELEASE-IAR-SUBDIRS)
+-endif
+ 
+ .PHONY: release debug $(RELEASE-SUBDIRS) $(DEBUG-SUBDIRS)
+ 
+diff --git a/kernel/makefile b/kernel/makefile
+index ce65da7e..60179e19 100644
+--- a/kernel/makefile
++++ b/kernel/makefile
+@@ -1,35 +1,6 @@
+ # rules for building
+ all: release debug
+ 
+-# the following content will be active only if a 'tirtos' subdir exists
+-ifeq ($(wildcard tirtos), tirtos)
+-
+-.PHONY: tirtos-release tirtos-debug
+-
+-release: tirtos-release
+-debug: tirtos-debug
+-
+-tirtos-release:
+-	@ $(MAKE) -C tirtos release
+-
+-tirtos-debug:
+-	@ $(MAKE) -C tirtos debug
+-
+-# rules for cleaning
+-clean: clean-release clean-debug
+-
+-clean-release: clean-tirtos-release
+-
+-clean-debug: clean-tirtos-debug
+-
+-clean-tirtos-release:
+-	@ $(MAKE) -C tirtos clean-release
+-
+-clean-tirtos-debug:
+-	@ $(MAKE) -C tirtos clean-debug
+-
+-endif
+-
+ # the following content will be active only if a 'freertos' subdir exists
+ ifeq ($(wildcard freertos), freertos)
+ 
+@@ -44,6 +15,9 @@ freertos-release:
+ 
+ freertos-debug:
+ 
++# rules for cleaning
++clean: clean-release
++
+ # rules for cleaning
+ clean-release: clean-freertos-release
+ 
+diff --git a/source/ti/net/bsd/sys/select.h b/source/ti/net/bsd/sys/select.h
+index 71f85c8e..5d2674d0 100644
+--- a/source/ti/net/bsd/sys/select.h
++++ b/source/ti/net/bsd/sys/select.h
+@@ -39,8 +39,6 @@
+ #include <../include/sys/select.h>
+ #endif
+ 
+-/* POSIX requires this file define timeval.  We do that via sys/time.h */
+-#include <sys/time.h>
+ 
+ #include <ti/net/bsd/errnoutil.h>
+ #include <ti/net/slnetsock.h>
+diff --git a/source/ti/net/bsd/sys/socket.h b/source/ti/net/bsd/sys/socket.h
+index 69696e02..6b3f7319 100644
+--- a/source/ti/net/bsd/sys/socket.h
++++ b/source/ti/net/bsd/sys/socket.h
+@@ -38,11 +38,17 @@
+ 
+ #include <ti/net/bsd/errnoutil.h>
+ #include <ti/net/slnetsock.h>
++#include <ti/net/bsd/arpa/inet.h>
++#include <ti/net/bsd/sys/select.h>
+ 
+ #ifdef    __cplusplus
+ extern "C" {
+ #endif
+ 
++typedef unsigned short  ushort;         /* System V compatibility */
++typedef unsigned int    uint;           /* System V compatibility */
++typedef unsigned long   ulong;          /* System V compatibility */
++
+ /* structs */
+ #define socklen_t                           SlNetSocklen_t
+ #define sockaddr                            SlNetSock_Addr_t
+@@ -77,9 +83,11 @@ typedef struct linger
+ #define SO_LINGER                           SLNETSOCK_OPSOCK_LINGER
+ #define SO_RX_NO_IP_BOUNDARY                SLNETSOCK_OPSOCK_NON_IP_BOUNDARY
+ #define SO_RCVTIMEO                         SLNETSOCK_OPSOCK_RCV_TIMEO
++#define SO_SNDTIMEO                         SLNETSOCK_OPSOCK_RCV_TIMEO
+ #define SO_RCVBUF                           SLNETSOCK_OPSOCK_RCV_BUF
+ #define SO_NONBLOCKING                      SLNETSOCK_OPSOCK_NON_BLOCKING
+ #define SO_BROADCAST                        SLNETSOCK_OPSOCK_BROADCAST
++#define SO_ERROR                            SLNETSOCK_OPSOCK_ERROR
+ #define MSG_OOB                             SLNETSOCK_MSG_OOB
+ #define MSG_PEEK                            SLNETSOCK_MSG_PEEK
+ #define MSG_WAITALL                         SLNETSOCK_MSG_WAITALL
+@@ -88,7 +96,24 @@ typedef struct linger
+ #define MSG_NOSIGNAL                        SLNETSOCK_MSG_NOSIGNAL
+ #define SO_REUSEADDR                        (201)
+ #define SO_SNDBUF                           (202)
++#define SO_TYPE                             (0x1008)
++
++/* commands for fnctl */
++#ifndef F_GETFL
++#define F_GETFL 3
++#endif
++#ifndef F_SETFL
++#define F_SETFL 4
++#endif
+ 
++/* File status flags and file access modes for fnctl,
++   these are bits in an int. */
++#ifndef O_NONBLOCK
++#define O_NONBLOCK  1 /* nonblocking I/O */
++#endif
++#ifndef O_NDELAY
++#define O_NDELAY    1 /* same as O_NONBLOCK, for compatibility */
++#endif
+ 
+ /* socket shutdown opts */
+ #define SHUT_RD                             SLNETSOCK_SHUT_RD
+diff --git a/source/ti/net/slnetsock.h b/source/ti/net/slnetsock.h
+index 11594b50..80e537ab 100644
+--- a/source/ti/net/slnetsock.h
++++ b/source/ti/net/slnetsock.h
+@@ -191,7 +191,7 @@ interface.  Some are mandatory, others are optional (but recommended).
+ #define __SL_NET_SOCK_H__
+ 
+ #include <stdint.h>
+-#include <sys/time.h>
++#include <sys/_timeval.h>
+ 
+ #ifdef    __cplusplus
+ extern "C" {
+-- 
+2.17.1
+

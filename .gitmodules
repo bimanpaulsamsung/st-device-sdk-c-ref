@@ -28,3 +28,6 @@
 [submodule "bsp/tizenrt"]
 	path = bsp/tizenrt
 	url = https://github.com/Samsung/TizenRT/
+[submodule "bsp/cc3220sf"]
+	path = bsp/cc3220sf
+	url = git@github.sec.samsung.net:STDK/ti-cc3220sf.git
