@@ -1,19 +1,20 @@
-From 50e634ea43070149fa7d273188b468fcd17ebe66 Mon Sep 17 00:00:00 2001
+From 915a40c07e869a5e1c732f8ca306fe335795147d Mon Sep 17 00:00:00 2001
 From: "baojun.luo" <baojun.luo@samsung.com>
 Date: Wed, 15 Jan 2020 19:16:52 +0900
 Subject: [PATCH] Add stdk compile for emw3166
 
 Signed-off-by: baojun.luo <baojun.luo@samsung.com>
+Signed-off-by: qin.li <qin.li@samsung.com>
 ---
  MiCO/MiCO.mk                                      |  6 ++-
  MiCO/iot_main.c                                   | 16 +++++++
  MiCO/mico_config.h                                | 16 +++++++
  MiCO/system/system.mk                             |  2 +-
- makefiles/config.mk                               | 53 +++++++++++++++++++++++
- makefiles/mico_target_config.mk                   | 44 ++++++++++++++++---
+ makefiles/config.mk                               | 58 +++++++++++++++++++++++
+ makefiles/mico_target_config.mk                   | 44 ++++++++++++++---
  makefiles/micoder_host_cmd.mk                     |  2 +-
  platform/MCU/STM32F4xx/peripherals/platform_rng.c | 16 ++++---
- 8 files changed, 139 insertions(+), 16 deletions(-)
+ 8 files changed, 144 insertions(+), 16 deletions(-)
  create mode 100644 MiCO/iot_main.c
  create mode 100644 MiCO/mico_config.h
  create mode 100644 makefiles/config.mk
@@ -102,10 +103,10 @@ index 25755f8..b837867 100644
  $(NAME)_SOURCES += config_server/config_server_menu.c \
 diff --git a/makefiles/config.mk b/makefiles/config.mk
 new file mode 100644
-index 0000000..f06df3b
+index 0000000..bbd0b65
 --- /dev/null
 +++ b/makefiles/config.mk
-@@ -0,0 +1,53 @@
+@@ -0,0 +1,58 @@
 +########################################
 +# Config
 +########################################
@@ -113,6 +114,7 @@ index 0000000..f06df3b
 +#/* For STDK */
 +CONFIG_STDK_IOT_CORE=y
 +CONFIG_STDK_IOT_CORE_USE_MBEDTLS=y
++CONFIG_STDK_IOT_CORE_NET_MBEDTLS=y
 +CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP=y
 +CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP=y
 +CONFIG_STDK_IOT_CORE_BSP_SUPPORT_EMW3166=y
@@ -129,6 +131,10 @@ index 0000000..f06df3b
 +
 +ifeq ($(CONFIG_STDK_IOT_CORE_USE_MBEDTLS),y)
 +STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE_USE_MBEDTLS
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_NET_MBEDTLS),y)
++STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE_NET_MBEDTLS
 +endif
 +
 +ifeq ($(CONFIG_STDK_IOT_CORE_BSP_SUPPORT_EMW3166),y)

@@ -1,7 +1,7 @@
-From 894dc1ded502e91db543de9ded3a99cebe7bf4b7 Mon Sep 17 00:00:00 2001
+From 3a56d857b273e3681f41280552ca65246975c17e Mon Sep 17 00:00:00 2001
 From: "baojun.luo" <baojun.luo@samsung.com>
 Date: Wed, 15 Jan 2020 19:29:25 +0900
-Subject: [PATCH 4/6] Add Libsodim for stdk
+Subject: [PATCH] Add Libsodim for stdk
 
 Signed-off-by: baojun.luo <baojun.luo@samsung.com>
 ---
@@ -250,8 +250,8 @@ Signed-off-by: baojun.luo <baojun.luo@samsung.com>
  MiCO/security/libsodium/sodium/runtime.c           |  297 +++
  MiCO/security/libsodium/sodium/utils.c             |  733 ++++++
  MiCO/security/libsodium/sodium/version.c           |   30 +
- MiCO/security/security.mk                          |    4 +-
- 246 files changed, 36247 insertions(+), 1 deletion(-)
+ MiCO/security/security.mk                          |    7 +-
+ 246 files changed, 36247 insertions(+), 4 deletions(-)
  create mode 100644 MiCO/security/libsodium/component.mk
  create mode 100644 MiCO/security/libsodium/crypto_aead/aes256gcm/aesni/aead_aes256gcm_aesni.c
  create mode 100644 MiCO/security/libsodium/crypto_aead/chacha20poly1305/sodium/aead_chacha20poly1305.c
@@ -38213,19 +38213,18 @@ index 0000000..4e584a6
 +#endif
 +}
 diff --git a/MiCO/security/security.mk b/MiCO/security/security.mk
-index 44122d3..2866359 100644
+index 041d127..95cb032 100644
 --- a/MiCO/security/security.mk
 +++ b/MiCO/security/security.mk
-@@ -27,9 +27,11 @@ GLOBAL_INCLUDES += SHAUtils
+@@ -27,8 +27,7 @@ GLOBAL_INCLUDES += SHAUtils
  $(NAME)_COMPONENTS += MiCO/security/SRP_6a
  
  #Sodium
 -$(NAME)_COMPONENTS += MiCO/security/Sodium
+-
+-
+-
 +#$(NAME)_COMPONENTS += MiCO/security/Sodium
- 
- #Openssl
- $(NAME)_COMPONENTS += MiCO/security/TLS/openssl
- 
  
 +#libsodim
 +$(NAME)_COMPONENTS += MiCO/security/libsodium
