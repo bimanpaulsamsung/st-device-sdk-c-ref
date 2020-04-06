@@ -31,7 +31,7 @@
 #include "iot_os_util.h"
 
 #define UART_BUF_SIZE (20)
-#define UART_LINE_SIZE (128)
+#define UART_LINE_SIZE (MAX_UART_LINE_SIZE)
 
 #define PROMPT_STRING "STDK # "
 

@@ -46,6 +46,7 @@
 
 #define UART_BUF_SIZE (20)
 extern int g_StopMainTask;
+extern IOT_CTX *ctx;
 
 
 static int _cli_copy_nth_arg(char* dest, char* src, int size, int n)
@@ -1368,6 +1369,21 @@ exit:
 	return;
 }
 
+static void _cli_cmd_pub_event(char *string)
+{
+	char buf[MAX_UART_LINE_SIZE];
+
+	if (ctx == NULL) {
+		printf("ctx is NULL\n");
+		return;
+	}
+
+	if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+		printf("event payload %s\n", buf);
+		st_publish_event_raw(ctx, buf);
+	}
+}
+
 static struct cli_command cmd_list[] = {
 	{"heap_dump", "heap_dump start_address size OR heap_dump all", _cli_cmd_heap_dump},
 	{"heap_trace", "heap_trace [start|stop|resume|dump]", _cli_cmd_heap_trace},
@@ -1392,6 +1408,7 @@ static struct cli_command cmd_list[] = {
 	{"ifconfig", "show network and wifi status", _cli_cmd_network_ifconfig},
 	{"iperf", "run iperf : iperf -s -i 1 or iperf -c xx.xx.xx.xx -i 1", _cli_cmd_network_iperf},
 	{"wifitest", "wifi test(wifitest rssi 10, wifitest scan 10)", _cli_cmd_network_wifitest},
+	{"pub_event", "pub_event [event payload]", _cli_cmd_pub_event},
 	{"dummy", "dummy cmd", _cli_cmd_dummy_cmd},
 };
 
