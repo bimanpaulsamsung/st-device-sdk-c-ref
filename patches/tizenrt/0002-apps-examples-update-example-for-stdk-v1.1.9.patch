@@ -1,0 +1,48 @@
+From 1966577408417cf592ab4eb0ff521c2fc7ed1b49 Mon Sep 17 00:00:00 2001
+From: "qin.li" <qin.li@samsung.com>
+Date: Mon, 13 Apr 2020 15:18:13 +0800
+Subject: [PATCH] apps/examples: update example for stdk v1.1.9
+
+---
+ apps/examples/stdk_smart_lamp/smart_lamp.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/apps/examples/stdk_smart_lamp/smart_lamp.c b/apps/examples/stdk_smart_lamp/smart_lamp.c
+index 625a400..1eab871 100644
+--- a/apps/examples/stdk_smart_lamp/smart_lamp.c
++++ b/apps/examples/stdk_smart_lamp/smart_lamp.c
+@@ -24,6 +24,7 @@
+ #include "device_info.h"
+ #include "onboarding_config.h"
+ #include "iot_os_util.h"
++#include "json/cJSON.h"
+ 
+ static const char *TAG = "SLamp";
+ #define SL_LOGE(tag, format, ...) do {printf("%s ", tag); printf(format"\n", ##__VA_ARGS__); } while (0)
+@@ -201,12 +202,20 @@ void cap_color_init_cb(IOT_CAP_HANDLE *handle, void *usr_data)
+ 
+ void cap_color_cmd_cb(IOT_CAP_HANDLE *handle, iot_cap_cmd_data_t *cmd_data, void *usr_data)
+ {
++	cJSON *json = NULL;
+ 	int tmp_state;
+-	SL_LOGI(TAG, "called [%s] func with : num_args:%u",
++	SL_LOGI(TAG, "called [%s] with : num_args:%u",
+ 		__func__, cmd_data->num_args);
+ 
+-	smartlamp_color_saturation = cmd_data->cmd_data[0].number;
+-	smartlamp_color_hue = cmd_data->cmd_data[1].number;
++	if (cmd_data->cmd_data[0].type == IOT_CAP_VAL_TYPE_INT_OR_NUM) {
++		smartlamp_color_saturation = cmd_data->cmd_data[0].number;
++		smartlamp_color_hue = cmd_data->cmd_data[1].number;
++	} else if (cmd_data->cmd_data[0].type == IOT_CAP_VAL_TYPE_JSON_OBJECT) {
++		json = cJSON_Parse(cmd_data->cmd_data[0].json_object);
++		smartlamp_color_saturation = cJSON_GetObjectItem(json, "saturation")->valuedouble;
++		smartlamp_color_hue = cJSON_GetObjectItem(json, "hue")->valuedouble;
++		cJSON_Delete(json);
++	}
+ 
+ 	update_rgb_from_hsl(smartlamp_color_hue, smartlamp_color_saturation, smartlamp_color_level,
+ 					&smartlamp_color_red, &smartlamp_color_green, &smartlamp_color_blue);
+-- 
+2.7.4
+

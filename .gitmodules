@@ -25,3 +25,6 @@
 [submodule "bsp/emw3080/mico-os"]
 	path = bsp/emw3080/mico-os
 	url = https://github.com/MXCHIP/mico-os
+[submodule "bsp/tizenrt"]
+	path = bsp/tizenrt
+	url = https://github.com/Samsung/TizenRT/

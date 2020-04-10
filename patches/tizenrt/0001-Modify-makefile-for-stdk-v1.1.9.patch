@@ -1,0 +1,80 @@
+From 4550d63238989c923f93c12841feb43b2ca048db Mon Sep 17 00:00:00 2001
+From: "qin.li" <qin.li@samsung.com>
+Date: Fri, 10 Apr 2020 11:47:15 +0800
+Subject: [PATCH] Modify makefile for stdk v1.1.9
+
+---
+ build/configs/esp_wrover_kit/STDK/defconfig | 4 ++--
+ external/stdk/Makefile                      | 9 ++++++++-
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/build/configs/esp_wrover_kit/STDK/defconfig b/build/configs/esp_wrover_kit/STDK/defconfig
+index db57090..e75d6d4 100644
+--- a/build/configs/esp_wrover_kit/STDK/defconfig
++++ b/build/configs/esp_wrover_kit/STDK/defconfig
+@@ -310,7 +310,7 @@ CONFIG_DEV_CONSOLE=y
+ # CONFIG_FDCLONE_DISABLE is not set
+ # CONFIG_FDCLONE_STDIO is not set
+ # CONFIG_SDCLONE_DISABLE is not set
+-CONFIG_NFILE_DESCRIPTORS=8
++CONFIG_NFILE_DESCRIPTORS=16
+ CONFIG_NFILE_STREAMS=8
+ CONFIG_NAME_MAX=32
+ CONFIG_PRIORITY_INHERITANCE=y
+@@ -540,7 +540,7 @@ CONFIG_NET_IPv6_DUP_DETECT_ATTEMPTS=1
+ # Socket support
+ #
+ CONFIG_NET_SOCKET=y
+-CONFIG_NBSDSOCKET_DESCRIPTORS=8
++CONFIG_NBSDSOCKET_DESCRIPTORS=16
+ CONFIG_NET_TCP_KEEPALIVE=y
+ CONFIG_NET_RAW=y
+ # CONFIG_NET_SOCKET_OPTION_BROADCAST is not set
+diff --git a/external/stdk/Makefile b/external/stdk/Makefile
+index a307cb1..4fe36f2 100644
+--- a/external/stdk/Makefile
++++ b/external/stdk/Makefile
+@@ -24,18 +24,21 @@ STDK_INCLUDE_DIR = ./st-device-sdk-c/src/include
+ STDK_SRC_DIR = ./st-device-sdk-c/src
+ BILERPLATE_HEADER = $(STDK_INCLUDE_DIR)/certs/boilerplate.h
+ ROOT_CA_FILE = $(STDK_SRC_DIR)/certs/root_ca.pem
++ROOT_CA_FILE_LIST=$(wildcard $(STDK_SRC_DIR)/certs/root_ca_*.pem)
+ ROOT_CA_SOURCE = $(STDK_SRC_DIR)/iot_root_ca.c
+ ROOT_CA_BACKUP_FILE = $(ROOT_CA_SOURCE).bak
+ 
+ ASRCS =
+ 
+-CFLAGS += -std=c99 -D_GNU_SOURCE
++CFLAGS += -std=c99 -D_GNU_SOURCE -DCBOR_NO_FLOATING_POINT
+ CFLAGS += -Wall -Wno-error -pipe
+ 
+ CFLAGS += -I$(STDK_INCLUDE_DIR)
+ CFLAGS += -I$(STDK_INCLUDE_DIR)/bsp
+ CFLAGS += -I$(STDK_INCLUDE_DIR)/os
+ CFLAGS += -I$(STDK_INCLUDE_DIR)/mqtt
++CFLAGS += -I$(STDK_INCLUDE_DIR)/external
++CFLAGS += -I$(STDK_SRC_DIR)/deps/cbor/tinycbor/src
+ 
+ CFLAGS += -I$(TOPDIR)/kernel
+ CFLAGS += -I$(TOPDIR)/../external/include/json
+@@ -72,6 +75,8 @@ else
+ 	CFLAGS += -DCONFIG_STDK_IOT_CORE_OS_SUPPORT_TIZENRT
+ endif
+ 
++CSRCS	+= $(wildcard $(STDK_SRC_DIR)/deps/cbor/tinycbor/src/*.c)
++
+ CSRCS	+= $(wildcard $(STDK_SRC_DIR)/crypto/*.c)
+ ifeq ($(CONFIG_STDK_IOT_CORE_USE_MBEDTLS),y)
+ CSRCS	+= $(wildcard $(STDK_SRC_DIR)/crypto/mbedtls/*.c)
+@@ -126,6 +131,8 @@ $(COBJS): %$(OBJEXT): %.c
+ #################################################
+ # certificate
+ #################################################
++$(shell rm -f $(ROOT_CA_FILE) 2> /dev/null)
++$(foreach file, $(ROOT_CA_FILE_LIST), $(shell cat $(file) >> $(ROOT_CA_FILE)))
+ context:
+ 	$(Q) cat $(BILERPLATE_HEADER) > $(ROOT_CA_SOURCE); echo $$?;
+ 	$(Q) xxd -i $(ROOT_CA_FILE) >> $(ROOT_CA_SOURCE); echo $$?;
+-- 
+2.7.4
+
