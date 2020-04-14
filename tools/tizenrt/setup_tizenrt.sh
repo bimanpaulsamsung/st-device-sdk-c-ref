@@ -18,7 +18,14 @@ if [ "$?" == "0" ]; then
 	cd os
 	#source ./tools/setenv.sh ~/gcc-arm-none-eabi-6-2017-q1-update/bin
 	#config with different board
-	./tools/configure.sh esp_wrover_kit/STDK
+	./dbuild.sh clean
+	./dbuild.sh distclean
+	if [ "${BOARD_NAME}" == "esp32" ]; then
+		./tools/configure.sh esp_wrover_kit/STDK
+	elif [ "${BOARD_NAME}" == "artik053" ]; then
+		./tools/configure.sh artik053/STDK
+	fi
+
 else
 	if [ "$(ls bsp/${CHIP_NAME})" == "" ]; then
 		echo "Failed to find source code in bsp/${CHIP_NAME}"
@@ -31,6 +38,7 @@ else
 		git submodule update --init external/libsodium/libsodium
 		#ln -s ../../../../../iot-core/src external/stdk/st-device-sdk-c/src
 		
+		rm -rf external/stdk/st-device-sdk-c/*
 		cp -r ../../iot-core/* external/stdk/st-device-sdk-c/
 		
 		for patch in ../../patches/${CHIP_NAME}/*
@@ -39,7 +47,13 @@ else
 		
 		cd os
 		#config with different board
-		./tools/configure.sh esp_wrover_kit/STDK
+		./dbuild.sh clean
+		./dbuild.sh distclean
+		if [ "${BOARD_NAME}" == "esp32" ]; then
+			./tools/configure.sh esp_wrover_kit/STDK
+		elif [ "${BOARD_NAME}" == "artik053" ]; then
+			./tools/configure.sh artik053/STDK
+		fi
 	fi
 	echo "Check source code in bsp/${CHIP_NAME}"
 fi

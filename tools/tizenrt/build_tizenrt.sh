@@ -11,16 +11,15 @@ IOT_OUTPUT_PATH="${PWD}/output/${CHIP_NAME}"
 OUTPUT_BUILD=y
 
 print_usage () {
-	echo "    Usage: ./build.sh rtl8195 APP_NAME"
+	echo "    Usage: ./build.sh tizenrt BORAD_NAME APP_NAME"
 	echo "- - - - - - - - - - - - - - - - - - -"
-	echo "    ex) ./build.sh rtl8195 st_switch"
-	echo "    ex) ./build.sh rtl8195 st_lamp"
 	echo "    ex) ./build.sh tizenrt esp32 st_lamp"
 	echo "    ex) ./build.sh tizenrt esp32 st_lamp download"
+	echo "    ex) ./build.sh tizenrt artik053 st_lamp"
 	echo
 }
 
-if [ "${4}" = "clean" ]; then
+if [ "${4}" == "clean" ]; then
 	OUTPUT_BUILD=n
 
 	pushd ${PROJECT}/os/ > /dev/null
@@ -30,7 +29,7 @@ if [ "${4}" = "clean" ]; then
 	exit
 fi
 
-if [ "${BOARD_NAME}" = "" ]; then
+if [ "${BOARD_NAME}" == "" ]; then
 	print_usage
 	exit
 fi
@@ -42,7 +41,7 @@ fi
 
 pushd ${PROJECT}/os/ > /dev/null
 
-if [ "${4}" = "download" ]; then
+if [ "${4}" == "download" ]; then
 #make download ALL
 ./dbuild.sh build download ALL
 else
@@ -52,9 +51,13 @@ fi
 
 popd > /dev/null
 
-if [ ${OUTPUT_BUILD} = y ]; then
+if [ ${OUTPUT_BUILD} == y ]; then
 	BINARY_PATH=${PROJECT}/build/output/bin
-	export OUTPUT_FILE_LIST="${BINARY_PATH}/romfs.img ${BINARY_PATH}/tinyara.elf.bin"
+	if [ "${BOARD_NAME}" == "esp32" ]; then
+		export OUTPUT_FILE_LIST="${BINARY_PATH}/romfs.img ${BINARY_PATH}/tinyara.elf.bin"
+	elif [ "${BOARD_NAME}" == "artik053" ]; then
+		export OUTPUT_FILE_LIST="${BINARY_PATH}/romfs.img ${BINARY_PATH}/tinyara.bin"
+	fi
 	export DEBUG_FILE_LIST="${BINARY_PATH}/tinyara.map"
 	${STDK_PATH}/tools/common/generate_output.sh
 fi
