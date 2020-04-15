@@ -7,7 +7,9 @@ git submodule status bsp/${CHIP_NAME} &> /dev/null
 if [ "$?" == "0" ]; then
 	cd bsp/${CHIP_NAME}
 	
-	git submodule update --init build/tools/esp32/esptool_py/esptool
+	if [ "${BOARD_NAME}" == "esp32" ] || [ "${BOARD_NAME}" == "esp32wr" ]; then
+		git submodule update --init build/tools/esp32/esptool_py/esptool
+	fi
 	#git submodule update --init external/stdk/st-device-sdk-c
 	git submodule update --init external/libsodium/libsodium
 	
@@ -33,10 +35,10 @@ else
 		echo "Failed to find source code in bsp/${CHIP_NAME}"
 	else
 		cd bsp/${CHIP_NAME}
-		
-		git submodule deinit build/tools/esp32/esptool_py/esptool
-		git submodule deinit external/libsodium/libsodium
-		git submodule update --init build/tools/esp32/esptool_py/esptool
+
+		if [ "${BOARD_NAME}" == "esp32" ] || [ "${BOARD_NAME}" == "esp32wr" ]; then
+			git submodule update --init build/tools/esp32/esptool_py/esptool
+		fi
 		git submodule update --init external/libsodium/libsodium
 		#ln -s ../../../../../iot-core/src external/stdk/st-device-sdk-c/src
 		
