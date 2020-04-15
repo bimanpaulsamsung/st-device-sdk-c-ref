@@ -15,6 +15,7 @@ print_usage () {
 	echo "- - - - - - - - - - - - - - - - - - -"
 	echo "    ex) ./build.sh tizenrt esp32 st_lamp"
 	echo "    ex) ./build.sh tizenrt esp32 st_lamp download"
+	echo "    ex) ./build.sh tizenrt esp32wr st_lamp"
 	echo "    ex) ./build.sh tizenrt artik053 st_lamp"
 	echo
 }
@@ -29,7 +30,7 @@ if [ "${4}" == "clean" ]; then
 	exit
 fi
 
-if [ "${BOARD_NAME}" == "" ]; then
+if [ "${BOARD_NAME}" == "" ] || [ "${3}" == "" ]; then
 	print_usage
 	exit
 fi
@@ -53,7 +54,7 @@ popd > /dev/null
 
 if [ ${OUTPUT_BUILD} == y ]; then
 	BINARY_PATH=${PROJECT}/build/output/bin
-	if [ "${BOARD_NAME}" == "esp32" ]; then
+	if [ "${BOARD_NAME}" == "esp32" ] || [ "${BOARD_NAME}" == "esp32wr" ] ; then
 		export OUTPUT_FILE_LIST="${BINARY_PATH}/romfs.img ${BINARY_PATH}/tinyara.elf.bin"
 	elif [ "${BOARD_NAME}" == "artik053" ]; then
 		export OUTPUT_FILE_LIST="${BINARY_PATH}/romfs.img ${BINARY_PATH}/tinyara.bin"

@@ -21,6 +21,8 @@ if [ "$?" == "0" ]; then
 	./dbuild.sh clean
 	./dbuild.sh distclean
 	if [ "${BOARD_NAME}" == "esp32" ]; then
+		./tools/configure.sh esp32_DevKitC/STDK
+	elif [ "${BOARD_NAME}" == "esp32wr" ]; then
 		./tools/configure.sh esp_wrover_kit/STDK
 	elif [ "${BOARD_NAME}" == "artik053" ]; then
 		./tools/configure.sh artik053/STDK
@@ -50,6 +52,8 @@ else
 		./dbuild.sh clean
 		./dbuild.sh distclean
 		if [ "${BOARD_NAME}" == "esp32" ]; then
+			./tools/configure.sh esp32_DevKitC/STDK
+		elif [ "${BOARD_NAME}" == "esp32wr" ]; then
 			./tools/configure.sh esp_wrover_kit/STDK
 		elif [ "${BOARD_NAME}" == "artik053" ]; then
 			./tools/configure.sh artik053/STDK
