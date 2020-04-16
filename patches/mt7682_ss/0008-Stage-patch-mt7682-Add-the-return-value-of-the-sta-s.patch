@@ -1,0 +1,64 @@
+From 21cc20cf249a22cf4cea0fac39f334b0e69c7a6e Mon Sep 17 00:00:00 2001
+From: "baojun.luo" <43360374+baojunluo@users.noreply.github.com>
+Date: Thu, 16 Apr 2020 23:18:11 +0900
+Subject: [PATCH] [Stage] patch/mt7682: Add the return value of the sta start
+
+add it to distinguish the error reason
+
+Signed-off-by: baojun.luo <43360374+baojunluo@users.noreply.github.com>
+---
+ ...he-return-value-of-the-MT7682-wifi-driver.patch | 43 ++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+ create mode 100644 patches/mt7682_ss/0008-Stage-Add-the-return-value-of-the-MT7682-wifi-driver.patch
+
+diff --git a/patches/mt7682_ss/0008-Stage-Add-the-return-value-of-the-MT7682-wifi-driver.patch b/patches/mt7682_ss/0008-Stage-Add-the-return-value-of-the-MT7682-wifi-driver.patch
+new file mode 100644
+index 0000000..6aa4caf
+--- /dev/null
++++ b/patches/mt7682_ss/0008-Stage-Add-the-return-value-of-the-MT7682-wifi-driver.patch
+@@ -0,0 +1,42 @@
++From fb1d55fc37d40f74cfe74effe7c736a256259d9d Mon Sep 17 00:00:00 2001
++From: "baojun.luo" <baojun.luo@samsung.com>
++Date: Thu, 16 Apr 2020 23:13:11 +0900
++Subject: [PATCH] [Stage] Add the return value of the MT7682 wifi driver
++  to distinguish the connect fail or operate fail
++
++Signed-off-by: baojun.luo <baojun.luo@samsung.com>
++---
++ project/mt7682_hdk/apps/stdk_project/src/wifi_helper.c | 9 +++++++--
++ 1 file changed, 7 insertions(+), 2 deletions(-)
++
++diff --git a/project/mt7682_hdk/apps/stdk_project/src/wifi_helper.c b/project/mt7682_hdk/apps/stdk_project/src/wifi_helper.c
++index 9f7c943..59de87e 100644
++--- a/project/mt7682_hdk/apps/stdk_project/src/wifi_helper.c
+++++ b/project/mt7682_hdk/apps/stdk_project/src/wifi_helper.c
++@@ -368,6 +368,7 @@ int wlan_sta_start(char *ssid, char *psk_key, int channel)
++	uint8_t onoff = 1;  /* ON */
++	uint8_t ssid_len;
++	uint8_t psk_key_len;
+++	int32_t ret = 0;
++	/* Check input whether valid */
++	if (ssid == NULL) {
++		IOT_ERROR("There are no SSID");
++@@ -401,10 +402,14 @@ int wlan_sta_start(char *ssid, char *psk_key, int channel)
++		wifi_config_set_wpa_psk_key(WIFI_PORT_STA,
++			(uint8_t *)psk_key, psk_key_len);
++	}
++-	wifi_config_reload_setting();
+++	ret = wifi_config_reload_setting();
+++	if (ret < 0)
+++		ret = 1;
+++	else
+++		ret = 0;
++	/* Waiting infinity for iot-core's next step */
++	lwip_net_ready();
++-	return 0;
+++	return ret;
++ }
++
++ int wlan_sta_stop(void)
++--
++2.7.4
+--
+2.7.4
+
