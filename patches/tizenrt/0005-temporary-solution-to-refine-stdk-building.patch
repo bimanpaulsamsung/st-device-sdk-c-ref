@@ -1,0 +1,202 @@
+From d02f925d1eb5a2758c29b61fd064824590c4740f Mon Sep 17 00:00:00 2001
+From: "qin.li" <qin.li@samsung.com>
+Date: Fri, 17 Apr 2020 18:04:25 +0800
+Subject: [PATCH] temporary solution to refine stdk building
+
+---
+ build/configs/artik053/STDK/defconfig       |  4 ++
+ build/configs/esp32_DevKitC/STDK/defconfig  |  4 ++
+ build/configs/esp_wrover_kit/STDK/defconfig |  4 ++
+ external/stdk/Kconfig                       | 26 ++++++++++++
+ external/stdk/Makefile                      | 66 +++++------------------------
+ 5 files changed, 48 insertions(+), 56 deletions(-)
+ mode change 100644 => 100755 build/configs/esp_wrover_kit/STDK/defconfig
+
+diff --git a/build/configs/artik053/STDK/defconfig b/build/configs/artik053/STDK/defconfig
+index 499c192..7c5511a 100644
+--- a/build/configs/artik053/STDK/defconfig
++++ b/build/configs/artik053/STDK/defconfig
+@@ -1244,6 +1244,10 @@ CONFIG_STDK_IOT_CORE_LOG_LEVEL_INFO=y
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG=y
+ # CONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION is not set
+ # CONFIG_STDK_DEBUG_MEMORY_CHECK is not set
++CONFIG_STDK_IOT_CORE_BSP_SUPPORT_TIZENRT=y
++# CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS is not set
++CONFIG_STDK_IOT_CORE_OS_SUPPORT_TIZENRT=y
++# CONFIG_STDK_IOT_CORE_OS_SUPPORT_POSIX is not set
+ 
+ #
+ # Crypto
+diff --git a/build/configs/esp32_DevKitC/STDK/defconfig b/build/configs/esp32_DevKitC/STDK/defconfig
+index 3521449..276883e 100755
+--- a/build/configs/esp32_DevKitC/STDK/defconfig
++++ b/build/configs/esp32_DevKitC/STDK/defconfig
+@@ -1090,6 +1090,10 @@ CONFIG_STDK_IOT_CORE_LOG_LEVEL_INFO=y
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG=y
+ # CONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION is not set
+ # CONFIG_STDK_DEBUG_MEMORY_CHECK is not set
++CONFIG_STDK_IOT_CORE_BSP_SUPPORT_TIZENRT=y
++# CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS is not set
++CONFIG_STDK_IOT_CORE_OS_SUPPORT_TIZENRT=y
++# CONFIG_STDK_IOT_CORE_OS_SUPPORT_POSIX is not set
+ 
+ #
+ # Crypto
+diff --git a/build/configs/esp_wrover_kit/STDK/defconfig b/build/configs/esp_wrover_kit/STDK/defconfig
+old mode 100644
+new mode 100755
+index e75d6d4..189ee12
+--- a/build/configs/esp_wrover_kit/STDK/defconfig
++++ b/build/configs/esp_wrover_kit/STDK/defconfig
+@@ -1136,6 +1136,10 @@ CONFIG_STDK_IOT_CORE_LOG_LEVEL_INFO=y
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG=y
+ # CONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION is not set
+ # CONFIG_STDK_DEBUG_MEMORY_CHECK is not set
++CONFIG_STDK_IOT_CORE_BSP_SUPPORT_TIZENRT=y
++# CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS is not set
++CONFIG_STDK_IOT_CORE_OS_SUPPORT_TIZENRT=y
++# CONFIG_STDK_IOT_CORE_OS_SUPPORT_POSIX is not set
+ 
+ #
+ # Crypto
+diff --git a/external/stdk/Kconfig b/external/stdk/Kconfig
+index b279dde..2602734 100644
+--- a/external/stdk/Kconfig
++++ b/external/stdk/Kconfig
+@@ -87,6 +87,32 @@ config STDK_DEBUG_MEMORY_CHECK
+ 	---help---
+ 		If this debug option is enabled, IOT_MEM_CHECK will print memory utilization.
+ 
++choice STDK_IOT_CORE_BSP_SUPPORT
++    prompt "BSP Support"
++    default STDK_IOT_CORE_BSP_SUPPORT_TIZENRT
++    depends on STDK_IOT_CORE
++    help
++       Choose the bsp support layer
++
++config STDK_IOT_CORE_BSP_SUPPORT_TIZENRT
++    bool "tizenrt"
++endchoice
++
++choice STDK_IOT_CORE_OS_SUPPORT
++    prompt "OS Support"
++    default STDK_IOT_CORE_OS_SUPPORT_TIZENRT
++    depends on STDK_IOT_CORE
++    help
++       Choose the os support layer
++
++config STDK_IOT_CORE_OS_SUPPORT_FREERTOS
++    bool "FreeRTOS"
++config STDK_IOT_CORE_OS_SUPPORT_TIZENRT
++    bool "TizenRT"
++config STDK_IOT_CORE_OS_SUPPORT_POSIX
++    bool "Posix"
++endchoice
++
+ menu "Crypto"
+ 	depends on STDK_IOT_CORE
+ 
+diff --git a/external/stdk/Makefile b/external/stdk/Makefile
+index 4fe36f2..ca8b052 100644
+--- a/external/stdk/Makefile
++++ b/external/stdk/Makefile
+@@ -22,24 +22,12 @@
+ 
+ STDK_INCLUDE_DIR = ./st-device-sdk-c/src/include
+ STDK_SRC_DIR = ./st-device-sdk-c/src
+-BILERPLATE_HEADER = $(STDK_INCLUDE_DIR)/certs/boilerplate.h
+-ROOT_CA_FILE = $(STDK_SRC_DIR)/certs/root_ca.pem
+-ROOT_CA_FILE_LIST=$(wildcard $(STDK_SRC_DIR)/certs/root_ca_*.pem)
+-ROOT_CA_SOURCE = $(STDK_SRC_DIR)/iot_root_ca.c
+-ROOT_CA_BACKUP_FILE = $(ROOT_CA_SOURCE).bak
+ 
+ ASRCS =
+ 
+ CFLAGS += -std=c99 -D_GNU_SOURCE -DCBOR_NO_FLOATING_POINT
+ CFLAGS += -Wall -Wno-error -pipe
+ 
+-CFLAGS += -I$(STDK_INCLUDE_DIR)
+-CFLAGS += -I$(STDK_INCLUDE_DIR)/bsp
+-CFLAGS += -I$(STDK_INCLUDE_DIR)/os
+-CFLAGS += -I$(STDK_INCLUDE_DIR)/mqtt
+-CFLAGS += -I$(STDK_INCLUDE_DIR)/external
+-CFLAGS += -I$(STDK_SRC_DIR)/deps/cbor/tinycbor/src
+-
+ CFLAGS += -I$(TOPDIR)/kernel
+ CFLAGS += -I$(TOPDIR)/../external/include/json
+ CFLAGS += -I$(TOPDIR)/../external/libsodium/libsodium/src/libsodium/include
+@@ -64,43 +52,19 @@ endif
+ #################################################
+ # st-device-sdk-c
+ #################################################
+-CSRCS	:= $(wildcard $(STDK_SRC_DIR)/*.c)
++COMPONENT_PATH = $(STDK_SRC_DIR)
++include $(STDK_SRC_DIR)/component.mk
++IOT_CORE_C += $(foreach srcdir,$(COMPONENT_SRCDIRS),$(wildcard $(STDK_SRC_DIR)/$(srcdir)/*.c))
++IOT_CORE_INCLUDES += $(foreach inc,$(COMPONENT_ADD_INCLUDEDIRS), -I$(STDK_SRC_DIR)/$(inc))
+ 
+-ifeq ($(CONFIG_STDK_IOT_CORE_NET_MBEDTLS),y)
+-	CSRCS += $(STDK_SRC_DIR)/port/net/mbedtls/iot_net_mbedtls.c
+-	CFLAGS += -I$(STDK_SRC_DIR)/port/net/mbedtls
++ifeq ($(CONFIG_ARCH_BOARD_ESP32_FAMILY),y)
++IOT_CORE_EXCLUDE_C = $(STDK_SRC_DIR)/port/os/tizenrt/event_groups.c
++IOT_CORE_EXCLUDE_C += $(STDK_SRC_DIR)/port/os/tizenrt/queue_api.c
++CSRCS += $(filter-out $(IOT_CORE_EXCLUDE_C), $(IOT_CORE_C))
+ else
+-	CSRCS += $(STDK_SRC_DIR)/port/net/openssl/iot_net_openssl.c
+-	CFLAGS += -I$(STDK_SRC_DIR)/port/net/openssl
+-	CFLAGS += -DCONFIG_STDK_IOT_CORE_OS_SUPPORT_TIZENRT
+-endif
+-
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/deps/cbor/tinycbor/src/*.c)
+-
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/crypto/*.c)
+-ifeq ($(CONFIG_STDK_IOT_CORE_USE_MBEDTLS),y)
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/crypto/mbedtls/*.c)
+-endif
+-
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/easysetup/*.c)
+-
+-ifeq ($(CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP),y)
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/easysetup/http/*.c)
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/easysetup/http/lwip_httpd/*.c)
+-endif
+-
+-#################################################
+-# tizenrt wrapper
+-#################################################
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/mqtt/client/*.c)
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/mqtt/packet/*.c)
+-CSRCS	+= $(wildcard $(STDK_SRC_DIR)/port/bsp/tizenrt/*.c)
+-
+-CSRCS	+= $(STDK_SRC_DIR)/port/os/tizenrt/iot_os_util_tizenrt.c
+-ifneq ($(CONFIG_ARCH_BOARD_ESP32_FAMILY),y)
+-CSRCS	+= $(STDK_SRC_DIR)/port/os/tizenrt/event_groups.c
+-CSRCS	+= $(STDK_SRC_DIR)/port/os/tizenrt/queue_api.c
++CSRCS += $(IOT_CORE_C)
+ endif
++CFLAGS += $(IOT_CORE_INCLUDES)
+ 
+ VPATH += :st-device-sdk-c/src/
+ 
+@@ -128,17 +92,7 @@ $(COBJS): %$(OBJEXT): %.c
+ 	$(call ARCHIVE, $(BIN), $(OBJS))
+ 	$(Q) touch .built
+ 
+-#################################################
+-# certificate
+-#################################################
+-$(shell rm -f $(ROOT_CA_FILE) 2> /dev/null)
+-$(foreach file, $(ROOT_CA_FILE_LIST), $(shell cat $(file) >> $(ROOT_CA_FILE)))
+ context:
+-	$(Q) cat $(BILERPLATE_HEADER) > $(ROOT_CA_SOURCE); echo $$?;
+-	$(Q) xxd -i $(ROOT_CA_FILE) >> $(ROOT_CA_SOURCE); echo $$?;
+-	$(Q) sed -i.bak 's/_.*pem/st_root_ca/g' $(ROOT_CA_SOURCE)
+-	$(Q) sed -i.bak 's/unsigned/const unsigned/g' $(ROOT_CA_SOURCE)
+-	$(Q) rm $(ROOT_CA_BACKUP_FILE);
+ 
+ .depend: Makefile $(SRCS)
+ 	$(Q) $(MKDEP) $(DEPPATH) "$(CC)" -- $(CFLAGS) -- $(SRCS) >Make.dep
+-- 
+2.7.4
+

@@ -1,4 +1,4 @@
-From 0e13fb7e4d237e94debf1963f379bd98050f8dbf Mon Sep 17 00:00:00 2001
+From ba0618c6177e6479bf9ab9f82274bf4760a29f3a Mon Sep 17 00:00:00 2001
 From: "qin.li" <qin.li@samsung.com>
 Date: Wed, 15 Apr 2020 16:53:05 +0800
 Subject: [PATCH] apps/examples: add stdk smart switch example
@@ -289,7 +289,7 @@ index 0000000..77462b7
 +preconfig:
 diff --git a/apps/examples/stdk_smart_switch/device_control.c b/apps/examples/stdk_smart_switch/device_control.c
 new file mode 100644
-index 0000000..bd4d649
+index 0000000..9a88f0d
 --- /dev/null
 +++ b/apps/examples/stdk_smart_switch/device_control.c
 @@ -0,0 +1,176 @@
@@ -453,7 +453,7 @@ index 0000000..bd4d649
 +	iotapi_initialize();
 +	g_pir = iotbus_gpio_open(GPIO_INPUT_BUTTON);
 +	iotbus_gpio_register_cb(g_pir, GPIO_INPUT_BUTTON_EDGE, button_isr_handler, NULL);
-+	
++
 +	//Set RGB LED GPIO to output mode
 +	iotbus_gpio_context_h n_handle;
 +	n_handle = iotbus_gpio_open(GPIO_OUTPUT_NOTIFICATION_LED);
@@ -462,16 +462,16 @@ index 0000000..bd4d649
 +
 +	n_handle = iotbus_gpio_open(GPIO_OUTPUT_MAINLED);
 +	iotbus_gpio_set_direction(n_handle, GPIO_DIRECTION_OUT);
-+	iotbus_gpio_close(n_handle); 
++	iotbus_gpio_close(n_handle);
 +
 +	gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
 +	gpio_set_level(GPIO_OUTPUT_MAINLED, 0);
-+ 
++
 +	printf("gpio_init end\n");
 +}
 diff --git a/apps/examples/stdk_smart_switch/device_control.h b/apps/examples/stdk_smart_switch/device_control.h
 new file mode 100644
-index 0000000..0a912ed
+index 0000000..a3b9809
 --- /dev/null
 +++ b/apps/examples/stdk_smart_switch/device_control.h
 @@ -0,0 +1,99 @@
@@ -567,7 +567,7 @@ index 0000000..0a912ed
 +	MAINLED_GPIO_OFF = 0,
 +};
 +
-+ 
++
 +void button_isr_handler(void *arg);
 +bool get_button_event(int *button_event_type, int *button_event_count);
 +void led_blink(int gpio, int delay, int count);
@@ -613,7 +613,7 @@ index 0000000..1ea9a90
 +}
 diff --git a/apps/examples/stdk_smart_switch/smart_switch.c b/apps/examples/stdk_smart_switch/smart_switch.c
 new file mode 100644
-index 0000000..eacf0dd
+index 0000000..3a39e24
 --- /dev/null
 +++ b/apps/examples/stdk_smart_switch/smart_switch.c
 @@ -0,0 +1,304 @@
@@ -665,7 +665,7 @@ index 0000000..eacf0dd
 +static void change_switch_state(int32_t state)
 +{
 +	/* change state */
-+	smartlamp_switch_state = state; 
++	smartlamp_switch_state = state;
 +	if (state == SMARTLAMP_SWITCH_ON) {
 +		gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
 +		gpio_set_level(GPIO_OUTPUT_MAINLED, MAINLED_GPIO_ON);
