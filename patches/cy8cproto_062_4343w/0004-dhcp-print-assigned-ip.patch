@@ -1,0 +1,25 @@
+From 8601daac6a1d65786bd7baae710189c2223bd25c Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Mon, 13 Apr 2020 23:38:49 +0530
+Subject: [PATCH 4/9] dhcp: print assigned ip
+
+---
+ .../TARGET_Cypress/COMPONENT_WHD/interface/CyDhcpServer.cpp             | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/features/netsocket/emac-drivers/TARGET_Cypress/COMPONENT_WHD/interface/CyDhcpServer.cpp b/features/netsocket/emac-drivers/TARGET_Cypress/COMPONENT_WHD/interface/CyDhcpServer.cpp
+index 89464bd..c1b3cee 100644
+--- a/features/netsocket/emac-drivers/TARGET_Cypress/COMPONENT_WHD/interface/CyDhcpServer.cpp
++++ b/features/netsocket/emac-drivers/TARGET_Cypress/COMPONENT_WHD/interface/CyDhcpServer.cpp
+@@ -185,6 +185,8 @@ void CyDhcpServer::setAddress(const cy_mac_addr_t &mac_id, const cy_ip_addr_t &a
+     uint32_t cached_slot;
+     char empty_cache[NSAPI_IPv6_SIZE] = "";
+ 
++    uint8_t *ips = (uint8_t *)addr.addrv4.addrs;
++    printf("Assigned IP : %u.%u.%u.%u\n", ips[3],ips[2],ips[1],ips[0]);
+     /* Search for empty slot in cache */
+     for (a = 0, first_empty_slot = DHCP_IP_ADDRESS_CACHE_MAX, cached_slot = DHCP_IP_ADDRESS_CACHE_MAX; a < DHCP_IP_ADDRESS_CACHE_MAX; a++) {
+         /* Check for matching MAC address */
+-- 
+2.7.4
+
