@@ -44,3 +44,14 @@ iot-core/src/deps/json/cJSON/fuzzing/
 iot-core/src/deps/libsodium/libsodium/test/
 #iot-core/src/deps/libsodium/libsodium/
 
+MbedEventsExample.cpp
+WifiAPtoSTA.cpp
+BlinkyTest.cpp
+ButtonExample.cpp
+RandomExample.cpp
+WifiAPTest.cpp
+WifiSTATest.cpp
+FileSystemexample.cpp
+FileIO.cpp
+NTP/
+
