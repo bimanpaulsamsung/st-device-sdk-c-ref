@@ -1,6 +1,7 @@
 #!/bin/bash
 
-CHIP_LIST=("esp8266" "esp32" "rtl8195" "rtl8720c" "rtl8721c" "mt7682_ss" "emw3166" "emw3080" "cc3220sf" "lpc54018")
+CHIP_LIST=("esp8266" "esp32" "rtl8195" "rtl8720c" "rtl8721c" "mt7682_ss" "emw3166" "emw3080" "cc3220sf" "lpc54018" "cy8cproto_062_4343w")
+
 CORE_PATH="iot-core"
 CHIP_NAME=${1}
 print_usage () {
@@ -18,6 +19,7 @@ print_usage () {
 	echo "    ex) ./setup.sh tizenrt esp32wr"
 	echo "    ex) ./setup.sh cc3220sf"
 	echo "    ex) ./setup.sh lpc54018"
+	echo "    ex) ./setup.sh cy8cproto_062_4343w"
 	echo
 }
 
