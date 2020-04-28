@@ -1,0 +1,25 @@
+From c6650a6465c3c3cc8035f383c436ed03ee8bd974 Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Tue, 28 Apr 2020 16:11:46 +0530
+Subject: [PATCH 10/11] enable heap memory stats
+
+---
+ platform/mbed_lib.json | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/platform/mbed_lib.json b/platform/mbed_lib.json
+index befcfddd40..df7e1401cb 100644
+--- a/platform/mbed_lib.json
++++ b/platform/mbed_lib.json
+@@ -110,7 +110,7 @@
+         "heap-stats-enabled": {
+             "macro_name": "MBED_HEAP_STATS_ENABLED",
+             "help": "Set to 1 to enable heap stats. When enabled the function mbed_stats_heap_get returns non-zero data. See mbed_stats.h for more information",
+-            "value": null
++            "value": 1
+         },
+ 
+         "thread-stats-enabled": {
+-- 
+2.17.1
+

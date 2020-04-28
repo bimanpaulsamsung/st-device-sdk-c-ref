@@ -1,0 +1,38 @@
+From 0e9e5b8caa758d7fb29f5d221934bee8f6906712 Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Mon, 13 Apr 2020 23:43:34 +0530
+Subject: [PATCH 03/11] lwip: enable posix lwip sockets
+
+---
+ features/lwipstack/lwipopts.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/features/lwipstack/lwipopts.h b/features/lwipstack/lwipopts.h
+index 0a866f391b..ec86ef46cd 100644
+--- a/features/lwipstack/lwipopts.h
++++ b/features/lwipstack/lwipopts.h
+@@ -194,8 +194,8 @@
+ 
+ #define LWIP_DNS                    1
+ // Only DNS address storage is enabled
+-#define LWIP_FULL_DNS               0
+-#define LWIP_SOCKET                 0
++#define LWIP_FULL_DNS               1
++#define LWIP_SOCKET                 1
+ 
+ #define SO_REUSE                    1
+ 
+@@ -204,8 +204,8 @@
+ #define LWIP_IGMP                   LWIP_IPV4
+ #define LWIP_RAND()                 lwip_get_random()
+ 
+-#define LWIP_COMPAT_SOCKETS         0
+-#define LWIP_POSIX_SOCKETS_IO_NAMES 0
++#define LWIP_COMPAT_SOCKETS         1
++#define LWIP_POSIX_SOCKETS_IO_NAMES 1
+ #define LWIP_SO_RCVTIMEO            1
+ 
+ #define LWIP_BROADCAST_PING         1
+-- 
+2.17.1
+

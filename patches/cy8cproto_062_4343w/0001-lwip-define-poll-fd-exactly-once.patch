@@ -1,0 +1,52 @@
+From efb5dc923a8485def3a122020998c753acf24c24 Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Mon, 13 Apr 2020 23:31:37 +0530
+Subject: [PATCH 01/11] lwip: define poll fd exactly once
+
+---
+ features/lwipstack/lwip/src/include/lwip/sockets.h | 3 +++
+ platform/mbed_retarget.h                           | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/features/lwipstack/lwip/src/include/lwip/sockets.h b/features/lwipstack/lwip/src/include/lwip/sockets.h
+index d70d36c4d2..8ffb042a48 100644
+--- a/features/lwipstack/lwip/src/include/lwip/sockets.h
++++ b/features/lwipstack/lwip/src/include/lwip/sockets.h
+@@ -504,12 +504,15 @@ typedef struct fd_set
+ #define POLLWRBAND 0x100
+ #define POLLHUP    0x200
+ typedef unsigned int nfds_t;
++#ifndef POLL_FD_LWIP_SOCKET
++#define POLL_FD_LWIP_SOCKET
+ struct pollfd
+ {
+   int fd;
+   short events;
+   short revents;
+ };
++#endif /* POLL_FD_LWIP_SOCKET */
+ #endif
+ 
+ /** LWIP_TIMEVAL_PRIVATE: if you want to use the struct timeval provided
+diff --git a/platform/mbed_retarget.h b/platform/mbed_retarget.h
+index 56c2d8b351..ee3a51e6c5 100644
+--- a/platform/mbed_retarget.h
++++ b/platform/mbed_retarget.h
+@@ -550,11 +550,14 @@ enum {
+ #define F_GETFL 3
+ #define F_SETFL 4
+ 
++#ifndef POLL_FD_LWIP_SOCKET
++#define POLL_FD_LWIP_SOCKET
+ struct pollfd {
+     int fd;
+     short events;
+     short revents;
+ };
++#endif /* POLL_FD_LWIP_SOCKET */
+ 
+ /* POSIX-compatible I/O functions */
+ #if __cplusplus
+-- 
+2.17.1
+

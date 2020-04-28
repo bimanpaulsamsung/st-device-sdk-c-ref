@@ -1,0 +1,53 @@
+From 813397ab4325c1bfcfe9ef0685fcecfc55aa1d0e Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Wed, 29 Apr 2020 22:27:10 +0530
+Subject: [PATCH 11/11] enable lwip sntp application
+
+---
+ features/lwipstack/.mbedignore                    | 13 ++++++++++++-
+ features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c |  6 ++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/features/lwipstack/.mbedignore b/features/lwipstack/.mbedignore
+index b86f9de430..0f089d81cf 100644
+--- a/features/lwipstack/.mbedignore
++++ b/features/lwipstack/.mbedignore
+@@ -1,6 +1,17 @@
+ lwip/doc/*
+ lwip/test/*
+-lwip/src/apps/*
++
++lwip/src/apps/altcp_tls/
++lwip/src/apps/http/
++lwip/src/apps/lwiperf/
++lwip/src/apps/mdns/
++lwip/src/apps/mqtt/
++lwip/src/apps/netbiosns/
++lwip/src/apps/smtp/
++lwip/src/apps/snmp/
++#lwip/src/apps/sntp/
++lwip/src/apps/tftp/
++
+ lwip/src/netif/lwip_slipif.c
+ lwip/src/include/lwip/apps/*
+ lwip/src/include/compat/stdc/*
+diff --git a/features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c b/features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c
+index b7ff56adce..cb6a1640db 100644
+--- a/features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c
++++ b/features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c
+@@ -327,6 +327,12 @@ sntp_process(const struct sntp_timestamps *timestamps)
+   LWIP_UNUSED_ARG(frac); /* might be unused if only seconds are set */
+   LWIP_DEBUGF(SNTP_DEBUG_TRACE, ("sntp_process: %s, %" U32_F " us\n",
+                                  sntp_format_time(sec), SNTP_FRAC_TO_US(frac)));
++
++  /* NTP gives seconds since 01-01-1900 epoch
++   * 2208988800L is 01-01-1970 in seconds since 1900
++   * set_time() expects seconds elaspsed since 01-01-1970 epoch
++   */
++  set_time(sec - 2208988800L);
+ }
+ 
+ /**
+-- 
+2.17.1
+

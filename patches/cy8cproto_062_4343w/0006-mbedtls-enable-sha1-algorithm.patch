@@ -1,0 +1,25 @@
+From 9a35d3915b291d4576ce749e498268ede5acc0a9 Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Mon, 13 Apr 2020 23:41:38 +0530
+Subject: [PATCH 06/11] mbedtls: enable sha1 algorithm
+
+---
+ features/mbedtls/inc/mbedtls/config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/features/mbedtls/inc/mbedtls/config.h b/features/mbedtls/inc/mbedtls/config.h
+index e6b459dc11..a45898e1c9 100644
+--- a/features/mbedtls/inc/mbedtls/config.h
++++ b/features/mbedtls/inc/mbedtls/config.h
+@@ -2978,7 +2978,7 @@
+  *            on it, and considering stronger message digests instead.
+  *
+  */
+-//#define MBEDTLS_SHA1_C
++#define MBEDTLS_SHA1_C
+ 
+ /**
+  * \def MBEDTLS_SHA256_C
+-- 
+2.17.1
+

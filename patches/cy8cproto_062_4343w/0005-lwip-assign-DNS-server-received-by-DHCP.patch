@@ -1,0 +1,35 @@
+From 2040caea6a5efc8c3fdf8f2fee45c660f3733c52 Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Mon, 13 Apr 2020 23:40:16 +0530
+Subject: [PATCH 05/11] lwip: assign DNS server received by DHCP
+
+---
+ features/lwipstack/lwip/src/core/lwip_dns.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/features/lwipstack/lwip/src/core/lwip_dns.c b/features/lwipstack/lwip/src/core/lwip_dns.c
+index f742221733..2737ea5cec 100644
+--- a/features/lwipstack/lwip/src/core/lwip_dns.c
++++ b/features/lwipstack/lwip/src/core/lwip_dns.c
+@@ -367,7 +367,7 @@ void
+ dns_setserver(u8_t numdns, const ip_addr_t *dnsserver, struct netif *netif)
+ {
+ 
+-  if (netif == NULL ) {
++//  if (netif == NULL ) {
+     if (numdns < DNS_MAX_SERVERS) {
+       if (dnsserver != NULL) {
+         dns_servers[numdns] = (*dnsserver);
+@@ -375,7 +375,8 @@ dns_setserver(u8_t numdns, const ip_addr_t *dnsserver, struct netif *netif)
+         dns_servers[numdns] = *IP_ADDR_ANY;
+       }
+     }
+-  } else {
++//  } else
++  if (netif) {
+     char name[INTERFACE_NAME_MAX_SIZE];
+     sprintf(name, "%c%c%d", netif->name[0], netif->name[1], netif->num);
+     dns_add_interface_server(numdns, name, dnsserver);
+-- 
+2.17.1
+

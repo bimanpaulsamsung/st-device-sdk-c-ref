@@ -1,0 +1,25 @@
+From 6294095a17a08c49a4dfc9eabb5f9907daea5025 Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Mon, 13 Apr 2020 23:45:23 +0530
+Subject: [PATCH 09/11] lwip: increase memp-num-tcpip-msg-inpkt to 32
+
+---
+ features/lwipstack/mbed_lib.json | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/features/lwipstack/mbed_lib.json b/features/lwipstack/mbed_lib.json
+index 53d46ec2d2..08960ad3e0 100644
+--- a/features/lwipstack/mbed_lib.json
++++ b/features/lwipstack/mbed_lib.json
+@@ -84,7 +84,7 @@
+         },
+         "memp-num-tcpip-msg-inpkt": {
+             "help": "Number of simultaneously queued TCP messages that are received",
+-            "value": 8
++            "value": 32
+         },
+         "tcp-mss": {
+             "help": "TCP Maximum segment size, see LWIP opt.h for more information. Current default is 536.",
+-- 
+2.17.1
+
