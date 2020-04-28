@@ -1,0 +1,39 @@
+From 7b83aeb0f4e8b38af1f80c5811b9a4dde83c07fc Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Mon, 13 Apr 2020 23:36:10 +0530
+Subject: [PATCH 2/9] lwip: include proper error header file
+
+---
+ features/lwipstack/lwip/src/api/lwip_if_api.c      | 2 +-
+ features/lwipstack/lwip/src/include/lwip/sockets.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/features/lwipstack/lwip/src/api/lwip_if_api.c b/features/lwipstack/lwip/src/api/lwip_if_api.c
+index 8e094d0..e3cae32 100644
+--- a/features/lwipstack/lwip/src/api/lwip_if_api.c
++++ b/features/lwipstack/lwip/src/api/lwip_if_api.c
+@@ -43,7 +43,7 @@
+ 
+ #if LWIP_SOCKET
+ 
+-#include "lwip/errno.h"
++#include "lwip/lwip_errno.h"
+ #include "lwip/if_api.h"
+ #include "lwip/netifapi.h"
+ #include "lwip/priv/sockets_priv.h"
+diff --git a/features/lwipstack/lwip/src/include/lwip/sockets.h b/features/lwipstack/lwip/src/include/lwip/sockets.h
+index 8ffb042..f2b271c 100644
+--- a/features/lwipstack/lwip/src/include/lwip/sockets.h
++++ b/features/lwipstack/lwip/src/include/lwip/sockets.h
+@@ -47,7 +47,7 @@
+ #include "lwip/netif.h"
+ #include "lwip/err.h"
+ #include "lwip/inet.h"
+-#include "lwip/errno.h"
++#include "lwip/lwip_errno.h"
+ 
+ #include <string.h>
+ 
+-- 
+2.7.4
+
