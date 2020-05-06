@@ -27,6 +27,10 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
+// for command line interface(CLI)
+#include "iot_uart_cli.h"
+#include "iot_cli_cmd.h"
+
 #include "caps_thermostatMode.h"
 #include "caps_switchLevel.h"
 #include "caps_threeAxis.h"
@@ -57,6 +61,25 @@ static iot_stat_lv_t g_iot_stat_lv;
 IOT_CTX *ctx = NULL;
 
 void send_test_capabilities();
+
+#ifdef CONFIG_SAMSUNG_RUN_TIME_STATS
+#include "driver/hw_timer.h"
+uint32_t ulHighFrequencyTimerTicks;
+void hw_timer_callback(void *arg)
+{
+	    ulHighFrequencyTimerTicks++;
+}
+
+uint32_t get_TimerTicks(void)
+{
+	    return ulHighFrequencyTimerTicks;
+}
+
+void config_TimerTicks(void)
+{
+	    ulHighFrequencyTimerTicks = 0UL;
+}
+#endif
 
 static void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 {
@@ -239,6 +262,21 @@ void app_main(void)
 	unsigned int device_info_len = device_info_end - device_info_start;
 	IOT_CAP_HANDLE *handle = NULL;
 	int iot_err;
+
+#ifdef SS_VER
+	printf("SS version:%s(%06x)\n", SS_VER, STDK_VERSION_CODE);
+#endif
+
+#ifdef CONFIG_SAMSUNG_RUN_TIME_STATS
+	hw_timer_init(hw_timer_callback, NULL);
+	hw_timer_alarm_us(1000, true);
+#endif
+
+#ifdef CONFIG_SAMSUNG_BUILD_ENG
+	setbuf(stdout, NULL);
+	register_iot_cli_cmd();
+	uart_cli_main();
+#endif
 
 	// 1. create a iot context
 	ctx = st_conn_init(onboarding_config, onboarding_config_len, device_info, device_info_len);

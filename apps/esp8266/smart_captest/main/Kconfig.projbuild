@@ -1,5 +1,24 @@
 menu "Example Configuration"
 
+config SAMSUNG_HOTFIX
+    bool "Samsung hotfix"
+    default y
+    help
+	Bug fix for Samsung SmartThings
+
+config SAMSUNG_BUILD_ENG
+    bool "Samsung build ENG"
+    default y
+    help
+        SAMSUNG BUILD ENG
+
+config SAMSUNG_RUN_TIME_STATS
+    bool "Samsung runtime stats"
+    depends on SAMSUNG_BUILD_ENG
+    default y
+    help
+        SAMSUNG RUNTIME_STATS
+
 config WIFI_SSID
     string "WiFi SSID"
     default "myssid"
