@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CHIP_LIST=("esp8266" "esp32" "rtl8195" "rtl8720c" "rtl8721c" "emw3166" "emw3080" "cc3220sf")
+CHIP_LIST=("esp8266" "esp32" "rtl8195" "rtl8720c" "rtl8721c" "emw3166" "emw3080" "cc3220sf" "lpc54018")
 
 CHIP_NAME=${1}
 APP_NAME=${2}
@@ -18,6 +18,7 @@ print_usage () {
 	echo "    ex) ./build.sh emw3080 st_switch"
 	echo "    ex) ./build.sh tizenrt esp32 st_lamp"
 	echo "    ex) ./build.sh cc3220sf st_switch"
+	echo "    ex) ./build.sh lpc54018 st_switch"
 	echo
 }
 

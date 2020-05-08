@@ -31,3 +31,6 @@
 [submodule "bsp/cc3220sf"]
 	path = bsp/cc3220sf
 	url = git@github.sec.samsung.net:STDK/ti-cc3220sf.git
+[submodule "bsp/lpc54018"]
+	path = bsp/lpc54018
+	url = git@github.sec.samsung.net:STDK/nxp-lpc54018-sdk.git

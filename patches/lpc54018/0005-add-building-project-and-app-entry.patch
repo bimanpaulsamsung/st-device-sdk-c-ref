@@ -1,0 +1,3406 @@
+From 45b3a4ad3a85f2bb5da99ed71f065dfa12795970 Mon Sep 17 00:00:00 2001
+From: "qin.li" <qin.li@samsung.com>
+Date: Fri, 8 May 2020 14:52:07 +0800
+Subject: [PATCH] add building project and app entry
+
+---
+ boards/lpc54018iotmodule/stdk/FreeRTOSConfig.h     | 163 ++++
+ .../lpc54018iotmodule/stdk/armgcc/CMakeLists.txt   | 845 +++++++++++++++++++++
+ .../stdk/armgcc/LPC54018_spifi_flash.ld            | 238 ++++++
+ boards/lpc54018iotmodule/stdk/armgcc/build_all.sh  |   5 +
+ .../lpc54018iotmodule/stdk/armgcc/build_debug.sh   |   4 +
+ .../lpc54018iotmodule/stdk/armgcc/build_release.sh |   3 +
+ boards/lpc54018iotmodule/stdk/armgcc/clean.sh      |   3 +
+ boards/lpc54018iotmodule/stdk/armgcc/config.cmake  |  60 ++
+ boards/lpc54018iotmodule/stdk/aws_wifi_config.h    |  80 ++
+ boards/lpc54018iotmodule/stdk/board.c              | 227 ++++++
+ boards/lpc54018iotmodule/stdk/board.h              | 232 ++++++
+ boards/lpc54018iotmodule/stdk/clock_config.c       | 269 +++++++
+ boards/lpc54018iotmodule/stdk/clock_config.h       | 142 ++++
+ boards/lpc54018iotmodule/stdk/main.c               | 193 +++++
+ boards/lpc54018iotmodule/stdk/pin_mux.c            | 291 +++++++
+ boards/lpc54018iotmodule/stdk/pin_mux.h            | 173 +++++
+ boards/lpc54018iotmodule/stdk/readme.txt           |  81 ++
+ boards/lpc54018iotmodule/stdk/stdk_freertos.xml    | 143 ++++
+ middleware/wifi_qca/common_src/qapi/qcom_api.c     |  12 +-
+ middleware/wifi_qca/qcom_api.h                     |  14 +-
+ 20 files changed, 3165 insertions(+), 13 deletions(-)
+ create mode 100644 boards/lpc54018iotmodule/stdk/FreeRTOSConfig.h
+ create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt
+ create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld
+ create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/build_all.sh
+ create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/build_debug.sh
+ create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/build_release.sh
+ create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/clean.sh
+ create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/config.cmake
+ create mode 100644 boards/lpc54018iotmodule/stdk/aws_wifi_config.h
+ create mode 100644 boards/lpc54018iotmodule/stdk/board.c
+ create mode 100644 boards/lpc54018iotmodule/stdk/board.h
+ create mode 100644 boards/lpc54018iotmodule/stdk/clock_config.c
+ create mode 100644 boards/lpc54018iotmodule/stdk/clock_config.h
+ create mode 100644 boards/lpc54018iotmodule/stdk/main.c
+ create mode 100644 boards/lpc54018iotmodule/stdk/pin_mux.c
+ create mode 100644 boards/lpc54018iotmodule/stdk/pin_mux.h
+ create mode 100755 boards/lpc54018iotmodule/stdk/readme.txt
+ create mode 100755 boards/lpc54018iotmodule/stdk/stdk_freertos.xml
+
+diff --git a/boards/lpc54018iotmodule/stdk/FreeRTOSConfig.h b/boards/lpc54018iotmodule/stdk/FreeRTOSConfig.h
+new file mode 100644
+index 0000000..f6c1f07
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/FreeRTOSConfig.h
+@@ -0,0 +1,163 @@
++/*
++ * FreeRTOS Kernel V10.2.0
++ * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy of
++ * this software and associated documentation files (the "Software"), to deal in
++ * the Software without restriction, including without limitation the rights to
++ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
++ * the Software, and to permit persons to whom the Software is furnished to do so,
++ * subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all
++ * copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * http://www.FreeRTOS.org
++ * http://aws.amazon.com/freertos
++ *
++ * 1 tab == 4 spaces!
++ */
++
++#ifndef FREERTOS_CONFIG_H
++#define FREERTOS_CONFIG_H
++
++/*-----------------------------------------------------------
++ * Application specific definitions.
++ *
++ * These definitions should be adjusted for your particular hardware and
++ * application requirements.
++ *
++ * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
++ * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
++ *
++ * See http://www.freertos.org/a00110.html.
++ *----------------------------------------------------------*/
++
++#define configUSE_PREEMPTION                    1
++#define configUSE_TICKLESS_IDLE                 0
++#define configCPU_CLOCK_HZ                      (SystemCoreClock)
++#define configTICK_RATE_HZ                      ((TickType_t)400)
++#define configMAX_PRIORITIES                    8
++#define configMINIMAL_STACK_SIZE                ((unsigned short)90)
++#define configMAX_TASK_NAME_LEN                 20
++#define configUSE_16_BIT_TICKS                  0
++#define configIDLE_SHOULD_YIELD                 1
++#define configUSE_TASK_NOTIFICATIONS            1
++#define configUSE_MUTEXES                       1
++#define configUSE_RECURSIVE_MUTEXES             1
++#define configUSE_COUNTING_SEMAPHORES           1
++#define configUSE_ALTERNATIVE_API               0 /* Deprecated! */
++#define configQUEUE_REGISTRY_SIZE               8
++#define configUSE_QUEUE_SETS                    0
++#define configUSE_TIME_SLICING                  0
++#define configUSE_NEWLIB_REENTRANT              0
++#define configENABLE_BACKWARD_COMPATIBILITY     1
++#define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
++/*TODO: drop*/
++#define INCLUDE_xQueueGetMutexHolder            1
++
++/* Used memory allocation (heap_x.c) */
++#define configFRTOS_MEMORY_SCHEME               4
++/* Tasks.c additions (e.g. Thread Aware Debug capability) */
++#define configINCLUDE_FREERTOS_TASK_C_ADDITIONS_H 1
++
++/* Memory allocation related definitions. */
++#define configSUPPORT_STATIC_ALLOCATION         0
++#define configSUPPORT_DYNAMIC_ALLOCATION        1
++#define configTOTAL_HEAP_SIZE                   ((size_t)(160 * 1024))
++#define configAPPLICATION_ALLOCATED_HEAP        0
++
++/* Hook function related definitions. */
++#define configUSE_IDLE_HOOK                     0
++#define configUSE_TICK_HOOK                     0
++#define configCHECK_FOR_STACK_OVERFLOW          0
++#define configUSE_MALLOC_FAILED_HOOK            0
++#define configUSE_DAEMON_TASK_STARTUP_HOOK      0
++
++/* Run time and task stats gathering related definitions. */
++#define configGENERATE_RUN_TIME_STATS           0
++#define configUSE_TRACE_FACILITY                1
++#define configUSE_STATS_FORMATTING_FUNCTIONS    1
++
++/* Task aware debugging. */
++#define configRECORD_STACK_HIGH_ADDRESS         1
++
++/* Co-routine related definitions. */
++#define configUSE_CO_ROUTINES                   0
++#define configMAX_CO_ROUTINE_PRIORITIES         2
++
++/* Software timer related definitions. */
++#define configUSE_TIMERS                        1
++#define configTIMER_TASK_PRIORITY               ((configMAX_PRIORITIES) - 1)
++#define configTIMER_QUEUE_LENGTH                10
++#define configTIMER_TASK_STACK_DEPTH            (configMINIMAL_STACK_SIZE * 2)
++
++/* Define to trap errors during development. */
++#define configASSERT(x) if(( x) == 0) {taskDISABLE_INTERRUPTS(); for (;;);}
++
++/* Optional functions - most linkers will remove unused functions anyway. */
++#define INCLUDE_vTaskPrioritySet                1
++#define INCLUDE_uxTaskPriorityGet               1
++#define INCLUDE_vTaskDelete                     1
++#define INCLUDE_vTaskSuspend                    1
++#define INCLUDE_xResumeFromISR                  1
++#define INCLUDE_vTaskDelayUntil                 1
++#define INCLUDE_vTaskDelay                      1
++#define INCLUDE_xTaskGetSchedulerState          1
++#define INCLUDE_xTaskGetCurrentTaskHandle       1
++#define INCLUDE_uxTaskGetStackHighWaterMark     0
++#define INCLUDE_xTaskGetIdleTaskHandle          0
++#define INCLUDE_eTaskGetState                   0
++#define INCLUDE_xEventGroupSetBitFromISR        1
++#define INCLUDE_xTimerPendFunctionCall          1
++#define INCLUDE_xTaskAbortDelay                 0
++#define INCLUDE_xTaskGetHandle                  0
++#define INCLUDE_xTaskResumeFromISR              1
++
++
++
++#if defined(__ICCARM__)||defined(__CC_ARM)||defined(__GNUC__)
++    /* Clock manager provides in this variable system core clock frequency */
++    #include <stdint.h>
++    extern uint32_t SystemCoreClock;
++#endif
++
++/* Interrupt nesting behaviour configuration. Cortex-M specific. */
++#ifdef __NVIC_PRIO_BITS
++/* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
++#define configPRIO_BITS __NVIC_PRIO_BITS
++#else
++#define configPRIO_BITS 3 /* 8 priority levels */
++#endif
++
++/* The lowest interrupt priority that can be used in a call to a "set priority"
++function. */
++#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY ((1U << (configPRIO_BITS)) - 1)
++
++/* The highest interrupt priority that can be used by any interrupt service
++routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL
++INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER
++PRIORITY THAN THIS! (higher priorities are lower numeric values. */
++#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY 2
++
++/* Interrupt priorities used by the kernel port layer itself.  These are generic
++to all Cortex-M ports, and do not rely on any particular library functions. */
++#define configKERNEL_INTERRUPT_PRIORITY (configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
++/* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
++See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
++#define configMAX_SYSCALL_INTERRUPT_PRIORITY (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
++
++/* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
++standard names. */
++#define vPortSVCHandler SVC_Handler
++#define xPortPendSVHandler PendSV_Handler
++#define xPortSysTickHandler SysTick_Handler
++
++#endif /* FREERTOS_CONFIG_H */
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt b/boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt
+new file mode 100755
+index 0000000..ea3eea1
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt
+@@ -0,0 +1,845 @@
++INCLUDE(CMakeForceCompiler)
++
++# CROSS COMPILER SETTING
++SET(CMAKE_SYSTEM_NAME Generic)
++CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
++
++# THE VERSION NUMBER
++SET (Tutorial_VERSION_MAJOR 1)
++SET (Tutorial_VERSION_MINOR 0)
++
++# ENABLE ASM
++ENABLE_LANGUAGE(ASM)
++
++SET(CMAKE_STATIC_LIBRARY_PREFIX)
++SET(CMAKE_STATIC_LIBRARY_SUFFIX)
++
++SET(CMAKE_EXECUTABLE_LIBRARY_PREFIX)
++SET(CMAKE_EXECUTABLE_LIBRARY_SUFFIX)
++
++# CURRENT DIRECTORY
++SET(ProjDirPath ${CMAKE_CURRENT_SOURCE_DIR})
++SET(BspDirPath ${ProjDirPath}/../../../..)
++SET(AppDirPath ${APP_PATH})
++SET(IotCoreDirPath ${IOT_CORE_PATH}/src)
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -DDEBUG")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -DXIP_IMAGE")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -DMXL12835F")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -D__STARTUP_CLEAR_BSS")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -DIMG_BAUDRATE=96000000")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -g")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -mcpu=cortex-m4")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -Wall")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -mfloat-abi=hard")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -mfpu=fpv4-sp-d16")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -mthumb")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -fno-common")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -ffunction-sections")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -fdata-sections")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -ffreestanding")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -fno-builtin")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -mapcs")
++
++SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -std=gnu99")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -DNDEBUG")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -DXIP_IMAGE")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -DMXL12835F")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -D__STARTUP_CLEAR_BSS")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -DIMG_BAUDRATE=96000000")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -mcpu=cortex-m4")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -Wall")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -mfloat-abi=hard")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -mfpu=fpv4-sp-d16")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -mthumb")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -fno-common")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -ffunction-sections")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -fdata-sections")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -ffreestanding")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -fno-builtin")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -mapcs")
++
++SET(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} -std=gnu99")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DXIP_IMAGE")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DCPU_LPC54018")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DBOARD_USE_VIRTUALCOM")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DUSB_STACK_FREERTOS")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DUSB_STACK_USE_DEDICATED_RAM=1")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DBOARD_DEBUG_UART_TYPE=kSerialPort_UsbCdc")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG_CONSOLE_TRANSFER_NON_BLOCKING")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DSERIAL_PORT_TYPE_USBCDC=1")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DCPU_LPC54018JET180=1")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DA_LITTLE_ENDIAN")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DSDK_DEBUGCONSOLE_UART")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DSERIAL_PORT_TYPE_UART=1")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DFSL_RTOS_FREE_RTOS")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -mcpu=cortex-m4")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -mfloat-abi=hard")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -mfpu=fpv4-sp-d16")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -mthumb")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -MMD")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -MP")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-common")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ffunction-sections")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fdata-sections")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ffreestanding")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-builtin")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -mapcs")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -std=gnu99")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DNDEBUG")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DXIP_IMAGE")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DCPU_LPC54018")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DBOARD_USE_VIRTUALCOM")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DUSB_STACK_FREERTOS")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DUSB_STACK_USE_DEDICATED_RAM=1")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DBOARD_DEBUG_UART_TYPE=kSerialPort_UsbCdc")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DDEBUG_CONSOLE_TRANSFER_NON_BLOCKING=1")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DSERIAL_PORT_TYPE_USBCDC=1")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DSHELL_MAX_CMD=24")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DSHELL_NON_BLOCKING_MODE=0")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DCPU_LPC54018JET180=1")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DA_LITTLE_ENDIAN")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DSDK_DEBUGCONSOLE_UART")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG_CONSOLE_RX_ENABLE=0")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DSERIAL_PORT_TYPE_UART=1")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DFSL_RTOS_FREE_RTOS")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Os")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mcpu=cortex-m4")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wall")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mfloat-abi=hard")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mfpu=fpv4-sp-d16")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mthumb")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -MMD")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -MP")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-common")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ffunction-sections")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fdata-sections")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ffreestanding")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-builtin")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mapcs")
++
++SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -std=gnu99")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DSERIAL_PORT_TYPE_USBCDC=1")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG_CONSOLE_TRANSFER_NON_BLOCKING")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DSERIAL_PORT_TYPE_UART=1")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mcpu=cortex-m4")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mfloat-abi=hard")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mfpu=fpv4-sp-d16")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mthumb")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -MMD")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -MP")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-common")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ffunction-sections")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fdata-sections")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ffreestanding")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-builtin")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mapcs")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-rtti")
++
++SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-exceptions")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSERIAL_PORT_TYPE_USBCDC=1")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DDEBUG_CONSOLE_TRANSFER_NON_BLOCKING")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DSERIAL_PORT_TYPE_UART=1")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Os")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mcpu=cortex-m4")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mfloat-abi=hard")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mfpu=fpv4-sp-d16")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mthumb")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -MMD")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -MP")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-common")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffunction-sections")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdata-sections")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffreestanding")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-builtin")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mapcs")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-rtti")
++
++SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-exceptions")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -mcpu=cortex-m4")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wall")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -mfloat-abi=hard")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -mfpu=fpv4-sp-d16")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --specs=nano.specs")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --specs=nosys.specs")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fno-common")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -ffunction-sections")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fdata-sections")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -ffreestanding")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fno-builtin")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -mthumb")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -mapcs")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --gc-sections")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -static")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -z")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} muldefs")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Map=output.map")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --defsym=__stack_size__=200")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --defsym=__heap_size__=2000")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --defsym=XIP_IMAGE=1")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,-wrap,malloc -Wl,-wrap,free -Wl,-wrap,realloc -Wl,-wrap,calloc")
++
++SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,-wrap,gettimeofday -Wl,-wrap,strdup")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mcpu=cortex-m4")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wall")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mfloat-abi=hard")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mfpu=fpv4-sp-d16")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} --specs=nano.specs")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} --specs=nosys.specs")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -fno-common")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -ffunction-sections")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -fdata-sections")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -ffreestanding")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -fno-builtin")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mthumb")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mapcs")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} --gc-sections")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -static")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -z")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} muldefs")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Map=output.map")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} --defsym=__stack_size__=0x200")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} --defsym=__heap_size__=0x200")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Xlinker")
++
++SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} --defsym=XIP_IMAGE=1")
++
++include_directories(${ProjDirPath}/../..)
++
++include_directories(${ProjDirPath}/..)
++
++include_directories(${BspDirPath}/rtos/amazon-freertos/freertos_kernel/portable/GCC/ARM_CM4F)
++
++include_directories(${BspDirPath}/CMSIS/Include)
++
++include_directories(${BspDirPath}/devices)
++
++include_directories(${BspDirPath}/devices/LPC54018)
++
++include_directories(${BspDirPath}/rtos/amazon-freertos/freertos_kernel/include)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/port/boards/lpc54018iotmodule/freertos/gt202)
++
++include_directories(${BspDirPath}/devices/LPC54018/drivers)
++
++include_directories(${BspDirPath}/middleware/usb/device)
++
++include_directories(${BspDirPath}/middleware/usb/include)
++
++include_directories(${BspDirPath}/components/serial_manager)
++
++include_directories(${BspDirPath}/components/lists)
++
++include_directories(${BspDirPath}/components/serial_manager/usb_cdc_adapter)
++
++include_directories(${ProjDirPath}/../../component_examples/config)
++
++include_directories(${BspDirPath}/middleware/wifi_qca)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/include)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/include/AR6002)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/include/AR6002/hw4.0/hw)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/custom_src/stack_custom)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/custom_src/include)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/common_src/include)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/common_src/stack_common)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/common_src/hcd)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/common_src/wmi)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/port)
++
++include_directories(${BspDirPath}/devices/LPC54018/utilities/str)
++
++include_directories(${BspDirPath}/devices/LPC54018/utilities/debug_console)
++
++include_directories(${BspDirPath}/components/uart)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/port/boards/lpc54018iotmodule/freertos)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/port/env/freertos)
++
++include_directories(${BspDirPath}/middleware/wifi_qca/port/drivers/flexcomm_freertos)
++
++include_directories(${BspDirPath}/components/osa)
++
++include_directories(${BspDirPath}/components/rng)
++
++include_directories(${BspDirPath}/devices/LPC54018/utilities)
++
++include_directories(${BspDirPath}/rtos/amazon-freertos/libraries/abstractions/wifi/include)
++
++include_directories(${BspDirPath}/rtos/amazon-freertos/libraries/c_sdk/standard/common/include)
++
++include_directories(${BspDirPath}/rtos/amazon-freertos/vendors/nxp/mflash/lpc54xxx)
++#freertos
++include_directories(${BspDirPath}/rtos/amazon-freertos/freertos_kernel/include)
++file(GLOB FREERTOS_SRC ${BspDirPath}/rtos/amazon-freertos/freertos_kernel/*.c)
++file(GLOB_RECURSE FREERTOS_GCC_SRC ${BspDirPath}/rtos/amazon-freertos/freertos_kernel/portable/GCC/*.c)
++#list(REMOVE_ITEM FREERTOS_SRC ${ARMV8_SRC})
++SET(FREERTOS_MEM_SRC "${BspDirPath}/rtos/amazon-freertos/freertos_kernel/portable/MemMang/heap_4.c")
++
++####cjson
++include_directories(${BspDirPath}/middleware/stdk-deps/cjson)
++file(GLOB CJSON_SRC ${BspDirPath}/middleware/stdk-deps/cjson/*c)
++
++####libsodium
++include_directories(${BspDirPath}/middleware/stdk-deps/libsodium/port)
++include_directories(${BspDirPath}/middleware/stdk-deps/libsodium/include)
++include_directories(${BspDirPath}/middleware/stdk-deps/libsodium/include/sodium)
++include_directories(${BspDirPath}/middleware/stdk-deps/libsodium/include/sodium/private)
++include_directories(${BspDirPath}/middleware/stdk-deps/libsodium/crypto_core/ed25519/ref10/fe_25_5)
++include_directories(${BspDirPath}/middleware/stdk-deps/libsodium/crypto_scalarmult/curve25519/ref10)
++include_directories(${BspDirPath}/middleware/stdk-deps/libsodium/crypto_scalarmult/curve25519)
++file(GLOB SODIM_SRC ${BspDirPath}/middleware/stdk-deps/libsodium/sodium/*c)
++file(GLOB_RECURSE CRYPTO_BOX_SRC ${BspDirPath}/middleware/stdk-deps/libsodium/crypto_box/*c)
++file(GLOB_RECURSE CRYPTO_CORE_SRC ${BspDirPath}/middleware/stdk-deps/libsodium/crypto_core/ed25519/*c)
++file(GLOB_RECURSE CRYPTO_SCAL_SRC ${BspDirPath}/middleware/stdk-deps/libsodium/crypto_scalarmult/*c)
++file(GLOB_RECURSE CRYPTO_HASH_SRC ${BspDirPath}/middleware/stdk-deps/libsodium/crypto_hash/*c)
++file(GLOB_RECURSE CRYPTO_SIGN_SRC ${BspDirPath}/middleware/stdk-deps/libsodium/crypto_sign/*c)
++file(GLOB CRYPTO_VERIFY_SRC ${BspDirPath}/middleware/stdk-deps/libsodium/crypto_verify/sodium/*c)
++file(GLOB RANDOM_SRC ${BspDirPath}/middleware/stdk-deps/libsodium/randombytes/*c)
++
++#mbedtls
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fomit-frame-pointer")
++include_directories(${AppDirPath})
++include_directories(${BspDirPath}/middleware/stdk-deps/mbedtls/include)
++include_directories(${BspDirPath}/middleware/stdk-deps/mbedtls/include/mbedtls)
++include_directories(${BspDirPath}/middleware/stdk-deps/socket_wrapper)
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSUPPORT_MBEDTLS")
++file(GLOB MBEDTLS_SRC ${BspDirPath}/middleware/stdk-deps/mbedtls/library/*c)
++file(GLOB MBEDTLS_PORT ${BspDirPath}/middleware/stdk-deps/mbedtls/port/*c)
++
++##############add for stdk###########################
++####iot-core
++SET(COMPONENT_PATH ${IOT_CORE_PATH}/src)
++include ("${ProjDirPath}/config.cmake")
++foreach(bsp_config_cflags ${NXP_CFLAGS})
++	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D${bsp_config_cflags}")
++endforeach()
++
++include ("${IotCoreDirPath}/iot-core.cmake")
++include_directories(${BspDirPath}/middleware/lwip/src/include/compat/posix)
++foreach(TMP_DIR ${COMPONENT_ADD_INCLUDEDIRS})
++	include_directories(${IotCoreDirPath}/${TMP_DIR})
++endforeach()
++
++foreach(TMP_DIR ${COMPONENT_SRCDIRS})
++	file(GLOB TMP_CORE_SRC ${IotCoreDirPath}/${TMP_DIR}/*.c)
++	set(IOT_CORE_SRC "${IOT_CORE_SRC}" ${TMP_CORE_SRC})
++endforeach()
++set(IOT_CORE_SRC "${IOT_CORE_SRC}" ${IotCoreDirPath}/iot_root_ca.c)
++####stdk app & json
++include_directories(${AppDirPath})
++file(GLOB_RECURSE STDK_APP ${AppDirPath}/main/*c)
++set(APP_ONBOARDING_JSON ${AppDirPath}/main/onboarding_config.json.o)
++set(APP_DEVICEINFO_JSON ${AppDirPath}/main/device_info.json.o)
++add_custom_target(buildJSON ALL)
++add_custom_command(
++		TARGET buildJSON
++		PRE_BUILD
++		COMMENT "Generating json object"
++		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
++		COMMAND cp ${AppDirPath}/main/onboarding_config.json ./
++		COMMAND cp ${AppDirPath}/main/device_info.json ./
++		COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-littlearm -B arm onboarding_config.json ${APP_ONBOARDING_JSON}
++		COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-littlearm -B arm device_info.json ${APP_DEVICEINFO_JSON}
++		COMMAND rm ./device_info.json
++		COMMAND rm ./onboarding_config.json
++)
++
++add_executable(stdk_${IMAGE_NAME}.elf "${ProjDirPath}/../FreeRTOSConfig.h"
++"${ProjDirPath}/../main.c"
++"${ProjDirPath}/../pin_mux.c"
++"${ProjDirPath}/../pin_mux.h"
++"${ProjDirPath}/../board.c"
++"${ProjDirPath}/../board.h"
++"${ProjDirPath}/../clock_config.c"
++"${ProjDirPath}/../clock_config.h"
++"${BspDirPath}/middleware/wifi_qca/port/boards/lpc54018iotmodule/freertos/gt202/wifi_shield_gt202.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_iocon.h"
++"${BspDirPath}/middleware/usb/device/usb_device_lpcip3511.c"
++"${BspDirPath}/middleware/usb/device/usb_device_lpcip3511.h"
++"${BspDirPath}/middleware/usb/include/usb.h"
++"${BspDirPath}/middleware/usb/include/usb_misc.h"
++"${BspDirPath}/middleware/usb/include/usb_spec.h"
++"${BspDirPath}/components/serial_manager/serial_manager.c"
++"${BspDirPath}/components/serial_manager/serial_manager.h"
++"${BspDirPath}/components/serial_manager/serial_port_internal.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_common.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_common.h"
++"${BspDirPath}/components/lists/generic_list.c"
++"${BspDirPath}/components/lists/generic_list.h"
++"${BspDirPath}/components/serial_manager/serial_port_usb.c"
++"${BspDirPath}/components/serial_manager/serial_port_usb.h"
++"${BspDirPath}/components/serial_manager/usb_cdc_adapter/usb_device_descriptor.c"
++"${BspDirPath}/components/serial_manager/usb_cdc_adapter/usb_device_descriptor.h"
++"${BspDirPath}/components/serial_manager/usb_cdc_adapter/usb_device_cdc_acm.c"
++"${BspDirPath}/components/serial_manager/usb_cdc_adapter/usb_device_cdc_acm.h"
++"${BspDirPath}/components/serial_manager/usb_cdc_adapter/usb_device_class.c"
++"${BspDirPath}/components/serial_manager/usb_cdc_adapter/usb_device_class.h"
++"${BspDirPath}/components/serial_manager/usb_cdc_adapter/usb_device_ch9.c"
++"${BspDirPath}/components/serial_manager/usb_cdc_adapter/usb_device_ch9.h"
++"${ProjDirPath}/../../component_examples/config/usb_device_config.h"
++"${BspDirPath}/middleware/usb/device/usb_device.h"
++"${BspDirPath}/middleware/usb/device/usb_device_dci.c"
++"${BspDirPath}/middleware/usb/device/usb_device_dci.h"
++"${BspDirPath}/middleware/wifi_qca/atheros_stack_offload.h"
++"${BspDirPath}/middleware/wifi_qca/atheros_wifi.h"
++"${BspDirPath}/middleware/wifi_qca/atheros_wifi_api.h"
++"${BspDirPath}/middleware/wifi_qca/atheros_wifi_internal.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/api_interface/api_init.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/api_interface/api_ioctl.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/api_interface/api_txrx.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/api_interface/api_wmi_rx.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/bmi/bmi.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/driver/driver_diag.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/driver/driver_init.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/driver/driver_main.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/driver/driver_netbuf.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/driver/driver_txrx.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/hcd/hcd_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/hcd/spi_hcd.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/htc/htc.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/hw_interface/hw_api.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/a_debug.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/a_drv.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/a_drv_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/aggr_recv_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/bmi.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/common_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/dbglog_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/driver_cxt.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/dset.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/dset_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/hif_internal.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/htc_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/ieee80211.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/netbuf.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/spi_hcd_if.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/wlan_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/include/wmi_api.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/qapi/qcom_api.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/qapi/qcom_dns.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/qapi/qcom_legacy.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/reorder/rcv_aggr.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/stack_common/api_stack_offload.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/stack_common/common_stack_offload.h"
++"${BspDirPath}/middleware/wifi_qca/common_src/storerecall/dset.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/storerecall/dset_api.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/storerecall/storerecall.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/util/util.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/wmi/wmi.c"
++"${BspDirPath}/middleware/wifi_qca/common_src/wmi/wmi_host.h"
++"${BspDirPath}/middleware/wifi_qca/custom_src/api_interface/cust_api_init.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/api_interface/cust_api_ioctl.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/api_interface/cust_api_txrx.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/api_interface/cust_api_wmi_rx.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/driver/cust_driver_main.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/driver/cust_driver_netbuf.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/hw_interface/cust_spi_hcd.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/include/a_config.h"
++"${BspDirPath}/middleware/wifi_qca/custom_src/include/a_osapi.h"
++"${BspDirPath}/middleware/wifi_qca/custom_src/include/a_types.h"
++"${BspDirPath}/middleware/wifi_qca/custom_src/include/cust_netbuf.h"
++"${BspDirPath}/middleware/wifi_qca/custom_src/include/custom_wlan_api.h"
++"${BspDirPath}/middleware/wifi_qca/custom_src/include/wlan_config.h"
++"${BspDirPath}/middleware/wifi_qca/custom_src/qapi/custom_qcom_api.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/stack_custom/cust_api_stack_offload.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/stack_custom/cust_api_stack_txrx.c"
++"${BspDirPath}/middleware/wifi_qca/custom_src/stack_custom/custom_stack_offload.h"
++"${BspDirPath}/middleware/wifi_qca/custom_src/stack_custom/qca_structs.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/AR6K_version.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw/hw20_apb_map.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw/hw20_gpio_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw/hw20_mbox_host_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw/hw20_mbox_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw/hw20_rtc_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw/hw20_si_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw/hw20_uart_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw2.0/hw/hw20_vmc_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw4.0/hw/hw40_rtc_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/AR6002/hw4.0/hw/hw40_rtc_wlan_reg.h"
++"${BspDirPath}/middleware/wifi_qca/include/athdefs.h"
++"${BspDirPath}/middleware/wifi_qca/include/bmi_msg.h"
++"${BspDirPath}/middleware/wifi_qca/include/dbglog.h"
++"${BspDirPath}/middleware/wifi_qca/include/dbglog_id.h"
++"${BspDirPath}/middleware/wifi_qca/include/htc.h"
++"${BspDirPath}/middleware/wifi_qca/include/htc_services.h"
++"${BspDirPath}/middleware/wifi_qca/include/p2p.h"
++"${BspDirPath}/middleware/wifi_qca/include/pkt_log.h"
++"${BspDirPath}/middleware/wifi_qca/include/pmu.h"
++"${BspDirPath}/middleware/wifi_qca/include/targaddrs.h"
++"${BspDirPath}/middleware/wifi_qca/include/wlan_defs.h"
++"${BspDirPath}/middleware/wifi_qca/include/wmi.h"
++"${BspDirPath}/middleware/wifi_qca/port/wifi_common.h"
++"${BspDirPath}/middleware/wifi_qca/port/wifi_shield_common.h"
++"${BspDirPath}/middleware/wifi_qca/qcom_api.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_clock.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_clock.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_power.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_power.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_reset.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_reset.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_wwdt.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_wwdt.h"
++"${BspDirPath}/devices/LPC54018/LPC54018.h"
++"${BspDirPath}/devices/LPC54018/LPC54018_features.h"
++"${BspDirPath}/devices/LPC54018/fsl_device_registers.h"
++"${BspDirPath}/devices/LPC54018/utilities/debug_console/fsl_debug_console.c"
++"${BspDirPath}/devices/LPC54018/utilities/debug_console/fsl_debug_console.h"
++"${BspDirPath}/devices/LPC54018/utilities/debug_console/fsl_debug_console_conf.h"
++"${BspDirPath}/devices/LPC54018/utilities/str/fsl_str.c"
++"${BspDirPath}/devices/LPC54018/utilities/str/fsl_str.h"
++"${BspDirPath}/components/uart/uart.h"
++"${BspDirPath}/components/uart/usart_adapter.c"
++"${BspDirPath}/components/serial_manager/serial_port_uart.c"
++"${BspDirPath}/components/serial_manager/serial_port_uart.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_usart.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_usart.h"
++"${BspDirPath}/devices/LPC54018/gcc/startup_LPC54018.S"
++"${BspDirPath}/devices/LPC54018/system_LPC54018.c"
++"${BspDirPath}/devices/LPC54018/system_LPC54018.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_flexcomm.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_flexcomm.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_gpio.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_gpio.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_emc.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_emc.h"
++"${BspDirPath}/devices/LPC54018/utilities/fsl_assert.c"
++"${BspDirPath}/devices/LPC54018/utilities/fsl_shell.c"
++"${BspDirPath}/middleware/wifi_qca/port/boards/lpc54018iotmodule/freertos/wifi_shield.c"
++"${BspDirPath}/middleware/wifi_qca/port/boards/lpc54018iotmodule/freertos/wifi_shield.h"
++"${BspDirPath}/middleware/wifi_qca/port/env/freertos/wifi_env.c"
++"${BspDirPath}/middleware/wifi_qca/port/env/freertos/wifi_env.h"
++"${BspDirPath}/middleware/wifi_qca/port/env/freertos/wifi_env_port.h"
++"${BspDirPath}/middleware/wifi_qca/port/env/freertos/wifi_port.h"
++"${BspDirPath}/middleware/wifi_qca/port/drivers/flexcomm_freertos/wifi_spi.c"
++"${BspDirPath}/middleware/wifi_qca/port/drivers/flexcomm_freertos/wifi_spi.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_spi.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_spi.h"
++"${BspDirPath}/CMSIS/Include/core_cm4.h"
++"${BspDirPath}/CMSIS/Include/cmsis_armcc.h"
++"${BspDirPath}/CMSIS/Include/cmsis_armclang.h"
++"${BspDirPath}/CMSIS/Include/cmsis_armclang_ltm.h"
++"${BspDirPath}/CMSIS/Include/cmsis_compiler.h"
++"${BspDirPath}/CMSIS/Include/cmsis_gcc.h"
++"${BspDirPath}/CMSIS/Include/cmsis_iccarm.h"
++"${BspDirPath}/CMSIS/Include/cmsis_version.h"
++"${BspDirPath}/CMSIS/Include/core_armv81mml.h"
++"${BspDirPath}/CMSIS/Include/core_armv8mbl.h"
++"${BspDirPath}/CMSIS/Include/core_armv8mml.h"
++"${BspDirPath}/CMSIS/Include/mpu_armv7.h"
++"${BspDirPath}/CMSIS/Include/mpu_armv8.h"
++"${BspDirPath}/CMSIS/Include/arm_common_tables.h"
++"${BspDirPath}/CMSIS/Include/arm_const_structs.h"
++"${BspDirPath}/CMSIS/Include/arm_math.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_spi_dma.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_spi_dma.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_dma.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_dma.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_pint.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_pint.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_inputmux.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_inputmux.h"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_inputmux_connections.h"
++"${BspDirPath}/components/osa/fsl_os_abstraction.h"
++"${BspDirPath}/components/osa/fsl_os_abstraction_config.h"
++"${BspDirPath}/components/osa/fsl_os_abstraction_free_rtos.c"
++"${BspDirPath}/components/osa/fsl_os_abstraction_free_rtos.h"
++"${BspDirPath}/devices/LPC54018/utilities/fsl_sbrk.c"
++"${BspDirPath}/rtos/amazon-freertos/vendors/nxp/wifi/qca_400x/iot_wifi.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_spifi.c"
++"${BspDirPath}/devices/LPC54018/drivers/fsl_spifi.h"
++"${BspDirPath}/rtos/amazon-freertos/vendors/nxp/mflash/lpc54xxx/mflash_drv.c"
++"${BspDirPath}/rtos/amazon-freertos/vendors/nxp/mflash/lpc54xxx/mflash_drv.h"
++"${BspDirPath}/rtos/amazon-freertos/vendors/nxp/mflash/lpc54xxx/mflash_file.c"
++"${BspDirPath}/rtos/amazon-freertos/vendors/nxp/mflash/lpc54xxx/mflash_file.h"
++"${BspDirPath}/components/rng/rng_adapter.c"
++
++"${FREERTOS_SRC}"
++"${FREERTOS_GCC_SRC}"
++"${FREERTOS_MEM_SRC}"
++
++"${MBEDTLS_SRC}"
++"${MBEDTLS_PORT}"
++"${BspDirPath}/middleware/stdk-deps/socket_wrapper/nxp_socket.c"
++
++"${SODIM_SRC}"
++"${CRYPTO_BOX_SRC}"
++"${CRYPTO_CORE_SRC}"
++"${CRYPTO_SCAL_SRC}"
++"${CRYPTO_HASH_SRC}"
++"${CRYPTO_SIGN_SRC}"
++"${CRYPTO_VERIFY_SRC}"
++"${RANDOM_SRC}"
++
++"${CJSON_SRC}"
++
++"${IOT_CORE_SRC}"
++"${STDK_APP}"
++)
++
++
++set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -T${ProjDirPath}/LPC54018_spifi_flash.ld -static")
++
++set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -T${ProjDirPath}/LPC54018_spifi_flash.ld -static")
++
++TARGET_LINK_LIBRARIES(stdk_${IMAGE_NAME}.elf -Wl,--start-group)
++target_link_libraries(stdk_${IMAGE_NAME}.elf debug m)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf debug c)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf debug gcc)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf debug nosys)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf optimized m)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf optimized c)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf optimized gcc)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf optimized nosys)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf debug ${APP_ONBOARDING_JSON})
++target_link_libraries(stdk_${IMAGE_NAME}.elf debug ${APP_DEVICEINFO_JSON})
++
++link_directories(${BspDirPath}/devices/LPC54018/gcc)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf debug ${BspDirPath}/devices/LPC54018/gcc/libpower_hardabi.a)
++
++link_directories(${BspDirPath}/devices/LPC54018/gcc)
++
++target_link_libraries(stdk_${IMAGE_NAME}.elf optimized ${BspDirPath}/devices/LPC54018/gcc/libpower_hardabi.a)
++
++TARGET_LINK_LIBRARIES(stdk_${IMAGE_NAME}.elf -Wl,--end-group)
++
++ADD_CUSTOM_COMMAND(TARGET stdk_${IMAGE_NAME}.elf POST_BUILD COMMAND ${CMAKE_OBJCOPY}
++-Obinary ${EXECUTABLE_OUTPUT_PATH}/stdk_${IMAGE_NAME}.elf ${EXECUTABLE_OUTPUT_PATH}/stdk_${IMAGE_NAME}.bin)
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld b/boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld
+new file mode 100755
+index 0000000..97a055c
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld
+@@ -0,0 +1,238 @@
++/*
++** ###################################################################
++**     Processors:          LPC54018JBD208
++**                          LPC54018JET180
++**
++**     Compiler:            GNU C Compiler
++**     Reference manual:    LPC540xx/LPC54S0xx User manual Rev.0.8 5 June 2018
++**     Version:             rev. 1.2, 2017-06-08
++**     Build:               b190925
++**
++**     Abstract:
++**         Linker file for the GNU C Compiler
++**
++**     Copyright 2016 Freescale Semiconductor, Inc.
++**     Copyright 2016-2019 NXP
++**     All rights reserved.
++**
++**     SPDX-License-Identifier: BSD-3-Clause
++**
++**     http:                 www.nxp.com
++**     mail:                 support@nxp.com
++**
++** ###################################################################
++*/
++
++
++
++/* Entry Point */
++ENTRY(Reset_Handler)
++
++HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0x0400;
++STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0800;
++
++IMAGE_START_ADDR  = DEFINED(XIP_IMAGE)  ? 0x10000000  : 0x00000000;
++DATA_START_ADDR   = DEFINED(XIP_IMAGE)  ? 0x00000004  : 0x20000000;
++TEXT_SECTION_SIZE = DEFINED(XIP_IMAGE)  ? 0x00FFFE00  : 0x0002FE00;
++DATA_SECTION_SIZE = DEFINED(XIP_IMAGE)  ? 0x0002FFFC  : 0x00028000;
++
++/* Specify the memory areas */
++MEMORY
++{
++  m_interrupts          (RX)  : ORIGIN = IMAGE_START_ADDR, LENGTH = 0x00000200
++  m_text                (RX)  : ORIGIN = IMAGE_START_ADDR + 0x00000200, LENGTH = TEXT_SECTION_SIZE
++  m_data                (RW)  : ORIGIN = DATA_START_ADDR, LENGTH = DATA_SECTION_SIZE
++  m_usb_sram            (RW)  : ORIGIN = 0x40100000, LENGTH = 0x00002000
++}
++
++/* Define output sections */
++SECTIONS
++{
++  /* The startup code goes first into internal flash */
++  .interrupts :
++  {
++    __vector_start = .;
++    . = ALIGN(4);
++    KEEP(*(.isr_vector))     /* Startup code */
++    . = ALIGN(4);
++  } > m_interrupts
++
++  /* The program code and other data goes into internal flash */
++  .text :
++  {
++    . = ALIGN(4);
++	*(EXCLUDE_FILE(
++		/* Exclude flash and frequently executed functions from XIP */
++		*/mflash_drv.c.obj
++		*/fsl_spifi.c.obj
++		*/fsl_spi_dma.c.obj
++		*/fsl_dma.c.obj
++	) .text)                 /* .text sections (code) */
++	*(EXCLUDE_FILE(
++		/* Exclude flash and frequently executed functions from XIP */
++		*/mflash_drv.c.obj
++		*/fsl_spifi.c.obj
++		*/fsl_spi_dma.c.obj
++		*/fsl_dma.c.obj
++	) .text*)                /* .text* sections (code) */
++    *(.rodata)               /* .rodata sections (constants, strings, etc.) */
++    *(.rodata*)              /* .rodata* sections (constants, strings, etc.) */
++    *(.glue_7)               /* glue arm to thumb code */
++    *(.glue_7t)              /* glue thumb to arm code */
++    *(.eh_frame)
++    KEEP (*(.init))
++    KEEP (*(.fini))
++    . = ALIGN(4);
++  } > m_text
++
++  .ARM.extab :
++  {
++    *(.ARM.extab* .gnu.linkonce.armextab.*)
++  } > m_text
++
++  .ARM :
++  {
++    __exidx_start = .;
++    *(.ARM.exidx*)
++    __exidx_end = .;
++  } > m_text
++
++ .ctors :
++  {
++    __CTOR_LIST__ = .;
++    /* gcc uses crtbegin.o to find the start of
++       the constructors, so we make sure it is
++       first.  Because this is a wildcard, it
++       doesn't matter if the user does not
++       actually link against crtbegin.o; the
++       linker won't look for a file to match a
++       wildcard.  The wildcard also means that it
++       doesn't matter which directory crtbegin.o
++       is in.  */
++    KEEP (*crtbegin.o(.ctors))
++    KEEP (*crtbegin?.o(.ctors))
++    /* We don't want to include the .ctor section from
++       from the crtend.o file until after the sorted ctors.
++       The .ctor section from the crtend file contains the
++       end of ctors marker and it must be last */
++    KEEP (*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors))
++    KEEP (*(SORT(.ctors.*)))
++    KEEP (*(.ctors))
++    __CTOR_END__ = .;
++  } > m_text
++
++  .dtors :
++  {
++    __DTOR_LIST__ = .;
++    KEEP (*crtbegin.o(.dtors))
++    KEEP (*crtbegin?.o(.dtors))
++    KEEP (*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors))
++    KEEP (*(SORT(.dtors.*)))
++    KEEP (*(.dtors))
++    __DTOR_END__ = .;
++  } > m_text
++
++  .preinit_array :
++  {
++    PROVIDE_HIDDEN (__preinit_array_start = .);
++    KEEP (*(.preinit_array*))
++    PROVIDE_HIDDEN (__preinit_array_end = .);
++  } > m_text
++
++  .init_array :
++  {
++    PROVIDE_HIDDEN (__init_array_start = .);
++    KEEP (*(SORT(.init_array.*)))
++    KEEP (*(.init_array*))
++    PROVIDE_HIDDEN (__init_array_end = .);
++  } > m_text
++
++  .fini_array :
++  {
++    PROVIDE_HIDDEN (__fini_array_start = .);
++    KEEP (*(SORT(.fini_array.*)))
++    KEEP (*(.fini_array*))
++    PROVIDE_HIDDEN (__fini_array_end = .);
++  } > m_text
++
++  __etext = .;    /* define a global symbol at end of code */
++  __DATA_ROM = .; /* Symbol is used by startup for data initialization */
++
++  .data : ALIGN(4)
++  {
++    . = ALIGN(4);
++    __DATA_RAM = .;
++    __data_start__ = .;      /* create a global symbol at data start */
++    *(.ramfunc*)             /* for functions in ram */
++	/* Explicit placement of flash and frequently executed functions in RAM */
++	*/mflash_drv.c.obj(.text .text* .rodata .rodata*)
++	*/fsl_spifi.c.obj(.text .text* .rodata .rodata*)
++	*/fsl_spi_dma.c.obj(.text .text* .rodata .rodata*)
++	*/fsl_dma.c.obj(.text .text* .rodata .rodata*)
++    *(.data)                 /* .data sections */
++    *(.data*)                /* .data* sections */
++    KEEP(*(.jcr*))
++    . = ALIGN(4);
++    __data_end__ = .;        /* define a global symbol at data end */
++  } > m_data AT>m_text
++
++  __DATA_END = __DATA_ROM + (__data_end__ - __data_start__);
++  __IMAGE_START = LOADADDR(.interrupts);
++  __IMAGE_END = LOADADDR(.data) + SIZEOF(.data);
++  __IMAGE_SIZE = __IMAGE_END - __IMAGE_START;
++
++  text_end = ORIGIN(m_text) + LENGTH(m_text);
++  ASSERT(__DATA_END <= text_end, "region m_text overflowed with text and data")
++
++  /* Uninitialized data section */
++  .bss :
++  {
++    /* This is used by the startup in order to initialize the .bss section */
++    . = ALIGN(4);
++    __START_BSS = .;
++    __bss_start__ = .;
++    *(.bss)
++    *(.bss*)
++    *(COMMON)
++    . = ALIGN(4);
++    __bss_end__ = .;
++    __END_BSS = .;
++  } > m_data
++
++  .heap :
++  {
++    . = ALIGN(8);
++    __end__ = .;
++    PROVIDE(end = .);
++    __HeapBase = .;
++    . += HEAP_SIZE;
++    __HeapLimit = .;
++    __heap_limit = .; /* Add for _sbrk */
++  } > m_data
++
++  .stack :
++  {
++    . = ALIGN(8);
++    . += STACK_SIZE;
++  } > m_data
++
++  m_usb_bdt (NOLOAD) :
++  {
++    . = ALIGN(512);
++    *(m_usb_bdt)
++  } > m_usb_sram
++
++  m_usb_global (NOLOAD) :
++  {
++    *(m_usb_global)
++  } > m_usb_sram
++
++  /* Initializes stack on the end of block */
++  __StackTop   = ORIGIN(m_data) + LENGTH(m_data);
++  __StackLimit = __StackTop - STACK_SIZE;
++  PROVIDE(__stack = __StackTop);
++
++  .ARM.attributes 0 : { *(.ARM.attributes) }
++
++  ASSERT(__StackLimit >= __HeapLimit, "region m_data overflowed with stack and heap")
++}
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/build_all.sh b/boards/lpc54018iotmodule/stdk/armgcc/build_all.sh
+new file mode 100755
+index 0000000..bde2922
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/armgcc/build_all.sh
+@@ -0,0 +1,5 @@
++#!/bin/sh
++cmake -DCMAKE_TOOLCHAIN_FILE="../../../../tools/cmake_toolchain_files/armgcc.cmake" -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=debug  .
++make -j4
++cmake -DCMAKE_TOOLCHAIN_FILE="../../../../tools/cmake_toolchain_files/armgcc.cmake" -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=release  .
++make -j4
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/build_debug.sh b/boards/lpc54018iotmodule/stdk/armgcc/build_debug.sh
+new file mode 100755
+index 0000000..e3841ac
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/armgcc/build_debug.sh
+@@ -0,0 +1,4 @@
++#!/bin/sh
++cmake -DCMAKE_TOOLCHAIN_FILE="../../../../tools/cmake_toolchain_files/armgcc.cmake" -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=debug \
++	-DAPP_PATH=${PROJECT_PATH} -DIOT_CORE_PATH=${CORE_PATH} -DIMAGE_NAME=${PROJECT_TITLE}
++make -j4
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/build_release.sh b/boards/lpc54018iotmodule/stdk/armgcc/build_release.sh
+new file mode 100755
+index 0000000..3346f02
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/armgcc/build_release.sh
+@@ -0,0 +1,3 @@
++#!/bin/sh
++cmake -DCMAKE_TOOLCHAIN_FILE="../../../../tools/cmake_toolchain_files/armgcc.cmake" -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=release  .
++make -j4
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/clean.sh b/boards/lpc54018iotmodule/stdk/armgcc/clean.sh
+new file mode 100755
+index 0000000..795ad87
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/armgcc/clean.sh
+@@ -0,0 +1,3 @@
++#!/bin/sh
++rm -rf debug release CMakeFiles
++rm -rf Makefile cmake_install.cmake CMakeCache.txt
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/config.cmake b/boards/lpc54018iotmodule/stdk/armgcc/config.cmake
+new file mode 100755
+index 0000000..72b7ceb
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/armgcc/config.cmake
+@@ -0,0 +1,60 @@
++########################################
++# Config
++########################################
++
++#/* For STDK */
++option(CONFIG_STDK_IOT_CORE "iot-core" on)
++option(CONFIG_STDK_IOT_CORE_BSP_SUPPORT_LPC54018 "lpc54018" on)
++option(CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS "freertos" on)
++option(CONFIG_STDK_IOT_CORE_USE_MBEDTLS "use mbedtls" on)
++option(CONFIG_STDK_IOT_CORE_NET_MBEDTLS "net mbedtls" on)
++option(CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP "easysetup http" on)
++option(CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP "httpd" on)
++option(CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519 "ed25519" on)
++option(CONFIG_SAMSUNG_BUILD_ENG "eng" on)
++
++
++
++if(CONFIG_STDK_IOT_CORE)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE)
++endif()
++
++if(CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP)
++endif()
++
++if(CONFIG_STDK_IOT_CORE_USE_MBEDTLS)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_USE_MBEDTLS)
++endif()
++
++if(CONFIG_STDK_IOT_CORE_NET_MBEDTLS)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_NET_MBEDTLS)
++endif()
++
++if(CONFIG_STDK_IOT_CORE_BSP_SUPPORT_LPC54018)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_BSP_SUPPORT_LPC54018)
++endif()
++
++if(CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP)
++endif()
++
++if(CONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION)
++endif()
++
++if(CONFIG_SAMSUNG_BUILD_ENG)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_SAMSUNG_BUILD_ENG)
++endif()
++
++if(CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS)
++endif()
++
++if(CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519)
++	set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519)
++endif()
++
++set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_LOG_LEVEL_INFO)
++set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_LOG_LEVEL_ERROR)
++set(NXP_CFLAGS "${NXP_CFLAGS}" CONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG)
+diff --git a/boards/lpc54018iotmodule/stdk/aws_wifi_config.h b/boards/lpc54018iotmodule/stdk/aws_wifi_config.h
+new file mode 100644
+index 0000000..5dea29f
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/aws_wifi_config.h
+@@ -0,0 +1,80 @@
++/*
++ * Amazon FreeRTOS V1.4.8
++ * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy of
++ * this software and associated documentation files (the "Software"), to deal in
++ * the Software without restriction, including without limitation the rights to
++ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
++ * the Software, and to permit persons to whom the Software is furnished to do so,
++ * subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all
++ * copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
++ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
++ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
++ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * http://aws.amazon.com/freertos
++ * http://www.FreeRTOS.org
++ */
++
++/**
++ * @file aws_wifi_config.h
++ * @brief WiFi module configuration parameters.
++ */
++
++#ifndef _AWS_WIFI_CONFIG_H_
++#define _AWS_WIFI_CONFIG_H_
++
++/**
++ * @brief Max SSID length.
++ */
++#define wificonfigMAX_SSID_LEN                ( 32 )
++
++/**
++ * @brief Max BSSID length.
++ */
++#define wificonfigMAX_BSSID_LEN               ( 6 )
++
++/**
++ * @brief Max passphrase length.
++ *
++ * This length is designated by the Wi-Fi driver as both the WPA PSK and
++ * Passphrase length.
++ */
++#define wificonfigMAX_PASSPHRASE_LEN          ( 64 )
++
++/**
++ * @brief DNS query timeout when getting a host IP.
++ */
++#define wificonfigDNS_QUERY_TIMEOUT           ( 10000 )
++
++/**
++ * @brief Soft Access point SSID
++ */
++#define wificonfigACCESS_POINT_SSID_PREFIX    ( "ConfigureMe" )
++
++/**
++ * @brief Soft Access point Passkey
++ */
++#define wificonfigACCESS_POINT_PASSKEY        ( "awsiotdevice" )
++
++/**
++ * @brief Soft Access point Channel
++ */
++#define wificonfigACCESS_POINT_CHANNEL        ( 11 )
++
++/**
++ * @brief Soft Access point security
++ * WPA2 Security, see WIFISecurity_t
++ * other values are - eWiFiSecurityOpen, eWiFiSecurityWEP, eWiFiSecurityWPA
++ */
++#define wificonfigACCESS_POINT_SECURITY       ( eWiFiSecurityWPA2 )
++
++
++#endif
+diff --git a/boards/lpc54018iotmodule/stdk/board.c b/boards/lpc54018iotmodule/stdk/board.c
+new file mode 100644
+index 0000000..404b199
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/board.c
+@@ -0,0 +1,227 @@
++/*
++ * Copyright (c) 2016, Freescale Semiconductor, Inc.
++ * Copyright 2016-2018 NXP
++ * All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include "board.h"
++#include <stdint.h>
++#include "clock_config.h"
++#include "fsl_common.h"
++#include "fsl_debug_console.h"
++#include "fsl_emc.h"
++#if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
++#include "fsl_i2c.h"
++#endif /* SDK_I2C_BASED_COMPONENT_USED */
++#if defined BOARD_USE_CODEC
++#include "fsl_wm8904.h"
++#endif
++/*******************************************************************************
++ * Definitions
++ ******************************************************************************/
++/* The SDRAM timing. */
++
++#define W9812G6JB6I
++
++#ifdef MTL48LC8M16A2B
++#define SDRAM_REFRESHPERIOD_NS (64 * 1000000 / 4096) /* 4096 rows/ 64ms */
++#define SDRAM_TRP_NS (18u)
++#define SDRAM_TRAS_NS (42u)
++#define SDRAM_TSREX_NS (67u)
++#define SDRAM_TAPR_NS (18u)
++#define SDRAM_TWRDELT_NS (6u)
++#define SDRAM_TRC_NS (60u)
++#define SDRAM_RFC_NS (60u)
++#define SDRAM_XSR_NS (67u)
++#define SDRAM_RRD_NS (12u)
++#define SDRAM_MRD_NCLK (2u)
++#define SDRAM_RAS_NCLK (2u)
++#define SDRAM_MODEREG_VALUE (0x23u)
++#define SDRAM_DEV_MEMORYMAP (0x09u) /* 128Mbits (8M*16, 4banks, 12 rows, 9 columns)*/
++#endif
++
++#ifdef W9812G6JB6I
++#define SDRAM_REFRESHPERIOD_NS (64 * 1000000 / 4096) /* 4096 rows/ 64ms */
++#define SDRAM_TRP_NS (20u)
++#define SDRAM_TRAS_NS (42u)
++#define SDRAM_TSREX_NS (72u)
++#define SDRAM_TAPR_NS (18u)
++#define SDRAM_TWRDELT_NS (12u)
++#define SDRAM_TRC_NS (60u)
++#define SDRAM_RFC_NS (60u)
++#define SDRAM_XSR_NS (67u)
++#define SDRAM_RRD_NS (12u)
++#define SDRAM_MRD_NCLK (2u)
++#define SDRAM_RAS_NCLK (2u)
++#define SDRAM_MODEREG_VALUE (0x23u)
++#define SDRAM_DEV_MEMORYMAP (0x09u) /* 128Mbits (8M*16, 4banks, 12 rows, 9 columns)*/
++#endif
++
++/*******************************************************************************
++ * Variables
++ ******************************************************************************/
++
++/* Clock rate on the CLKIN pin */
++const uint32_t ExtClockIn = BOARD_EXTCLKINRATE;
++
++/*******************************************************************************
++ * Code
++ ******************************************************************************/
++/* Initialize debug console. */
++status_t BOARD_InitDebugConsole(void)
++{
++#if ((SDK_DEBUGCONSOLE == DEBUGCONSOLE_REDIRECT_TO_SDK) || defined(SDK_DEBUGCONSOLE_UART))
++    status_t result;
++    uint8_t instance = BOARD_DEBUG_UART_INSTANCE;
++
++#if (defined(SERIAL_PORT_TYPE_USBCDC) && (SERIAL_PORT_TYPE_USBCDC > 0U))
++    if (BOARD_DEBUG_UART_TYPE == kSerialPort_UsbCdc)
++    {
++        instance = kSerialManager_UsbControllerLpcIp3511Hs0;
++    }
++#endif
++
++    /* attach 12 MHz clock to FLEXCOMM0 (debug console) */
++    CLOCK_AttachClk(BOARD_DEBUG_UART_CLK_ATTACH);
++    RESET_PeripheralReset(BOARD_DEBUG_UART_RST);
++    result = DbgConsole_Init(instance, BOARD_DEBUG_UART_BAUDRATE, BOARD_DEBUG_UART_TYPE, BOARD_DEBUG_UART_CLK_FREQ);
++    assert(kStatus_Success == result);
++    return result;
++#else
++    return kStatus_Success;
++#endif
++}
++
++/* Initialize the external memory. */
++void BOARD_InitSDRAM(void)
++{
++    uint32_t emcFreq;
++    emc_basic_config_t basicConfig;
++    emc_dynamic_timing_config_t dynTiming;
++    emc_dynamic_chip_config_t dynChipConfig;
++
++    emcFreq = CLOCK_GetEmcClkFreq();
++    assert(emcFreq != 0); /* Check the clock of emc */
++    /* Basic configuration. */
++    basicConfig.endian   = kEMC_LittleEndian;
++    basicConfig.fbClkSrc = kEMC_IntloopbackEmcclk;
++    /* EMC Clock = CPU FREQ/2 here can fit CPU freq from 12M ~ 180M.
++     * If you change the divide to 0 and EMC clock is larger than 100M
++     * please take refer to emc.dox to adjust EMC clock delay.
++     */
++    basicConfig.emcClkDiv = 1;
++    /* Dynamic memory timing configuration. */
++    dynTiming.readConfig            = kEMC_Cmddelay;
++    dynTiming.refreshPeriod_Nanosec = SDRAM_REFRESHPERIOD_NS;
++    dynTiming.tRp_Ns                = SDRAM_TRP_NS;
++    dynTiming.tRas_Ns               = SDRAM_TRAS_NS;
++    dynTiming.tSrex_Ns              = SDRAM_TSREX_NS;
++    dynTiming.tApr_Ns               = SDRAM_TAPR_NS;
++    dynTiming.tWr_Ns                = (1000000000 / emcFreq + SDRAM_TWRDELT_NS); /* one clk + 6ns */
++    dynTiming.tDal_Ns               = dynTiming.tWr_Ns + dynTiming.tRp_Ns;
++    dynTiming.tRc_Ns                = SDRAM_TRC_NS;
++    dynTiming.tRfc_Ns               = SDRAM_RFC_NS;
++    dynTiming.tXsr_Ns               = SDRAM_XSR_NS;
++    dynTiming.tRrd_Ns               = SDRAM_RRD_NS;
++    dynTiming.tMrd_Nclk             = SDRAM_MRD_NCLK;
++    /* Dynamic memory chip specific configuration: Chip 0 - W9812G6JB-6I */
++    dynChipConfig.chipIndex       = 0;
++    dynChipConfig.dynamicDevice   = kEMC_Sdram;
++    dynChipConfig.rAS_Nclk        = SDRAM_RAS_NCLK;
++    dynChipConfig.sdramModeReg    = SDRAM_MODEREG_VALUE;
++    dynChipConfig.sdramExtModeReg = 0; /* it has no use for normal sdram */
++    dynChipConfig.devAddrMap      = SDRAM_DEV_MEMORYMAP;
++    /* EMC Basic configuration. */
++    EMC_Init(EMC, &basicConfig);
++    /* EMC Dynamc memory configuration. */
++    EMC_DynamicMemInit(EMC, &dynTiming, &dynChipConfig, 1);
++}
++#if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
++void BOARD_I2C_Init(I2C_Type *base, uint32_t clkSrc_Hz)
++{
++    i2c_master_config_t i2cConfig = {0};
++
++    I2C_MasterGetDefaultConfig(&i2cConfig);
++    I2C_MasterInit(base, &i2cConfig, clkSrc_Hz);
++}
++
++status_t BOARD_I2C_Send(I2C_Type *base,
++                        uint8_t deviceAddress,
++                        uint32_t subAddress,
++                        uint8_t subaddressSize,
++                        uint8_t *txBuff,
++                        uint8_t txBuffSize)
++{
++    i2c_master_transfer_t masterXfer;
++
++    /* Prepare transfer structure. */
++    masterXfer.slaveAddress   = deviceAddress;
++    masterXfer.direction      = kI2C_Write;
++    masterXfer.subaddress     = subAddress;
++    masterXfer.subaddressSize = subaddressSize;
++    masterXfer.data           = txBuff;
++    masterXfer.dataSize       = txBuffSize;
++    masterXfer.flags          = kI2C_TransferDefaultFlag;
++
++    return I2C_MasterTransferBlocking(base, &masterXfer);
++}
++
++status_t BOARD_I2C_Receive(I2C_Type *base,
++                           uint8_t deviceAddress,
++                           uint32_t subAddress,
++                           uint8_t subaddressSize,
++                           uint8_t *rxBuff,
++                           uint8_t rxBuffSize)
++{
++    i2c_master_transfer_t masterXfer;
++
++    /* Prepare transfer structure. */
++    masterXfer.slaveAddress   = deviceAddress;
++    masterXfer.subaddress     = subAddress;
++    masterXfer.subaddressSize = subaddressSize;
++    masterXfer.data           = rxBuff;
++    masterXfer.dataSize       = rxBuffSize;
++    masterXfer.direction      = kI2C_Read;
++    masterXfer.flags          = kI2C_TransferDefaultFlag;
++
++    return I2C_MasterTransferBlocking(base, &masterXfer);
++}
++
++void BOARD_Accel_I2C_Init(void)
++{
++    BOARD_I2C_Init(BOARD_ACCEL_I2C_BASEADDR, BOARD_ACCEL_I2C_CLOCK_FREQ);
++}
++
++status_t BOARD_Accel_I2C_Send(uint8_t deviceAddress, uint32_t subAddress, uint8_t subaddressSize, uint32_t txBuff)
++{
++    uint8_t data = (uint8_t)txBuff;
++
++    return BOARD_I2C_Send(BOARD_ACCEL_I2C_BASEADDR, deviceAddress, subAddress, subaddressSize, &data, 1);
++}
++
++status_t BOARD_Accel_I2C_Receive(
++    uint8_t deviceAddress, uint32_t subAddress, uint8_t subaddressSize, uint8_t *rxBuff, uint8_t rxBuffSize)
++{
++    return BOARD_I2C_Receive(BOARD_ACCEL_I2C_BASEADDR, deviceAddress, subAddress, subaddressSize, rxBuff, rxBuffSize);
++}
++
++void BOARD_Codec_I2C_Init(void)
++{
++    BOARD_I2C_Init(BOARD_CODEC_I2C_BASEADDR, BOARD_CODEC_I2C_CLOCK_FREQ);
++}
++
++status_t BOARD_Codec_I2C_Send(
++    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t *txBuff, uint8_t txBuffSize)
++{
++    return BOARD_I2C_Send(BOARD_CODEC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, (uint8_t *)txBuff,
++                          txBuffSize);
++}
++
++status_t BOARD_Codec_I2C_Receive(
++    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize)
++{
++    return BOARD_I2C_Receive(BOARD_CODEC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
++}
++#endif /* SDK_I2C_BASED_COMPONENT_USED */
+diff --git a/boards/lpc54018iotmodule/stdk/board.h b/boards/lpc54018iotmodule/stdk/board.h
+new file mode 100644
+index 0000000..15eda82
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/board.h
+@@ -0,0 +1,232 @@
++/*
++ * Copyright (c) 2016, Freescale Semiconductor, Inc.
++ * Copyright 2016-2018 NXP
++ * All rights reserved.
++ *
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef _BOARD_H_
++#define _BOARD_H_
++
++#include "clock_config.h"
++#include "fsl_common.h"
++#include "fsl_gpio.h"
++
++/*******************************************************************************
++ * Definitions
++ ******************************************************************************/
++/*! @brief The board name */
++#define BOARD_NAME "LPC54018-IoT-Module"
++
++#define BOARD_EXTCLKINRATE (0)
++
++/*! @brief The UART to use for debug messages. */
++/* TODO: rename UART to USART */
++#ifndef BOARD_DEBUG_UART_TYPE
++#define BOARD_DEBUG_UART_TYPE kSerialPort_Uart
++#endif
++
++#define BOARD_DEBUG_UART_BASEADDR (uint32_t) USART0
++#define BOARD_DEBUG_UART_INSTANCE 0U
++#define BOARD_DEBUG_UART_CLK_FREQ CLOCK_GetFlexCommClkFreq(0U)
++#define BOARD_DEBUG_UART_CLK_ATTACH kFRO12M_to_FLEXCOMM0
++#define BOARD_DEBUG_UART_RST kFC0_RST_SHIFT_RSTn
++#define BOARD_UART_IRQ_HANDLER FLEXCOMM0_IRQHandler
++#define BOARD_UART_IRQ FLEXCOMM0_IRQn
++/* TODO: obsolete */
++#define BOARD_DEBUG_SPI_CLK_FREQ 12000000
++
++#ifndef BOARD_DEBUG_UART_BAUDRATE
++#define BOARD_DEBUG_UART_BAUDRATE 115200
++#endif /* BOARD_DEBUG_UART_BAUDRATE */
++
++#define BOARD_ACCEL_I2C_BASEADDR I2C2
++#define BOARD_ACCEL_I2C_CLOCK_FREQ 12000000
++
++#define BOARD_CODEC_I2C_BASEADDR I2C2
++#define BOARD_CODEC_I2C_INSTANCE 2U
++#define BOARD_CODEC_I2C_CLOCK_FREQ 12000000
++
++/*! @brief The ENET PHY address. */
++#define BOARD_ENET0_PHY_ADDRESS (0x00U) /* Phy address of enet port 0. */
++
++#ifndef BOARD_LED1_GPIO
++#define BOARD_LED1_GPIO GPIO
++#endif
++#define BOARD_LED1_GPIO_PORT 3U
++#ifndef BOARD_LED1_GPIO_PIN
++#define BOARD_LED1_GPIO_PIN 14U
++#endif
++
++#ifndef BOARD_LED2_GPIO
++#define BOARD_LED2_GPIO GPIO
++#endif
++#define BOARD_LED2_GPIO_PORT 3U
++#ifndef BOARD_LED2_GPIO_PIN
++#define BOARD_LED2_GPIO_PIN 3U
++#endif
++#ifndef BOARD_LED3_GPIO
++#define BOARD_LED3_GPIO GPIO
++#endif
++#define BOARD_LED3_GPIO_PORT 3U
++#ifndef BOARD_LED3_GPIO_PIN
++#define BOARD_LED3_GPIO_PIN 13U
++#endif
++
++#ifndef BOARD_SW1_GPIO
++#define BOARD_SW1_GPIO GPIO
++#endif
++#define BOARD_SW1_GPIO_PORT 0U
++#ifndef BOARD_SW1_GPIO_PIN
++#define BOARD_SW1_GPIO_PIN 4U
++#endif
++#define BOARD_SW1_NAME "SW1"
++#define BOARD_SW3_IRQ PIN_INT0_IRQn
++#define BOARD_SW3_IRQ_HANDLER PIN_INT0_IRQHandler
++
++#ifndef BOARD_SW2_GPIO
++#define BOARD_SW2_GPIO GPIO
++#endif
++#define BOARD_SW2_GPIO_PORT 0U
++#ifndef BOARD_SW2_GPIO_PIN
++#define BOARD_SW2_GPIO_PIN 6U
++#endif
++#define BOARD_SW2_NAME "SW2"
++#define BOARD_SW2_IRQ PIN_INT0_IRQn
++#define BOARD_SW2_IRQ_HANDLER PIN_INT0_IRQHandler
++
++#ifndef BOARD_SW3_GPIO
++#define BOARD_SW3_GPIO GPIO
++#endif
++#define BOARD_SW3_GPIO_PORT 0U
++#ifndef BOARD_SW3_GPIO_PIN
++#define BOARD_SW3_GPIO_PIN 5U
++#endif
++#define BOARD_SW3_NAME "SW3"
++#define BOARD_SW3_IRQ PIN_INT0_IRQn
++#define BOARD_SW3_IRQ_HANDLER PIN_INT0_IRQHandler
++#define BOARD_SW3_GPIO_PININT_INDEX 0
++
++#ifndef BOARD_SW4_GPIO
++#define BOARD_SW4_GPIO GPIO
++#endif
++#ifndef BOARD_SW4_GPIO_PORT
++#define BOARD_SW4_GPIO_PORT 0U
++#endif
++#ifndef BOARD_SW4_GPIO_PIN
++#define BOARD_SW4_GPIO_PIN 4U
++#endif
++#define BOARD_SW4_NAME "SW4"
++#define BOARD_SW4_IRQ PIN_INT0_IRQn
++#define BOARD_SW4_IRQ_HANDLER PIN_INT0_IRQHandler
++#define BOARD_SW4_GPIO_PININT_INDEX 0
++
++#ifndef BOARD_SW5_GPIO
++#define BOARD_SW5_GPIO GPIO
++#endif
++#ifndef BOARD_SW5_GPIO_PORT
++#define BOARD_SW5_GPIO_PORT 1U
++#endif
++#ifndef BOARD_SW5_GPIO_PIN
++#define BOARD_SW5_GPIO_PIN 1U
++#endif
++#define BOARD_SW5_NAME "SW5"
++#define BOARD_SW5_IRQ PIN_INT1_IRQn
++#define BOARD_SW5_IRQ_HANDLER PIN_INT1_IRQHandler
++#define BOARD_SW5_GPIO_PININT_INDEX 0
++
++#define BOARD_SDIF_BASEADDR SDIF
++#define BOARD_SDIF_CLK_FREQ CLOCK_GetSdioClkFreq()
++#define BOARD_SDIF_CLK_ATTACH kMAIN_CLK_to_SDIO_CLK
++#define BOARD_SDIF_IRQ SDIO_IRQn
++
++#define BOARD_MMC_VCC_SUPPLY kMMC_VoltageWindows270to360
++#define BOARD_SD_CARD_DETECT_PIN 10
++#define BOARD_SD_CARD_DETECT_PORT 2
++#define BOARD_SD_CARD_DETECT_GPIO GPIO
++#define BOARD_SD_DETECT_TYPE kSDMMCHOST_DetectCardByHostCD
++
++#define BOARD_SDIF_CD_GPIO_INIT()                                                                    \
++    {                                                                                                \
++        CLOCK_EnableClock(kCLOCK_Gpio2);                                                             \
++        GPIO_PinInit(BOARD_SD_CARD_DETECT_GPIO, BOARD_SD_CARD_DETECT_PORT, BOARD_SD_CARD_DETECT_PIN, \
++                     &(gpio_pin_config_t){kGPIO_DigitalInput, 0U});                                  \
++    }
++#define BOARD_SDIF_CD_STATUS() \
++    GPIO_PinRead(BOARD_SD_CARD_DETECT_GPIO, BOARD_SD_CARD_DETECT_PORT, BOARD_SD_CARD_DETECT_PIN)
++
++/* Board led color mapping */
++#define LOGIC_LED_ON 0U
++#define LOGIC_LED_OFF 1U
++
++#define LED1_INIT(output)                                                    \
++    GPIO_PinInit(BOARD_LED1_GPIO, BOARD_LED1_GPIO_PORT, BOARD_LED1_GPIO_PIN, \
++                 &(gpio_pin_config_t){kGPIO_DigitalOutput, (output)}) /*!< Enable target LED1 */
++#define LED1_ON() \
++    GPIO_PortClear(BOARD_LED1_GPIO, BOARD_LED1_GPIO_PORT, 1U << BOARD_LED1_GPIO_PIN) /*!< Turn on target LED1 */
++#define LED1_OFF() \
++    GPIO_PortSet(BOARD_LED1_GPIO, BOARD_LED1_GPIO_PORT, 1U << BOARD_LED1_GPIO_PIN) /*!< Turn off target LED1 */
++#define LED1_TOGGLE() \
++    GPIO_PortToggle(BOARD_LED1_GPIO, BOARD_LED1_GPIO_PORT, 1U << BOARD_LED1_GPIO_PIN) /*!< Toggle on target LED1 */
++#define LED2_INIT(output)                                                    \
++    GPIO_PinInit(BOARD_LED2_GPIO, BOARD_LED2_GPIO_PORT, BOARD_LED2_GPIO_PIN, \
++                 &(gpio_pin_config_t){kGPIO_DigitalOutput, (output)}) /*!< Enable target LED2 */
++#define LED2_ON() \
++    GPIO_PortClear(BOARD_LED2_GPIO, BOARD_LED2_GPIO_PORT, 1U << BOARD_LED2_GPIO_PIN) /*!< Turn on target LED2 */
++#define LED2_OFF() \
++    GPIO_PortSet(BOARD_LED2_GPIO, BOARD_LED2_GPIO_PORT, 1U << BOARD_LED2_GPIO_PIN) /*!< Turn off target LED2 */
++#define LED2_TOGGLE() \
++    GPIO_PortToggle(BOARD_LED2_GPIO, BOARD_LED2_GPIO_PORT, 1U << BOARD_LED2_GPIO_PIN) /*!< Toggle on target LED2 */
++
++#define LED3_INIT(output)                                                    \
++    GPIO_PinInit(BOARD_LED3_GPIO, BOARD_LED3_GPIO_PORT, BOARD_LED3_GPIO_PIN, \
++                 &(gpio_pin_config_t){kGPIO_DigitalOutput, (output)}) /*!< Enable target LED3 */
++#define LED3_ON() \
++    GPIO_PortClear(BOARD_LED3_GPIO, BOARD_LED3_GPIO_PORT, 1U << BOARD_LED3_GPIO_PIN) /*!< Turn on target LED3 */
++#define LED3_OFF() \
++    GPIO_PortSet(BOARD_LED3_GPIO, BOARD_LED3_GPIO_PORT, 1U << BOARD_LED3_GPIO_PIN) /*!< Turn off target LED3 */
++#define LED3_TOGGLE() \
++    GPIO_PortToggle(BOARD_LED3_GPIO, BOARD_LED3_GPIO_PORT, 1U << BOARD_LED3_GPIO_PIN) /*!< Toggle on target LED3 */
++
++#if defined(__cplusplus)
++extern "C" {
++#endif /* __cplusplus */
++
++/*******************************************************************************
++ * API
++ ******************************************************************************/
++
++status_t BOARD_InitDebugConsole(void);
++void BOARD_InitSDRAM(void);
++#if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
++void BOARD_I2C_Init(I2C_Type *base, uint32_t clkSrc_Hz);
++status_t BOARD_I2C_Send(I2C_Type *base,
++                        uint8_t deviceAddress,
++                        uint32_t subAddress,
++                        uint8_t subaddressSize,
++                        uint8_t *txBuff,
++                        uint8_t txBuffSize);
++status_t BOARD_I2C_Receive(I2C_Type *base,
++                           uint8_t deviceAddress,
++                           uint32_t subAddress,
++                           uint8_t subaddressSize,
++                           uint8_t *rxBuff,
++                           uint8_t rxBuffSize);
++void BOARD_Accel_I2C_Init(void);
++status_t BOARD_Accel_I2C_Send(uint8_t deviceAddress, uint32_t subAddress, uint8_t subaddressSize, uint32_t txBuff);
++status_t BOARD_Accel_I2C_Receive(
++    uint8_t deviceAddress, uint32_t subAddress, uint8_t subaddressSize, uint8_t *rxBuff, uint8_t rxBuffSize);
++void BOARD_Codec_I2C_Init(void);
++status_t BOARD_Codec_I2C_Send(
++    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t *txBuff, uint8_t txBuffSize);
++status_t BOARD_Codec_I2C_Receive(
++    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize);
++#endif /* SDK_I2C_BASED_COMPONENT_USED */
++
++#if defined(__cplusplus)
++}
++#endif /* __cplusplus */
++
++#endif /* _BOARD_H_ */
+diff --git a/boards/lpc54018iotmodule/stdk/clock_config.c b/boards/lpc54018iotmodule/stdk/clock_config.c
+new file mode 100644
+index 0000000..aa83ac4
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/clock_config.c
+@@ -0,0 +1,269 @@
++/*
++ * Copyright (c) 2015, Freescale Semiconductor, Inc.
++ * Copyright 2016-2017,2019 NXP
++ * All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++/***********************************************************************************************************************
++ * This file was generated by the MCUXpresso Config Tools. Any manual edits made to this file
++ * will be overwritten if the respective MCUXpresso Config Tools is used to update this file.
++ **********************************************************************************************************************/
++/*
++ * How to set up clock using clock driver functions:
++ *
++ * 1. Setup clock sources.
++ *
++ * 2. Setup voltage for the fastest of the clock outputs
++ *
++ * 3. Set up wait states of the flash.
++ *
++ * 4. Set up all dividers.
++ *
++ * 5. Set up all selectors to provide selected clocks.
++ */
++
++/* clang-format off */
++/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
++!!GlobalInfo
++product: Clocks v7.0
++processor: LPC54018
++package_id: LPC54018JET180
++mcu_data: ksdk2_0
++processor_version: 0.7.1
++ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
++/* clang-format on */
++
++#include "fsl_power.h"
++#include "fsl_clock.h"
++#include "clock_config.h"
++
++/*******************************************************************************
++ * Definitions
++ ******************************************************************************/
++
++/*******************************************************************************
++ * Variables
++ ******************************************************************************/
++/* System clock frequency. */
++extern uint32_t SystemCoreClock;
++
++/*******************************************************************************
++ ************************ BOARD_InitBootClocks function ************************
++ ******************************************************************************/
++void BOARD_InitBootClocks(void)
++{
++    BOARD_BootClockPLL180M();
++}
++
++/*******************************************************************************
++ ******************** Configuration BOARD_BootClockFRO12M **********************
++ ******************************************************************************/
++/* clang-format off */
++/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
++!!Configuration
++name: BOARD_BootClockFRO12M
++outputs:
++- {id: FRO12M_clock.outFreq, value: 12 MHz}
++- {id: FROHF_clock.outFreq, value: 48 MHz}
++- {id: MAIN_clock.outFreq, value: 12 MHz}
++- {id: System_clock.outFreq, value: 12 MHz}
++settings:
++- {id: SYSCON.EMCCLKDIV.scale, value: '1', locked: true}
++ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
++/* clang-format on */
++
++/*******************************************************************************
++ * Variables for BOARD_BootClockFRO12M configuration
++ ******************************************************************************/
++/*******************************************************************************
++ * Code for BOARD_BootClockFRO12M configuration
++ ******************************************************************************/
++void BOARD_BootClockFRO12M(void)
++{
++    /*!< Set up the clock sources */
++    /*!< Set up FRO */
++    POWER_DisablePD(kPDRUNCFG_PD_FRO_EN); /*!< Ensure FRO is on  */
++    CLOCK_AttachClk(kFRO12M_to_MAIN_CLK); /*!< Switch to FRO 12MHz first to ensure we can change voltage without
++                                             accidentally being below the voltage for current speed */
++    /*!< Need to make sure ROM and OTP has power(PDRUNCFG0[17,29]= 0U)
++         before calling this API since this API is implemented in ROM code */
++    CLOCK_SetupFROClocking(12000000U); /*!< Set up FRO to the 12 MHz, just for sure */
++    POWER_SetVoltageForFreq(
++        12000000U); /*!< Set voltage for the one of the fastest clock outputs: System clock output */
++
++    /*!< Set up dividers */
++    CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, false); /*!< Reset divider counter and set divider to value 1 */
++
++    /*!< Set up clock selectors - Attach clocks to the peripheries */
++    CLOCK_AttachClk(kFRO12M_to_MAIN_CLK); /*!< Switch MAIN_CLK to FRO12M */
++    /* Set SystemCoreClock variable. */
++    SystemCoreClock = BOARD_BOOTCLOCKFRO12M_CORE_CLOCK;
++}
++
++/*******************************************************************************
++ ******************* Configuration BOARD_BootClockFROHF48M *********************
++ ******************************************************************************/
++/* clang-format off */
++/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
++!!Configuration
++name: BOARD_BootClockFROHF48M
++outputs:
++- {id: FRO12M_clock.outFreq, value: 12 MHz}
++- {id: FROHF_clock.outFreq, value: 48 MHz}
++- {id: MAIN_clock.outFreq, value: 48 MHz}
++- {id: System_clock.outFreq, value: 48 MHz}
++settings:
++- {id: SYSCON.MAINCLKSELA.sel, value: SYSCON.fro_hf}
++ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
++/* clang-format on */
++
++/*******************************************************************************
++ * Variables for BOARD_BootClockFROHF48M configuration
++ ******************************************************************************/
++/*******************************************************************************
++ * Code for BOARD_BootClockFROHF48M configuration
++ ******************************************************************************/
++void BOARD_BootClockFROHF48M(void)
++{
++    /*!< Set up the clock sources */
++    /*!< Set up FRO */
++    POWER_DisablePD(kPDRUNCFG_PD_FRO_EN); /*!< Ensure FRO is on  */
++    CLOCK_AttachClk(kFRO12M_to_MAIN_CLK); /*!< Switch to FRO 12MHz first to ensure we can change voltage without
++                                             accidentally being below the voltage for current speed */
++    POWER_SetVoltageForFreq(
++        48000000U); /*!< Set voltage for the one of the fastest clock outputs: System clock output */
++    /*!< Need to make sure ROM and OTP has power(PDRUNCFG0[17,29]= 0U)
++         before calling this API since this API is implemented in ROM code */
++    CLOCK_SetupFROClocking(48000000U); /*!< Set up high frequency FRO output to selected frequency */
++
++    /*!< Set up dividers */
++    CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, false); /*!< Reset divider counter and set divider to value 1 */
++
++    /*!< Set up clock selectors - Attach clocks to the peripheries */
++    CLOCK_AttachClk(kFRO_HF_to_MAIN_CLK); /*!< Switch MAIN_CLK to FRO_HF */
++    /* Set SystemCoreClock variable. */
++    SystemCoreClock = BOARD_BOOTCLOCKFROHF48M_CORE_CLOCK;
++}
++
++/*******************************************************************************
++ ******************* Configuration BOARD_BootClockFROHF96M *********************
++ ******************************************************************************/
++/* clang-format off */
++/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
++!!Configuration
++name: BOARD_BootClockFROHF96M
++outputs:
++- {id: FRO12M_clock.outFreq, value: 12 MHz}
++- {id: FROHF_clock.outFreq, value: 96 MHz}
++- {id: MAIN_clock.outFreq, value: 96 MHz}
++- {id: System_clock.outFreq, value: 96 MHz}
++settings:
++- {id: SYSCON.MAINCLKSELA.sel, value: SYSCON.fro_hf}
++sources:
++- {id: SYSCON.fro_hf.outFreq, value: 96 MHz}
++ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
++/* clang-format on */
++
++/*******************************************************************************
++ * Variables for BOARD_BootClockFROHF96M configuration
++ ******************************************************************************/
++/*******************************************************************************
++ * Code for BOARD_BootClockFROHF96M configuration
++ ******************************************************************************/
++void BOARD_BootClockFROHF96M(void)
++{
++    /*!< Set up the clock sources */
++    /*!< Set up FRO */
++    POWER_DisablePD(kPDRUNCFG_PD_FRO_EN); /*!< Ensure FRO is on  */
++    CLOCK_AttachClk(kFRO12M_to_MAIN_CLK); /*!< Switch to FRO 12MHz first to ensure we can change voltage without
++                                             accidentally being below the voltage for current speed */
++    POWER_SetVoltageForFreq(
++        96000000U); /*!< Set voltage for the one of the fastest clock outputs: System clock output */
++    /*!< Need to make sure ROM and OTP has power(PDRUNCFG0[17,29]= 0U)
++         before calling this API since this API is implemented in ROM code */
++    CLOCK_SetupFROClocking(96000000U); /*!< Set up high frequency FRO output to selected frequency */
++
++    /*!< Set up dividers */
++    CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, false); /*!< Reset divider counter and set divider to value 1 */
++
++    /*!< Set up clock selectors - Attach clocks to the peripheries */
++    CLOCK_AttachClk(kFRO_HF_to_MAIN_CLK); /*!< Switch MAIN_CLK to FRO_HF */
++    /* Set SystemCoreClock variable. */
++    SystemCoreClock = BOARD_BOOTCLOCKFROHF96M_CORE_CLOCK;
++}
++
++/*******************************************************************************
++ ******************** Configuration BOARD_BootClockPLL180M *********************
++ ******************************************************************************/
++/* clang-format off */
++/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
++!!Configuration
++name: BOARD_BootClockPLL180M
++called_from_default_init: true
++outputs:
++- {id: FRO12M_clock.outFreq, value: 12 MHz}
++- {id: FROHF_clock.outFreq, value: 96 MHz}
++- {id: MAIN_clock.outFreq, value: 180 MHz}
++- {id: SYSPLL_clock.outFreq, value: 180 MHz}
++- {id: System_clock.outFreq, value: 180 MHz}
++- {id: USB0_clock.outFreq, value: 96 MHz}
++settings:
++- {id: SYSCON.MAINCLKSELB.sel, value: SYSCON.PLL_BYPASS}
++- {id: SYSCON.M_MULT.scale, value: '30', locked: true}
++- {id: SYSCON.N_DIV.scale, value: '1', locked: true}
++- {id: SYSCON.PDEC.scale, value: '2', locked: true}
++- {id: SYSCON.USB0CLKSEL.sel, value: SYSCON.fro_hf}
++- {id: SYSCON_PDRUNCFG0_PDEN_SYS_PLL_CFG, value: Power_up}
++sources:
++- {id: SYSCON._clk_in.outFreq, value: 12 MHz, enabled: true}
++- {id: SYSCON.fro_hf.outFreq, value: 96 MHz}
++ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
++/* clang-format on */
++
++/*******************************************************************************
++ * Variables for BOARD_BootClockPLL180M configuration
++ ******************************************************************************/
++/*******************************************************************************
++ * Code for BOARD_BootClockPLL180M configuration
++ ******************************************************************************/
++void BOARD_BootClockPLL180M(void)
++{
++    /*!< Set up the clock sources */
++    /*!< Set up FRO */
++    POWER_DisablePD(kPDRUNCFG_PD_FRO_EN);  /*!< Ensure FRO is on  */
++    CLOCK_AttachClk(kFRO12M_to_MAIN_CLK);  /*!< Switch to FRO 12MHz first to ensure we can change voltage without
++                                              accidentally  being below the voltage for current speed */
++    POWER_DisablePD(kPDRUNCFG_PD_SYS_OSC); /*!< Enable System Oscillator Power */
++    SYSCON->SYSOSCCTRL = ((SYSCON->SYSOSCCTRL & ~SYSCON_SYSOSCCTRL_FREQRANGE_MASK) |
++                          SYSCON_SYSOSCCTRL_FREQRANGE(0U)); /*!< Set system oscillator range */
++    POWER_SetVoltageForFreq(
++        180000000U); /*!< Set voltage for the one of the fastest clock outputs: System clock output */
++    /*!< Set up SYS PLL */
++    const pll_setup_t pllSetup = {
++        .pllctrl = SYSCON_SYSPLLCTRL_SELI(32U) | SYSCON_SYSPLLCTRL_SELP(16U) | SYSCON_SYSPLLCTRL_SELR(0U),
++        .pllmdec = (SYSCON_SYSPLLMDEC_MDEC(8191U)),
++        .pllndec = (SYSCON_SYSPLLNDEC_NDEC(770U)),
++        .pllpdec = (SYSCON_SYSPLLPDEC_PDEC(98U)),
++        .pllRate = 180000000U,
++        .flags   = PLL_SETUPFLAG_WAITLOCK | PLL_SETUPFLAG_POWERUP};
++    CLOCK_AttachClk(kFRO12M_to_SYS_PLL); /*!< Set sys pll clock source*/
++    CLOCK_SetPLLFreq(&pllSetup);         /*!< Configure PLL to the desired value */
++    /*!< Need to make sure ROM and OTP has power(PDRUNCFG0[17,29]= 0U)
++         before calling this API since this API is implemented in ROM code */
++    CLOCK_SetupFROClocking(96000000U); /*!< Set up high frequency FRO output to selected frequency */
++
++    /*!< Set up dividers */
++    CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, false);  /*!< Reset divider counter and set divider to value 1 */
++    CLOCK_SetClkDiv(kCLOCK_DivUsb0Clk, 0U, true);  /*!< Reset USB0CLKDIV divider counter and halt it */
++    CLOCK_SetClkDiv(kCLOCK_DivUsb0Clk, 1U, false); /*!< Set USB0CLKDIV divider to value 1 */
++
++    /*!< Set up clock selectors - Attach clocks to the peripheries */
++    CLOCK_AttachClk(kSYS_PLL_to_MAIN_CLK); /*!< Switch MAIN_CLK to SYS_PLL */
++    CLOCK_AttachClk(kFRO_HF_to_USB0_CLK);  /*!< Switch USB0_CLK to FRO_HF */
++    SYSCON->MAINCLKSELA =
++        ((SYSCON->MAINCLKSELA & ~SYSCON_MAINCLKSELA_SEL_MASK) |
++         SYSCON_MAINCLKSELA_SEL(0U)); /*!< Switch MAINCLKSELA to FRO12M even it is not used for MAINCLKSELB */
++    /* Set SystemCoreClock variable. */
++    SystemCoreClock = BOARD_BOOTCLOCKPLL180M_CORE_CLOCK;
++}
+diff --git a/boards/lpc54018iotmodule/stdk/clock_config.h b/boards/lpc54018iotmodule/stdk/clock_config.h
+new file mode 100644
+index 0000000..4721762
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/clock_config.h
+@@ -0,0 +1,142 @@
++/*
++ * Copyright (c) 2015, Freescale Semiconductor, Inc.
++ * Copyright 2016-2017,2019 NXP
++ * All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++/***********************************************************************************************************************
++ * This file was generated by the MCUXpresso Config Tools. Any manual edits made to this file
++ * will be overwritten if the respective MCUXpresso Config Tools is used to update this file.
++ **********************************************************************************************************************/
++
++#ifndef _CLOCK_CONFIG_H_
++#define _CLOCK_CONFIG_H_
++
++#include "fsl_common.h"
++
++/*******************************************************************************
++ * Definitions
++ ******************************************************************************/
++#define BOARD_XTAL0_CLK_HZ 12000000U /*!< Board xtal0 frequency in Hz */
++#define BOARD_XTAL32K_CLK_HZ 32768U  /*!< Board xtal32K frequency in Hz */
++
++/*******************************************************************************
++ ************************ BOARD_InitBootClocks function ************************
++ ******************************************************************************/
++
++#if defined(__cplusplus)
++extern "C" {
++#endif /* __cplusplus*/
++
++/*!
++ * @brief This function executes default configuration of clocks.
++ *
++ */
++void BOARD_InitBootClocks(void);
++
++#if defined(__cplusplus)
++}
++#endif /* __cplusplus*/
++
++/*******************************************************************************
++ ******************** Configuration BOARD_BootClockFRO12M **********************
++ ******************************************************************************/
++/*******************************************************************************
++ * Definitions for BOARD_BootClockFRO12M configuration
++ ******************************************************************************/
++#define BOARD_BOOTCLOCKFRO12M_CORE_CLOCK 12000000U /*!< Core clock frequency:12000000Hz */
++
++/*******************************************************************************
++ * API for BOARD_BootClockFRO12M configuration
++ ******************************************************************************/
++#if defined(__cplusplus)
++extern "C" {
++#endif /* __cplusplus*/
++
++/*!
++ * @brief This function executes configuration of clocks.
++ *
++ */
++void BOARD_BootClockFRO12M(void);
++
++#if defined(__cplusplus)
++}
++#endif /* __cplusplus*/
++
++/*******************************************************************************
++ ******************* Configuration BOARD_BootClockFROHF48M *********************
++ ******************************************************************************/
++/*******************************************************************************
++ * Definitions for BOARD_BootClockFROHF48M configuration
++ ******************************************************************************/
++#define BOARD_BOOTCLOCKFROHF48M_CORE_CLOCK 48000000U /*!< Core clock frequency:48000000Hz */
++
++/*******************************************************************************
++ * API for BOARD_BootClockFROHF48M configuration
++ ******************************************************************************/
++#if defined(__cplusplus)
++extern "C" {
++#endif /* __cplusplus*/
++
++/*!
++ * @brief This function executes configuration of clocks.
++ *
++ */
++void BOARD_BootClockFROHF48M(void);
++
++#if defined(__cplusplus)
++}
++#endif /* __cplusplus*/
++
++/*******************************************************************************
++ ******************* Configuration BOARD_BootClockFROHF96M *********************
++ ******************************************************************************/
++/*******************************************************************************
++ * Definitions for BOARD_BootClockFROHF96M configuration
++ ******************************************************************************/
++#define BOARD_BOOTCLOCKFROHF96M_CORE_CLOCK 96000000U /*!< Core clock frequency:96000000Hz */
++
++/*******************************************************************************
++ * API for BOARD_BootClockFROHF96M configuration
++ ******************************************************************************/
++#if defined(__cplusplus)
++extern "C" {
++#endif /* __cplusplus*/
++
++/*!
++ * @brief This function executes configuration of clocks.
++ *
++ */
++void BOARD_BootClockFROHF96M(void);
++
++#if defined(__cplusplus)
++}
++#endif /* __cplusplus*/
++
++/*******************************************************************************
++ ******************** Configuration BOARD_BootClockPLL180M *********************
++ ******************************************************************************/
++/*******************************************************************************
++ * Definitions for BOARD_BootClockPLL180M configuration
++ ******************************************************************************/
++#define BOARD_BOOTCLOCKPLL180M_CORE_CLOCK 180000000U /*!< Core clock frequency:180000000Hz */
++
++/*******************************************************************************
++ * API for BOARD_BootClockPLL180M configuration
++ ******************************************************************************/
++#if defined(__cplusplus)
++extern "C" {
++#endif /* __cplusplus*/
++
++/*!
++ * @brief This function executes configuration of clocks.
++ *
++ */
++void BOARD_BootClockPLL180M(void);
++
++#if defined(__cplusplus)
++}
++#endif /* __cplusplus*/
++
++#endif /* _CLOCK_CONFIG_H_ */
+diff --git a/boards/lpc54018iotmodule/stdk/main.c b/boards/lpc54018iotmodule/stdk/main.c
+new file mode 100644
+index 0000000..fb6702d
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/main.c
+@@ -0,0 +1,193 @@
++/*
++ * Copyright (c) 2013 - 2014, Freescale Semiconductor, Inc.
++ * Copyright 2016-2017 NXP
++ * All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++///////////////////////////////////////////////////////////////////////////////
++//  Includes
++///////////////////////////////////////////////////////////////////////////////
++
++// SDK Included Files
++#include "board.h"
++#include "fsl_debug_console.h"
++#include "qcom_api.h"
++
++#include "usb_device_config.h"
++#include "usb.h"
++#include "usb_device.h"
++#include "serial_port_usb.h"
++#include "pin_mux.h"
++#include <stdbool.h>
++#include "fsl_power.h"
++/*******************************************************************************
++ * Definitions
++ ******************************************************************************/
++
++
++/*******************************************************************************
++ * Prototypes
++ ******************************************************************************/
++void USB_DeviceClockInit(void);
++
++/*******************************************************************************
++ * Code
++ ******************************************************************************/
++
++void USB_DeviceClockInit(void)
++{
++#if defined(USB_DEVICE_CONFIG_LPCIP3511FS) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)
++    /* enable USB IP clock */
++    CLOCK_EnableUsbfs0DeviceClock(kCLOCK_UsbSrcFro, CLOCK_GetFroHfFreq());
++#if defined(FSL_FEATURE_USB_USB_RAM) && (FSL_FEATURE_USB_USB_RAM)
++    for (int i = 0; i < FSL_FEATURE_USB_USB_RAM; i++)
++    {
++        ((uint8_t *)FSL_FEATURE_USB_USB_RAM_BASE_ADDRESS)[i] = 0x00U;
++    }
++#endif
++
++#endif
++#if defined(USB_DEVICE_CONFIG_LPCIP3511HS) && (USB_DEVICE_CONFIG_LPCIP3511HS > 0U)
++    /* enable USB IP clock */
++    CLOCK_EnableUsbhs0DeviceClock(kCLOCK_UsbSrcUsbPll, 0U);
++#if defined(FSL_FEATURE_USBHSD_USB_RAM) && (FSL_FEATURE_USBHSD_USB_RAM)
++    for (int i = 0; i < FSL_FEATURE_USBHSD_USB_RAM; i++)
++    {
++        ((uint8_t *)FSL_FEATURE_USBHSD_USB_RAM_BASE_ADDRESS)[i] = 0x00U;
++    }
++#endif
++#endif
++}
++
++
++// 0 is the highest priority and priority 15 is the lowest priority
++const int TASK_MAIN_PRIO       = configMAX_PRIORITIES - 3;
++const int TASK_MAIN_STACK_SIZE = 512;
++
++extern void app_main(void);
++
++/* Added as there is no such function in FreeRTOS. */
++void *pvPortRealloc( void *pv, size_t xWantedSize )
++{
++	void *pvReturn;
++
++	pvReturn = pvPortMalloc(xWantedSize);
++	if (!pvReturn) {
++		return NULL;
++	}
++	memcpy(pvReturn, pv, xWantedSize);
++	vPortFree(pv);
++
++	return pvReturn;
++}
++
++void *__wrap_malloc(size_t xWantedSize)
++{
++	return pvPortMalloc(xWantedSize);
++}
++
++void __wrap_free(void *pv)
++{
++	vPortFree(pv);
++}
++
++void *__wrap_realloc(void *pv, size_t xWantedSize)
++{
++	return pvPortRealloc(pv, xWantedSize);
++}
++
++void *__wrap_calloc(size_t nmemb, size_t size)
++{
++	void *pvReturn;
++
++	pvReturn = pvPortMalloc(nmemb * size);
++	if (!pvReturn) {
++		return NULL;
++	}
++
++	memset(pvReturn, 0, nmemb * size);
++	return pvReturn;
++}
++
++unsigned char* __wrap_strdup(const unsigned char* string)
++{
++    size_t length = 0;
++    unsigned char *copy = NULL;
++
++    if (!string) {
++        return NULL;
++    }
++
++    length = strlen((const char*)string) + sizeof("");
++    copy = (unsigned char*)pvPortMalloc(length);
++    if (!copy) {
++        return NULL;
++    }
++    memcpy(copy, string, length);
++
++    return copy;
++}
++
++static void user_init_entry(void *arg)
++{
++	printf("user_init_entry...\r\n");
++	app_main();
++	vTaskDelete(NULL);
++}
++
++int main(void)
++{
++    BaseType_t result = 0;
++    (void)result;
++
++    /* attach 12 MHz clock to FLEXCOMM0 (debug console) */
++    CLOCK_AttachClk(BOARD_DEBUG_UART_CLK_ATTACH);
++
++    /* reset USB0 and USB1 device */
++    RESET_PeripheralReset(kUSB0D_RST_SHIFT_RSTn);
++    RESET_PeripheralReset(kUSB1D_RST_SHIFT_RSTn);
++    RESET_PeripheralReset(kUSB0HMR_RST_SHIFT_RSTn);
++    RESET_PeripheralReset(kUSB0HSL_RST_SHIFT_RSTn);
++    RESET_PeripheralReset(kUSB1H_RST_SHIFT_RSTn);
++
++    NVIC_ClearPendingIRQ(USB0_IRQn);
++    NVIC_ClearPendingIRQ(USB0_NEEDCLK_IRQn);
++    NVIC_ClearPendingIRQ(USB1_IRQn);
++    NVIC_ClearPendingIRQ(USB1_NEEDCLK_IRQn);
++
++    BOARD_InitPins();
++    BOARD_BootClockPLL180M();
++
++#if (defined USB_DEVICE_CONFIG_LPCIP3511HS) && (USB_DEVICE_CONFIG_LPCIP3511HS)
++    POWER_DisablePD(kPDRUNCFG_PD_USB1_PHY);
++    /* enable usb1 host clock */
++    CLOCK_EnableClock(kCLOCK_Usbh1);
++    /*According to reference mannual, device mode setting has to be set by access usb host register */
++    *((uint32_t *)(USBHSH_BASE + 0x50)) |= USBHSH_PORTMODE_DEV_ENABLE_MASK;
++    /* enable usb1 host clock */
++    CLOCK_DisableClock(kCLOCK_Usbh1);
++#endif
++#if (defined USB_DEVICE_CONFIG_LPCIP3511FS) && (USB_DEVICE_CONFIG_LPCIP3511FS)
++    POWER_DisablePD(kPDRUNCFG_PD_USB0_PHY); /*< Turn on USB Phy */
++    CLOCK_SetClkDiv(kCLOCK_DivUsb0Clk, 1, false);
++    CLOCK_AttachClk(kFRO_HF_to_USB0_CLK);
++    /* enable usb0 host clock */
++    CLOCK_EnableClock(kCLOCK_Usbhsl0);
++    /*According to reference mannual, device mode setting has to be set by access usb host register */
++    *((uint32_t *)(USBFSH_BASE + 0x5C)) |= USBFSH_PORTMODE_DEV_ENABLE_MASK;
++    /* disable usb0 host clock */
++    CLOCK_DisableClock(kCLOCK_Usbhsl0);
++#endif
++
++    USB_DeviceClockInit();
++    BOARD_InitDebugConsole();
++
++    xTaskCreate(user_init_entry, "user_init_entry", TASK_MAIN_STACK_SIZE, NULL, TASK_MAIN_PRIO, NULL);
++
++    vTaskStartScheduler();
++	for(;;)
++		;
++    /* Will not get here unless a task calls vTaskEndScheduler ()*/
++}
+diff --git a/boards/lpc54018iotmodule/stdk/pin_mux.c b/boards/lpc54018iotmodule/stdk/pin_mux.c
+new file mode 100644
+index 0000000..d82366c
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/pin_mux.c
+@@ -0,0 +1,291 @@
++/*
++ * Copyright 2019 NXP.
++ * All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++/***********************************************************************************************************************
++ * This file was generated by the MCUXpresso Config Tools. Any manual edits made to this file
++ * will be overwritten if the respective MCUXpresso Config Tools is used to update this file.
++ **********************************************************************************************************************/
++
++/* clang-format off */
++/*
++ * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
++!!GlobalInfo
++product: Pins v5.0
++processor: LPC54018
++package_id: LPC54018JET180
++mcu_data: ksdk2_0
++processor_version: 0.0.20
++pin_labels:
++- {pin_num: A13, pin_signal: PIO3_3/LCD_VD(17)/FC9_TXD_SCL_MISO, label: PWRON, identifier: PWRON}
++- {pin_num: E3, pin_signal: PIO3_14/SCT0_OUT4/FC9_RTS_SCL_SSEL1/CTIMER3_MAT1/TRACEDATA(2), label: KFFET, identifier: KFFET}
++- {pin_num: H4, pin_signal: PIO3_13/SCT0_OUT9/FC9_CTS_SDA_SSEL0/CTIMER3_CAP1/EMC_FBCK/TRACEDATA(1), label: LED, identifier: LED}
++- {pin_num: B10, pin_signal: PIO3_5/LCD_VD(19)/FC8_RTS_SCL_SSEL1/CTIMER4_MAT1, label: PWRON, identifier: LCD_VD19}
++- {pin_num: N3, pin_signal: PIO1_0/FC0_RTS_SCL_SSEL1/SD_D(3)/CTIMER0_CAP2/SCT0_GPI4/TRACECLK/ADC0_6, label: IRQ, identifier: IRQ}
++- {pin_num: P11, pin_signal: PIO1_22/FC8_RTS_SCL_SSEL1/SD_CMD/CTIMER2_MAT3/SCT0_GPI5/FC4_SSEL3/EMC_CKE(1), label: IRQ, identifier: IRQ}
++- {pin_num: C10, pin_signal: PIO3_2/LCD_VD(16)/FC9_RXD_SDA_MOSI/CTIMER1_MAT2, label: IRQ, identifier: IRQ}
++- {pin_num: A3, pin_signal: PIO3_10/SCT0_OUT3/CTIMER3_MAT0/EMC_DYCSN(1)/TRACEDATA(0), label: PWRON, identifier: PWRON}
++- {pin_num: A14, pin_signal: PIO4_7/CTIMER4_CAP3/USB0_PORTPWRN/USB0_FRAME/SCT0_GPI0, label: PWRON, identifier: PWRON}
++ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
++ */
++/* clang-format on */
++
++#include "fsl_common.h"
++#include "fsl_gpio.h"
++#include "fsl_iocon.h"
++#include "pin_mux.h"
++
++/* FUNCTION ************************************************************************************************************
++ *
++ * Function Name : BOARD_InitBootPins
++ * Description   : Calls initialization functions.
++ *
++ * END ****************************************************************************************************************/
++void BOARD_InitBootPins(void)
++{
++    BOARD_InitPins();
++}
++
++/* clang-format off */
++/*
++ * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
++BOARD_InitPins:
++- options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true'}
++- pin_list:
++  - {pin_num: B12, peripheral: USBFSH, signal: USB_VBUS, pin_signal: PIO0_22/FC6_TXD_SCL_MISO_WS/UTICK_CAP1/CTIMER3_CAP3/SCT0_OUT3/USB0_VBUS, mode: inactive, invert: disabled,
++    slew_rate: standard, open_drain: disabled}
++  - {pin_num: B13, peripheral: FLEXCOMM0, signal: RXD_SDA_MOSI, pin_signal: PIO0_29/FC0_RXD_SDA_MOSI/CTIMER2_MAT3/SCT0_OUT8/TRACEDATA(2), mode: inactive, invert: disabled,
++    glitch_filter: disabled, slew_rate: standard, open_drain: disabled}
++  - {pin_num: A2, peripheral: FLEXCOMM0, signal: TXD_SCL_MISO, pin_signal: PIO0_30/FC0_TXD_SCL_MISO/CTIMER0_MAT0/SCT0_OUT9/TRACEDATA(1), mode: inactive, invert: disabled,
++    glitch_filter: disabled, slew_rate: standard, open_drain: disabled}
++ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
++ */
++/* clang-format on */
++
++/* FUNCTION ************************************************************************************************************
++ *
++ * Function Name : BOARD_InitPins
++ * Description   : Configures pin routing and optionally pin electrical features.
++ *
++ * END ****************************************************************************************************************/
++/* Function assigned for the Cortex-M4F */
++void BOARD_InitPins(void)
++{
++    /* Enables the clock for the IOCON block. 0 = Disable; 1 = Enable.: 0x01u */
++    CLOCK_EnableClock(kCLOCK_Iocon);
++
++    IOCON->PIO[0][22] =
++        ((IOCON->PIO[0][22] &
++          /* Mask bits to zero which are setting */
++          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_MODE_MASK | IOCON_PIO_INVERT_MASK | IOCON_PIO_DIGIMODE_MASK | IOCON_PIO_SLEW_MASK | IOCON_PIO_OD_MASK)))
++
++         /* Selects pin function.
++          * : PORT022 (pin B12) is configured as USB0_VBUS. */
++         | IOCON_PIO_FUNC(PIO022_FUNC_ALT7)
++
++         /* Selects function mode (on-chip pull-up/pull-down resistor control).
++          * : Inactive.
++          * Inactive (no pull-down/pull-up resistor enabled). */
++         | IOCON_PIO_MODE(PIO022_MODE_INACTIVE)
++
++         /* Input polarity.
++          * : Disabled.
++          * Input function is not inverted. */
++         | IOCON_PIO_INVERT(PIO022_INVERT_DISABLED)
++
++         /* Select Analog/Digital mode.
++          * : Digital mode. */
++         | IOCON_PIO_DIGIMODE(PIO022_DIGIMODE_DIGITAL)
++
++         /* Driver slew rate.
++          * : Standard mode, output slew rate control is enabled.
++          * More outputs can be switched simultaneously. */
++         | IOCON_PIO_SLEW(PIO022_SLEW_STANDARD)
++
++         /* Controls open-drain mode.
++          * : Normal.
++          * Normal push-pull output. */
++         | IOCON_PIO_OD(PIO022_OD_NORMAL));
++
++    const uint32_t port0_pin29_config = (/* Pin is configured as FC0_RXD_SDA_MOSI */
++                                         IOCON_PIO_FUNC1 |
++                                         /* No addition pin function */
++                                         IOCON_PIO_MODE_INACT |
++                                         /* Input function is not inverted */
++                                         IOCON_PIO_INV_DI |
++                                         /* Enables digital function */
++                                         IOCON_PIO_DIGITAL_EN |
++                                         /* Input filter disabled */
++                                         IOCON_PIO_INPFILT_OFF |
++                                         /* Standard mode, output slew rate control is enabled */
++                                         IOCON_PIO_SLEW_STANDARD |
++                                         /* Open drain is disabled */
++                                         IOCON_PIO_OPENDRAIN_DI);
++    /* PORT0 PIN29 (coords: B13) is configured as FC0_RXD_SDA_MOSI */
++    IOCON_PinMuxSet(IOCON, 0U, 29U, port0_pin29_config);
++
++    const uint32_t port0_pin30_config = (/* Pin is configured as FC0_TXD_SCL_MISO */
++                                         IOCON_PIO_FUNC1 |
++                                         /* No addition pin function */
++                                         IOCON_PIO_MODE_INACT |
++                                         /* Input function is not inverted */
++                                         IOCON_PIO_INV_DI |
++                                         /* Enables digital function */
++                                         IOCON_PIO_DIGITAL_EN |
++                                         /* Input filter disabled */
++                                         IOCON_PIO_INPFILT_OFF |
++                                         /* Standard mode, output slew rate control is enabled */
++                                         IOCON_PIO_SLEW_STANDARD |
++                                         /* Open drain is disabled */
++                                         IOCON_PIO_OPENDRAIN_DI);
++    /* PORT0 PIN30 (coords: A2) is configured as FC0_TXD_SCL_MISO */
++    IOCON_PinMuxSet(IOCON, 0U, 30U, port0_pin30_config);
++}
++
++/* clang-format off */
++/*
++ * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
++BOARD_InitGT202Shield:
++- options: {coreID: core0, enableClock: 'true'}
++- pin_list:
++  - {pin_num: D2, peripheral: FLEXCOMM8, signal: SCK, pin_signal: PIO3_15/FC8_SCK/SD_WR_PRT}
++  - {pin_num: K1, peripheral: FLEXCOMM8, signal: TXD_SCL_MISO, pin_signal: PIO3_17/FC8_TXD_SCL_MISO/SD_D(5)}
++  - {pin_num: E1, peripheral: FLEXCOMM8, signal: RXD_SDA_MOSI, pin_signal: PIO3_16/FC8_RXD_SDA_MOSI/SD_D(4)}
++  - {pin_num: P11, peripheral: FLEXCOMM8, signal: RTS_SCL_SSEL1, pin_signal: PIO1_22/FC8_RTS_SCL_SSEL1/SD_CMD/CTIMER2_MAT3/SCT0_GPI5/FC4_SSEL3/EMC_CKE(1), identifier: ''}
++  - {pin_num: A13, peripheral: GPIO, signal: 'PIO3, 3', pin_signal: PIO3_3/LCD_VD(17)/FC9_TXD_SCL_MISO, direction: OUTPUT, mode: pullDown, invert: disabled}
++  - {pin_num: N3, peripheral: GPIO, signal: 'PIO1, 0', pin_signal: PIO1_0/FC0_RTS_SCL_SSEL1/SD_D(3)/CTIMER0_CAP2/SCT0_GPI4/TRACECLK/ADC0_6, direction: INPUT, mode: pullUp,
++    invert: disabled}
++ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
++ */
++/* clang-format on */
++
++/* FUNCTION ************************************************************************************************************
++ *
++ * Function Name : BOARD_InitGT202Shield
++ * Description   : Configures pin routing and optionally pin electrical features.
++ *
++ * END ****************************************************************************************************************/
++/* Function assigned for the Cortex-M4F */
++void BOARD_InitGT202Shield(void)
++{
++    /* Enables the clock for the IOCON block. 0 = Disable; 1 = Enable.: 0x01u */
++    CLOCK_EnableClock(kCLOCK_Iocon);
++    /* Enables the clock for the GPIO1 module */
++    CLOCK_EnableClock(kCLOCK_Gpio1);
++    /* Enables the clock for the GPIO3 module */
++    CLOCK_EnableClock(kCLOCK_Gpio3);
++
++    gpio_pin_config_t IRQ_config = {
++        .pinDirection = kGPIO_DigitalInput,
++        .outputLogic = 0U
++    };
++    /* Initialize GPIO functionality on pin PIO1_0 (pin N3)  */
++    GPIO_PinInit(BOARD_INITGT202SHIELD_IRQ_GPIO, BOARD_INITGT202SHIELD_IRQ_PORT, BOARD_INITGT202SHIELD_IRQ_PIN, &IRQ_config);
++
++    gpio_pin_config_t PWRON_config = {
++        .pinDirection = kGPIO_DigitalOutput,
++        .outputLogic = 0U
++    };
++    /* Initialize GPIO functionality on pin PIO3_3 (pin A13)  */
++    GPIO_PinInit(BOARD_INITGT202SHIELD_PWRON_GPIO, BOARD_INITGT202SHIELD_PWRON_PORT, BOARD_INITGT202SHIELD_PWRON_PIN, &PWRON_config);
++
++    IOCON->PIO[1][0] =
++        ((IOCON->PIO[1][0] &
++          /* Mask bits to zero which are setting */
++          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_MODE_MASK | IOCON_PIO_INVERT_MASK | IOCON_PIO_DIGIMODE_MASK)))
++
++         /* Selects pin function.
++          * : PORT10 (pin N3) is configured as PIO1_0. */
++         | IOCON_PIO_FUNC(PIO10_FUNC_ALT0)
++
++         /* Selects function mode (on-chip pull-up/pull-down resistor control).
++          * : Pull-up.
++          * Pull-up resistor enabled. */
++         | IOCON_PIO_MODE(PIO10_MODE_PULL_UP)
++
++         /* Input polarity.
++          * : Disabled.
++          * Input function is not inverted. */
++         | IOCON_PIO_INVERT(PIO10_INVERT_DISABLED)
++
++         /* Select Analog/Digital mode.
++          * : Digital mode. */
++         | IOCON_PIO_DIGIMODE(PIO10_DIGIMODE_DIGITAL));
++
++    IOCON->PIO[1][22] = ((IOCON->PIO[1][22] &
++                          /* Mask bits to zero which are setting */
++                          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_DIGIMODE_MASK)))
++
++                         /* Selects pin function.
++                          * : PORT122 (pin P11) is configured as FC8_RTS_SCL_SSEL1. */
++                         | IOCON_PIO_FUNC(PIO122_FUNC_ALT1)
++
++                         /* Select Analog/Digital mode.
++                          * : Digital mode. */
++                         | IOCON_PIO_DIGIMODE(PIO122_DIGIMODE_DIGITAL));
++
++    IOCON->PIO[3][15] = ((IOCON->PIO[3][15] &
++                          /* Mask bits to zero which are setting */
++                          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_DIGIMODE_MASK)))
++
++                         /* Selects pin function.
++                          * : PORT315 (pin D2) is configured as FC8_SCK. */
++                         | IOCON_PIO_FUNC(PIO315_FUNC_ALT1)
++
++                         /* Select Analog/Digital mode.
++                          * : Digital mode. */
++                         | IOCON_PIO_DIGIMODE(PIO315_DIGIMODE_DIGITAL));
++
++    IOCON->PIO[3][16] = ((IOCON->PIO[3][16] &
++                          /* Mask bits to zero which are setting */
++                          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_DIGIMODE_MASK)))
++
++                         /* Selects pin function.
++                          * : PORT316 (pin E1) is configured as FC8_RXD_SDA_MOSI. */
++                         | IOCON_PIO_FUNC(PIO316_FUNC_ALT1)
++
++                         /* Select Analog/Digital mode.
++                          * : Digital mode. */
++                         | IOCON_PIO_DIGIMODE(PIO316_DIGIMODE_DIGITAL));
++
++    IOCON->PIO[3][17] = ((IOCON->PIO[3][17] &
++                          /* Mask bits to zero which are setting */
++                          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_DIGIMODE_MASK)))
++
++                         /* Selects pin function.
++                          * : PORT317 (pin K1) is configured as FC8_TXD_SCL_MISO. */
++                         | IOCON_PIO_FUNC(PIO317_FUNC_ALT1)
++
++                         /* Select Analog/Digital mode.
++                          * : Digital mode. */
++                         | IOCON_PIO_DIGIMODE(PIO317_DIGIMODE_DIGITAL));
++
++    IOCON->PIO[3][3] =
++        ((IOCON->PIO[3][3] &
++          /* Mask bits to zero which are setting */
++          (~(IOCON_PIO_FUNC_MASK | IOCON_PIO_MODE_MASK | IOCON_PIO_INVERT_MASK | IOCON_PIO_DIGIMODE_MASK)))
++
++         /* Selects pin function.
++          * : PORT33 (pin A13) is configured as PIO3_3. */
++         | IOCON_PIO_FUNC(PIO33_FUNC_ALT0)
++
++         /* Selects function mode (on-chip pull-up/pull-down resistor control).
++          * : Pull-down.
++          * Pull-down resistor enabled. */
++         | IOCON_PIO_MODE(PIO33_MODE_PULL_DOWN)
++
++         /* Input polarity.
++          * : Disabled.
++          * Input function is not inverted. */
++         | IOCON_PIO_INVERT(PIO33_INVERT_DISABLED)
++
++         /* Select Analog/Digital mode.
++          * : Digital mode. */
++         | IOCON_PIO_DIGIMODE(PIO33_DIGIMODE_DIGITAL));
++}
++/***********************************************************************************************************************
++ * EOF
++ **********************************************************************************************************************/
+diff --git a/boards/lpc54018iotmodule/stdk/pin_mux.h b/boards/lpc54018iotmodule/stdk/pin_mux.h
+new file mode 100644
+index 0000000..c133c9a
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/pin_mux.h
+@@ -0,0 +1,173 @@
++/*
++ * Copyright 2019 NXP.
++ * All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++/***********************************************************************************************************************
++ * This file was generated by the MCUXpresso Config Tools. Any manual edits made to this file
++ * will be overwritten if the respective MCUXpresso Config Tools is used to update this file.
++ **********************************************************************************************************************/
++
++#ifndef _PIN_MUX_H_
++#define _PIN_MUX_H_
++
++/*!
++ * @addtogroup pin_mux
++ * @{
++ */
++
++/***********************************************************************************************************************
++ * API
++ **********************************************************************************************************************/
++
++#if defined(__cplusplus)
++extern "C" {
++#endif
++
++/*!
++ * @brief Calls initialization functions.
++ *
++ */
++void BOARD_InitBootPins(void);
++
++/*!
++ * @brief Enables digital function */
++#define IOCON_PIO_DIGITAL_EN 0x0100u
++/*!
++ * @brief Selects pin function 1 */
++#define IOCON_PIO_FUNC1 0x01u
++/*!
++ * @brief Input filter disabled */
++#define IOCON_PIO_INPFILT_OFF 0x0200u
++/*!
++ * @brief Input function is not inverted */
++#define IOCON_PIO_INV_DI 0x00u
++/*!
++ * @brief No addition pin function */
++#define IOCON_PIO_MODE_INACT 0x00u
++/*!
++ * @brief Open drain is disabled */
++#define IOCON_PIO_OPENDRAIN_DI 0x00u
++/*!
++ * @brief Standard mode, output slew rate control is enabled */
++#define IOCON_PIO_SLEW_STANDARD 0x00u
++/*!
++ * @brief Select Analog/Digital mode.: Digital mode. */
++#define PIO022_DIGIMODE_DIGITAL 0x01u
++/*!
++ * @brief Selects pin function.: Alternative connection 7. */
++#define PIO022_FUNC_ALT7 0x07u
++/*!
++ * @brief Input polarity.: Disabled. Input function is not inverted. */
++#define PIO022_INVERT_DISABLED 0x00u
++/*!
++ * @brief
++ * Selects function mode (on-chip pull-up/pull-down resistor control).
++ * : Inactive.
++ * Inactive (no pull-down/pull-up resistor enabled).
++ */
++#define PIO022_MODE_INACTIVE 0x00u
++/*!
++ * @brief Controls open-drain mode.: Normal. Normal push-pull output */
++#define PIO022_OD_NORMAL 0x00u
++/*!
++ * @brief
++ * Driver slew rate.
++ * : Standard mode, output slew rate control is enabled.
++ * More outputs can be switched simultaneously.
++ */
++#define PIO022_SLEW_STANDARD 0x00u
++
++/*!
++ * @brief Configures pin routing and optionally pin electrical features.
++ *
++ */
++void BOARD_InitPins(void); /* Function assigned for the Cortex-M4F */
++
++/*!
++ * @brief Select Analog/Digital mode.: Digital mode. */
++#define PIO10_DIGIMODE_DIGITAL 0x01u
++/*!
++ * @brief Selects pin function.: Alternative connection 0. */
++#define PIO10_FUNC_ALT0 0x00u
++/*!
++ * @brief Input polarity.: Disabled. Input function is not inverted. */
++#define PIO10_INVERT_DISABLED 0x00u
++/*!
++ * @brief Selects function mode (on-chip pull-up/pull-down resistor control).: Pull-up. Pull-up resistor enabled. */
++#define PIO10_MODE_PULL_UP 0x02u
++/*!
++ * @brief Select Analog/Digital mode.: Digital mode. */
++#define PIO122_DIGIMODE_DIGITAL 0x01u
++/*!
++ * @brief Selects pin function.: Alternative connection 1. */
++#define PIO122_FUNC_ALT1 0x01u
++/*!
++ * @brief Select Analog/Digital mode.: Digital mode. */
++#define PIO315_DIGIMODE_DIGITAL 0x01u
++/*!
++ * @brief Selects pin function.: Alternative connection 1. */
++#define PIO315_FUNC_ALT1 0x01u
++/*!
++ * @brief Select Analog/Digital mode.: Digital mode. */
++#define PIO316_DIGIMODE_DIGITAL 0x01u
++/*!
++ * @brief Selects pin function.: Alternative connection 1. */
++#define PIO316_FUNC_ALT1 0x01u
++/*!
++ * @brief Select Analog/Digital mode.: Digital mode. */
++#define PIO317_DIGIMODE_DIGITAL 0x01u
++/*!
++ * @brief Selects pin function.: Alternative connection 1. */
++#define PIO317_FUNC_ALT1 0x01u
++/*!
++ * @brief Select Analog/Digital mode.: Digital mode. */
++#define PIO33_DIGIMODE_DIGITAL 0x01u
++/*!
++ * @brief Selects pin function.: Alternative connection 0. */
++#define PIO33_FUNC_ALT0 0x00u
++/*!
++ * @brief Input polarity.: Disabled. Input function is not inverted. */
++#define PIO33_INVERT_DISABLED 0x00u
++/*!
++ * @brief
++ * Selects function mode (on-chip pull-up/pull-down resistor control).
++ * : Pull-down.
++ * Pull-down resistor enabled.
++ */
++#define PIO33_MODE_PULL_DOWN 0x01u
++
++/*! @name PIO3_3 (coord A13), PWRON
++  @{ */
++#define BOARD_INITGT202SHIELD_PWRON_GPIO GPIO /*!<@brief GPIO device name: GPIO */
++#define BOARD_INITGT202SHIELD_PWRON_PORT 3U   /*!<@brief PORT device name: 3U */
++#define BOARD_INITGT202SHIELD_PWRON_PIN 3U    /*!<@brief 3U pin index: 3 */
++                                              /* @} */
++
++/*! @name PIO1_0 (coord N3), IRQ
++  @{ */
++#define BOARD_INITGT202SHIELD_IRQ_GPIO GPIO /*!<@brief GPIO device name: GPIO */
++#define BOARD_INITGT202SHIELD_IRQ_PORT 1U   /*!<@brief PORT device name: 1U */
++#define BOARD_INITGT202SHIELD_IRQ_PIN 0U    /*!<@brief 1U pin index: 0 */
++                                            /* @} */
++
++/*!
++ * @brief Configures pin routing and optionally pin electrical features.
++ *
++ */
++void BOARD_InitGT202Shield(void); /* Function assigned for the Cortex-M4F */
++
++#if defined(__cplusplus)
++}
++#endif
++
++/*!
++ * @}
++ */
++#endif /* _PIN_MUX_H_ */
++
++/***********************************************************************************************************************
++ * EOF
++ **********************************************************************************************************************/
+diff --git a/boards/lpc54018iotmodule/stdk/readme.txt b/boards/lpc54018iotmodule/stdk/readme.txt
+new file mode 100755
+index 0000000..ea3979c
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/readme.txt
+@@ -0,0 +1,81 @@
++Overview
++========
++The qca_demo example provides basic commands to show the functionality of qca_wifi stack.
++The default IP configuration is "addr: 192.168.1.10 mask: 255.255.255.0 gw: 192.168.1.1".
++To obtain a valid IP configuration from DHCP server, press 'd' after WiFi connection is established.
++
++Toolchain supported
++===================
++- MCUXpresso  11.1.0
++- IAR embedded Workbench  8.40.2
++- Keil MDK  5.29
++- GCC ARM Embedded  8.3.1
++
++Hardware requirements
++=====================
++- Micro USB cable
++- LPC54018-IoT-Module + Baseboard
++- Personal Computer
++
++Board settings
++==============
++- Please switch to high speed mode when there is only a iotmodule board because there is only a high speed usb port (J8) on the iotmodule board.
++Prepare the Demo
++================
++
++1.  Configure your dedicated device to create a WiFi network with
++    SSID "nxp" and password "NXP0123456789"
++
++    If you want to use notebook as an AP, please follow these instructions:
++    a.  Download https://github.com/oblique/create_ap.git
++    b.  Run "make install"
++    c.  Connect ethernet cable with internet access to notebook.
++    d.  Run command "sudo create_ap wlan0 eth0 nxp NXP0123456789"
++    where
++        wlan0 - represent Linux Wifi device
++        eth0  - represent Linux ethernet device
++        nxp   - is a WiFi SSID
++        NXP0123456789 - is a WiFi password
++
++    The names of ethernet and WiFi device might be different.
++    Find names in your system by running of command "ifconfig"
++
++2.  Connect a micro USB cable between the PC host and the SDA port
++3.  Open a serial terminal with the following settings (See Appendix A in Getting started guide for description how to determine serial port number):
++    - 115200 baud rate
++    - 8 data bits
++    - No parity
++    - One stop bit
++    - No flow control
++3.  Download the program to the target board.
++4.  Reset the SoC and run the project.
++
++
++Running the demo
++================
++When the demo runs successfully, the log would be seen on the CMSIS DAP terminal like:
++
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++  s  AP Scan
++  c  AP Connect (SSID='nxp', pass='NXP0123456789')
++  D  AP Disconnect
++  d  Get DHCP address
++  g  HTTP GET nxp.com
++  w  HTTP GET from gateway
++  p  Ping gateway
++  P  Ping nxp.com
++  i  Print IP configuration
++  R  Resolve some hosts
++  h  Help (print this menu)
++  H  Print extended help
++
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++- Press 's' to scan available Wifi networks. In the list you should see the "nxp" network.
++- Press 'c' to connect to "nxp" network.
++- Press 'd' to get an IP address by DHCP.
++- Press 'g' to download several bytes of NXP website.
++
++Customization options
++=====================
+diff --git a/boards/lpc54018iotmodule/stdk/stdk_freertos.xml b/boards/lpc54018iotmodule/stdk/stdk_freertos.xml
+new file mode 100755
+index 0000000..58d89c9
+--- /dev/null
++++ b/boards/lpc54018iotmodule/stdk/stdk_freertos.xml
+@@ -0,0 +1,143 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<ksdk:examples xmlns:ksdk="http://nxp.com/ksdk/2.0/ksdk_manifest_v3.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nxp.com/ksdk/2.0/ksdk_manifest_v3.0.xsd manifest.xsd">
++  <externalDefinitions>
++    <definition extID="com.nxp.mcuxpresso"/>
++    <definition extID="component.lists.LPC54018"/>
++    <definition extID="component.osa.LPC54018"/>
++    <definition extID="component.serial_manager.LPC54018"/>
++    <definition extID="component.serial_manager_uart.LPC54018"/>
++    <definition extID="component.serial_manager_usb_cdc.LPC54018"/>
++    <definition extID="component.serial_manager_usb_cdc_device_config.lpc54018iotmodule.LPC54018"/>
++    <definition extID="component.usart_adapter.LPC54018"/>
++    <definition extID="device.LPC54018_CMSIS.LPC54018"/>
++    <definition extID="device.LPC54018_startup.LPC54018"/>
++    <definition extID="middleware.amazon_freertos-kernel.LPC54018"/>
++    <definition extID="middleware.amazon_freertos-kernel.extension.LPC54018"/>
++    <definition extID="middleware.amazon_freertos-kernel.heap_4.LPC54018"/>
++    <definition extID="middleware.usb.device.LPC54018"/>
++    <definition extID="middleware.usb.device_controller_ip3511hs.LPC54018"/>
++    <definition extID="middleware.wifi_qca.common.LPC54018"/>
++    <definition extID="middleware.wifi_qca.freertos.LPC54018"/>
++    <definition extID="middleware.wifi_qca.freertos.drivers.flexcomm_lpc_dma.LPC54018"/>
++    <definition extID="middleware.wifi_qca.lpc54018iotmodule.freertos.shields.LPC54018"/>
++    <definition extID="middleware.wifi_qca.lpc54018iotmodule.freertos.shields.gt202.LPC54018"/>
++    <definition extID="platform.Include_common.LPC54018"/>
++    <definition extID="platform.Include_core_cm4.LPC54018"/>
++    <definition extID="platform.Include_dsp.LPC54018"/>
++    <definition extID="platform.drivers.clock.LPC54018"/>
++    <definition extID="platform.drivers.common.LPC54018"/>
++    <definition extID="platform.drivers.emc.LPC54018"/>
++    <definition extID="platform.drivers.flexcomm.LPC54018"/>
++    <definition extID="platform.drivers.flexcomm_spi.LPC54018"/>
++    <definition extID="platform.drivers.flexcomm_spi_dma.LPC54018"/>
++    <definition extID="platform.drivers.flexcomm_usart.LPC54018"/>
++    <definition extID="platform.drivers.inputmux.LPC54018"/>
++    <definition extID="platform.drivers.inputmux_connections.LPC54018"/>
++    <definition extID="platform.drivers.lpc_dma.LPC54018"/>
++    <definition extID="platform.drivers.lpc_gpio.LPC54018"/>
++    <definition extID="platform.drivers.lpc_iocon.LPC54018"/>
++    <definition extID="platform.drivers.pint.LPC54018"/>
++    <definition extID="platform.drivers.power.LPC54018"/>
++    <definition extID="platform.drivers.reset.LPC54018"/>
++    <definition extID="platform.utilities.assert.LPC54018"/>
++    <definition extID="platform.utilities.misc_utilities.LPC54018"/>
++    <definition extID="utility.debug_console.LPC54018"/>
++    <definition extID="iar"/>
++    <definition extID="mdk"/>
++    <definition extID="armgcc"/>
++    <definition extID="mcuxpresso"/>
++  </externalDefinitions>
++  <example id="lpc54018iotmodule_stdk_freertos" name="stdk_smart_switch" category="stdk" dependency="middleware.wifi_qca.lpc54018iotmodule.freertos.shields.gt202.LPC54018 platform.drivers.lpc_iocon.LPC54018 middleware.usb.device_controller_ip3511hs.LPC54018 component.serial_manager.LPC54018 platform.drivers.common.LPC54018 component.lists.LPC54018 component.serial_manager_usb_cdc.LPC54018 component.serial_manager_usb_cdc_device_config.lpc54018iotmodule.LPC54018 middleware.usb.device.LPC54018 middleware.amazon_freertos-kernel.heap_4.LPC54018 middleware.wifi_qca.common.LPC54018 platform.drivers.clock.LPC54018 platform.drivers.power.LPC54018 platform.drivers.reset.LPC54018 device.LPC54018_CMSIS.LPC54018 utility.debug_console.LPC54018 component.usart_adapter.LPC54018 component.serial_manager_uart.LPC54018 platform.drivers.flexcomm_usart.LPC54018 device.LPC54018_startup.LPC54018 platform.drivers.flexcomm.LPC54018 platform.drivers.lpc_gpio.LPC54018 platform.drivers.emc.LPC54018 platform.utilities.assert.LPC54018 middleware.wifi_qca.lpc54018iotmodule.freertos.shields.LPC54018 middleware.wifi_qca.freertos.LPC54018 middleware.amazon_freertos-kernel.LPC54018 middleware.amazon_freertos-kernel.extension.LPC54018 middleware.wifi_qca.freertos.drivers.flexcomm_lpc_dma.LPC54018 platform.drivers.flexcomm_spi.LPC54018 platform.Include_core_cm4.LPC54018 platform.Include_common.LPC54018 platform.Include_dsp.LPC54018 platform.drivers.flexcomm_spi_dma.LPC54018 platform.drivers.lpc_dma.LPC54018 platform.drivers.pint.LPC54018 platform.drivers.inputmux.LPC54018 platform.drivers.inputmux_connections.LPC54018 component.osa.LPC54018 platform.utilities.misc_utilities.LPC54018">
++    <projects>
++      <project type="com.crt.advproject.projecttype.exe" nature="org.eclipse.cdt.core.cnature"/>
++    </projects>
++    <toolchainSettings>
++      <toolchainSetting id_refs="com.nxp.mcuxpresso">
++        <option id="com.crt.advproject.gas.fpu" type="enum">
++          <value>com.crt.advproject.gas.fpu.fpv4.hard</value>
++        </option>
++        <option id="com.crt.advproject.gcc.fpu" type="enum">
++          <value>com.crt.advproject.gcc.fpu.fpv4.hard</value>
++        </option>
++        <option id="com.crt.advproject.c.misc.dialect" type="enum">
++          <value>com.crt.advproject.misc.dialect.gnu99</value>
++        </option>
++        <option id="gnu.c.compiler.option.preprocessor.def.symbols" type="stringList">
++          <value>SDK_DEBUGCONSOLE=1</value>
++          <value>CPU_LPC54018</value>
++          <value>__USE_CMSIS</value>
++          <value>MXL12835F</value>
++          <value>BOARD_USE_VIRTUALCOM</value>
++          <value>USB_STACK_FREERTOS</value>
++          <value>USB_STACK_USE_DEDICATED_RAM=1</value>
++          <value>BOARD_DEBUG_UART_TYPE=kSerialPort_UsbCdc</value>
++          <value>DEBUG_CONSOLE_TRANSFER_NON_BLOCKING</value>
++          <value>SERIAL_PORT_TYPE_USBCDC=1</value>
++          <value>CPU_LPC54018JET180=1</value>
++          <value>A_LITTLE_ENDIAN</value>
++          <value>SDK_DEBUGCONSOLE_UART</value>
++          <value>SERIAL_PORT_TYPE_UART=1</value>
++          <value>FSL_RTOS_FREE_RTOS</value>
++        </option>
++        <option id="gnu.c.compiler.option.optimization.flags" type="string">
++          <value>-fno-common</value>
++        </option>
++        <option id="gnu.c.compiler.option.misc.other" type="string">
++          <value>-c  -ffunction-sections  -fdata-sections  -ffreestanding  -fno-builtin</value>
++        </option>
++        <option id="com.crt.advproject.link.fpu" type="enum">
++          <value>com.crt.advproject.link.fpu.fpv4.hard</value>
++        </option>
++        <option id="gnu.c.link.option.nostdlibs" type="boolean">
++          <value>true</value>
++        </option>
++        <option id="com.crt.advproject.link.memory.heapAndStack" type="string">
++          <value>&amp;Heap:Default;Default;0x200&amp;Stack:Default;Default;0x100</value>
++        </option>
++        <option id="com.crt.advproject.link.memory.load.image" type="string">
++          <value>true;SRAMX</value>
++        </option>
++        <option id="com.crt.advproject.link.memory.data" type="string">
++          <value>SRAM_0_1_2_3</value>
++        </option>
++      </toolchainSetting>
++    </toolchainSettings>
++    <source path="boards/lpc54018iotmodule/stdk/armgcc" target_path="LPC54018/gcc" type="linker" toolchain="armgcc">
++      <files mask="LPC54018_spifi_flash.ld"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk/iar" target_path="LPC54018/iar" type="linker" toolchain="iar">
++      <files mask="LPC54018_spifi_flash.icf"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk/iar" target_path="lpc54018iotmodule" type="other" toolchain="iar">
++      <files mask="jlink_qspi_plain_load.mac"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk/mdk" target_path="LPC54018/arm" type="linker" toolchain="mdk">
++      <files mask="LPC54018_spifi_flash.scf"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk/mdk" target_path="lpc54018iotmodule" type="configuration" toolchain="mdk">
++      <files mask="jlink_sramx_debug.ini"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk" target_path="board" type="c_include">
++      <files mask="board.h"/>
++      <files mask="clock_config.h"/>
++      <files mask="pin_mux.h"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk" target_path="board" type="src">
++      <files mask="board.c"/>
++      <files mask="clock_config.c"/>
++      <files mask="pin_mux.c"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk" target_path="doc" type="doc" toolchain="iar mdk mcuxpresso armgcc">
++      <files mask="readme.txt"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk" target_path="source" type="c_include">
++      <files mask="FreeRTOSConfig.h"/>
++      <files mask="wlan_qcom.h"/>
++    </source>
++    <source path="boards/lpc54018iotmodule/stdk" target_path="source" type="src">
++      <files mask="main.c"/>
++      <files mask="wlan_qca400x.c"/>
++      <files mask="wlan_qcom.c"/>
++    </source>
++  </example>
++</ksdk:examples>
+diff --git a/middleware/wifi_qca/common_src/qapi/qcom_api.c b/middleware/wifi_qca/common_src/qapi/qcom_api.c
+index f45a232..ed6919c 100644
+--- a/middleware/wifi_qca/common_src/qapi/qcom_api.c
++++ b/middleware/wifi_qca/common_src/qapi/qcom_api.c
+@@ -98,12 +98,12 @@ int qcom_socket(int family, int type, int protocol)
+     return (t_socket(Custom_Api_GetDriverCxt(0), family, type, protocol));
+ }
+ 
+-int qcom_connect(int s, struct sockaddr *addr, int addrlen)
++int qcom_connect(int s, sockaddr_t *addr, int addrlen)
+ {
+     return (t_connect(Custom_Api_GetDriverCxt(0), s, addr, addrlen));
+ }
+ 
+-int qcom_bind(int s, struct sockaddr *addr, int addrlen)
++int qcom_bind(int s, sockaddr_t *addr, int addrlen)
+ {
+     return (t_bind(Custom_Api_GetDriverCxt(0), s, addr, addrlen));
+ }
+@@ -113,7 +113,7 @@ int qcom_listen(int s, int backlog)
+     return (t_listen(Custom_Api_GetDriverCxt(0), s, backlog));
+ }
+ 
+-int qcom_accept(int s, struct sockaddr *addr, socklen_t *addrlen)
++int qcom_accept(int s, sockaddr_t *addr, socklen_t *addrlen)
+ {
+     return (t_accept(Custom_Api_GetDriverCxt(0), s, addr, *addrlen));
+ }
+@@ -138,9 +138,9 @@ int qcom_recv(int s, char *buf, int len, int flags)
+ }
+ 
+ #if ZERO_COPY
+-int qcom_recvfrom(int s, char **buf, int len, int flags, struct sockaddr *from, socklen_t *fromlen)
++int qcom_recvfrom(int s, char **buf, int len, int flags, sockaddr_t *from, socklen_t *fromlen)
+ #else
+-int qcom_recvfrom(int s, char *buf, int len, int flags, struct sockaddr *from, socklen_t *fromlen)
++int qcom_recvfrom(int s, char *buf, int len, int flags, sockaddr_t *from, socklen_t *fromlen)
+ #endif
+ {
+     return (t_recvfrom(Custom_Api_GetDriverCxt(0), s, (void *)buf, len, flags, from, (socklen_t*)fromlen));
+@@ -443,7 +443,7 @@ A_STATUS qcom_ota_set_callback(void *callback)
+     return ((A_STATUS)custom_ota_set_response_cb(Custom_Api_GetDriverCxt(0), callback));
+ }
+ 
+-int qcom_sendto(int s, char *buffer, int length, int flags, struct sockaddr *to, int tolen)
++int qcom_sendto(int s, char *buffer, int length, int flags, sockaddr_t *to, int tolen)
+ {
+     return (t_sendto(Custom_Api_GetDriverCxt(0), s, (uint8_t *)buffer, length, flags, to, tolen));
+ }
+diff --git a/middleware/wifi_qca/qcom_api.h b/middleware/wifi_qca/qcom_api.h
+index 2abf52f..fb34cf2 100644
+--- a/middleware/wifi_qca/qcom_api.h
++++ b/middleware/wifi_qca/qcom_api.h
+@@ -338,7 +338,7 @@ typedef struct
+ 
+ #if ENABLE_STACK_OFFLOAD
+ 
+-typedef struct sockaddr
++typedef struct qcom_sockaddr
+ {
+     uint16_t sa_family;
+     char sa_data[32];
+@@ -365,10 +365,10 @@ typedef enum
+ } QCOM_OTA_PROTOCOL_t;
+ 
+ int qcom_socket(int family, int type, int protocol);
+-int qcom_connect(int s, struct sockaddr *addr, int addrlen);
+-int qcom_bind(int s, struct sockaddr *addr, int addrlen);
++int qcom_connect(int s, sockaddr_t *addr, int addrlen);
++int qcom_bind(int s, sockaddr_t *addr, int addrlen);
+ int qcom_listen(int s, int backlog);
+-int qcom_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
++int qcom_accept(int s, sockaddr_t *addr, socklen_t *addrlen);
+ int qcom_setsockopt(int s, int level, int name, void *arg, int arglen);
+ int qcom_getsockopt(int s, int level, int name, void *arg, int arglen);
+ #if ZERO_COPY
+@@ -378,9 +378,9 @@ int qcom_recv(int s, char *buf, int len, int flags);
+ #endif
+ 
+ #if ZERO_COPY
+-int qcom_recvfrom(int s, char **buf, int len, int flags, struct sockaddr *from, socklen_t *fromlen);
++int qcom_recvfrom(int s, char **buf, int len, int flags, sockaddr_t *from, socklen_t *fromlen);
+ #else
+-int qcom_recvfrom(int s, char *buf, int len, int flags, struct sockaddr *from, socklen_t *fromlen);
++int qcom_recvfrom(int s, char *buf, int len, int flags, sockaddr_t *from, socklen_t *fromlen);
+ 
+ #endif
+ A_STATUS qcom_ipconfig(uint8_t device_id, QCOM_IPCONFIG_MODE mode, uint32_t *address, uint32_t *submask, uint32_t *gateway);
+@@ -404,7 +404,7 @@ int32_t qcom_SSL_read(SSL *ssl, void *buf, int32_t num);
+ #endif
+ int32_t qcom_SSL_write(SSL *ssl, const void *buf, int32_t num);
+ 
+-int qcom_sendto(int s, char *buffer, int length, int flags, struct sockaddr *to, int tolen);
++int qcom_sendto(int s, char *buffer, int length, int flags, sockaddr_t *to, int tolen);
+ int qcom_send(int s, char *buffer, int length, int flags);
+ int qcom_socket_close(int s);
+ A_STATUS qcom_ip6_address_get(uint8_t device_id,
+-- 
+2.7.4
+
