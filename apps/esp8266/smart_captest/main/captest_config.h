@@ -16,22 +16,33 @@
  *
  ****************************************************************************/
 
- //config the capabilities wanted to test here.
-#define CAPTEST_SUPPORT_TEMPLATE	1
-#define CAPTEST_SUPPORT_PREFIX_L	0
+ //config the capabilities wanted to test here. default use template
+#define CAPTEST_SUPPORT_TEMPLATE	0
+
+#define CAPTEST_SUPPORT_PREFIX_A	1
+//#define CAPTEST_SUPPORT_PREFIX_L	1
  
-#if CAPTEST_SUPPORT_TEMPLATE
- extern void captest_initialize(IOT_CTX *ctx);
- extern void send_test_capabilities(void);
+#if CAPTEST_SUPPORT_PREFIX_A
+ extern void captest_a_initialize(IOT_CTX *ctx);
+ extern void send_a_test_capabilities(void);
  
-#define custom_captest_init		captest_initialize
-#define custom_send_capabilities	send_test_capabilities
- 
+#define custom_captest_init		captest_a_initialize
+#define custom_send_capabilities	send_a_test_capabilities
+
 #elif CAPTEST_SUPPORT_PREFIX_L
  extern void captest_l_initialize(IOT_CTX *ctx);
  extern void send_l_test_capabilities(void);
- 
+
 #define custom_captest_init		captest_l_initialize
 #define custom_send_capabilities	send_l_test_capabilities
+
+#else
+
+ extern void captest_initialize(IOT_CTX *ctx);
+ extern void send_test_capabilities(void);
+
+#define custom_captest_init		captest_initialize
+#define custom_send_capabilities	send_test_capabilities
+
 #endif
 
