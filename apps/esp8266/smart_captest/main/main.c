@@ -30,7 +30,7 @@
 // for command line interface(CLI)
 #include "iot_uart_cli.h"
 #include "iot_cli_cmd.h"
-
+#include "captest_config.h"
 
 // onboarding_config_start is null-terminated string
 extern const uint8_t onboarding_config_start[]	asm("_binary_onboarding_config_json_start");
@@ -45,8 +45,6 @@ static iot_status_t g_iot_status;
 static iot_stat_lv_t g_iot_stat_lv;
 
 IOT_CTX *ctx = NULL;
-
-extern void send_test_capabilities();
 
 #ifdef CONFIG_SAMSUNG_RUN_TIME_STATS
 #include "driver/hw_timer.h"
@@ -73,7 +71,7 @@ static void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 		printf("Button short press, count: %d\n", count);
 		switch(count) {
 			case 1:
-				send_test_capabilities();
+				custom_send_capabilities();
 				break;
 			case 5:
 				/* clean-up provisioning & registered data with reboot option*/
@@ -115,8 +113,7 @@ static void captest_task(void *arg)
 		vTaskDelay(10 / portTICK_PERIOD_MS);
 	}
 }
-// CAPTEST : init for test capabilities
-extern void captest_initialize(IOT_CTX *ctx);
+
 void app_main(void)
 {
 	/**
@@ -174,7 +171,7 @@ void app_main(void)
 		printf("fail to create the iot_context\n");
 	}
 
-	captest_initialize(ctx);
+	custom_captest_init(ctx);
 
 	gpio_init();
 
