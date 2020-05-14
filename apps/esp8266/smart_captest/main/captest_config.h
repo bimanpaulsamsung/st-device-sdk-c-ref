@@ -23,8 +23,9 @@
 //#define CAPTEST_SUPPORT_PREFIX_C	1
 //#define CAPTEST_SUPPORT_PREFIX_D	1
 //#define CAPTEST_SUPPORT_PREFIX_F	1
-#define CAPTEST_SUPPORT_PREFIX_G	1
+//#define CAPTEST_SUPPORT_PREFIX_G	1
 //#define CAPTEST_SUPPORT_PREFIX_L	1
+#define CAPTEST_SUPPORT_PREFIX_W	1
  
 #if CAPTEST_SUPPORT_PREFIX_A
  extern void captest_a_initialize(IOT_CTX *ctx);
@@ -66,6 +67,13 @@
 
 #define custom_captest_init		captest_l_initialize
 #define custom_send_capabilities	send_l_test_capabilities
+
+#elif CAPTEST_SUPPORT_PREFIX_W
+ extern void captest_w_initialize(IOT_CTX *ctx);
+ extern void send_w_test_capabilities(void);
+
+#define custom_captest_init		captest_w_initialize
+#define custom_send_capabilities	send_w_test_capabilities
 
 #else
 
