@@ -99,11 +99,6 @@ void cap_audioVolume_init_cb(struct caps_audioVolume_data *caps_data)
 
 
 // CAPTEST : make cmd_cb for test capabilities
-static void cap_accelerationSensor_cmd_cb(struct caps_accelerationSensor_data *caps_data)
-{
-    const char *value = caps_data->get_acceleration_value(caps_data);
-	printf("%s : value : %s", __func__, value);
-}
 static void cap_activityLightingMode_cmd_cb(struct caps_activityLightingMode_data *caps_data)
 {
 	const char *value = caps_data->get_lightingMode_value(caps_data);
@@ -113,12 +108,6 @@ static void cap_airConditionerMode_cmd_cb(struct caps_airConditionerMode_data *c
 {
 	const char *value = caps_data->get_airConditionerMode_value(caps_data);
 	printf("%s : value : %s", __func__, value);
-}
-static void cap_airQualitySensor_cmd_cb(struct caps_airQualitySensor_data *caps_data)
-{
-	int value = caps_data->get_airQuality_value(caps_data);
-	const char *unit = caps_data->get_airQuality_unit(caps_data);
-	printf("%s : value : %d (%s)", __func__, value, unit);
 }
 static void cap_alarm_cmd_cb(struct caps_alarm_data *caps_data)
 {
@@ -138,14 +127,6 @@ static void cap_audioStream_cmd_cb(struct caps_audioStream_data *caps_data)
 {
 	const char *value = caps_data->get_uri_value(caps_data);
 	printf("%s : value : %s", __func__, value);
-}
-static void cap_audioTrackData_cmd_cb(struct caps_audioTrackData_data *caps_data)
-{
-	int totalTime = caps_data->get_totalTime_value(caps_data);
-	int elapsedTime = caps_data->get_elapsedTime_value(caps_data);
-	const JSON_H *trackData = caps_data->get_audioTrackData_value(caps_data);
-	printf("%s : totalTime elapsedTime: %d %d", __func__, totalTime, elapsedTime);
-	//TODO: printf track data
 }
 static void cap_audioVolume_cmd_cb(struct caps_audioVolume_data *caps_data)
 {
