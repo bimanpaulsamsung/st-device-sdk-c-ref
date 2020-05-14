@@ -77,35 +77,7 @@ static void cap_setFanOscillationMode_cmd_cb(struct caps_fanOscillationMode_data
 	printf("%s: value:%s\n",__func__,value);
 }
 
-static void cap_filterState_cmd_cb(struct caps_filterState_data *caps_data)
-{
-	int value = caps_data->get_filterLifeRemaining_value(caps_data);
-	printf("%s: value:%d\n",__func__,value);
-}
-
-static void cap_filterStatus_cmd_cb(struct caps_filterStatus_data *caps_data)
-{
-	const char *value = caps_data->get_filterStatus_value(caps_data);
-	printf("%s: value:%s\n",__func__,value);
-}
-
-static void cap_fineDustSensor_cmd_cb(struct caps_fineDustSensor_data *caps_data)
-{
-	const char *unit = caps_data->get_fineDustLevel_unit(caps_data);
-	int level = caps_data->get_fineDustLevel_value(caps_data);
-	printf("%s: level:%d\n",__func__,level);
-	printf("%s: unit:%s\n",__func__,unit);
-}
-
-static void cap_formaldehydeMeasurement_cmd_cb(struct caps_formaldehydeMeasurement_data *caps_data)
-{
-	const char *unit = caps_data->get_formaldehydeLevel_unit(caps_data);
-	int level = caps_data->get_formaldehydeLevel_value(caps_data);
-	printf("%s: level:%d\n",__func__,level);
-	printf("%s: unit:%s\n",__func__,unit);
-}
-
-static void cap_firmwareUpdate_init_cmd_cb(struct caps_firmwareUpdate_data *caps_data)
+static void cap_firmwareUpdate_usr_cmd_cb(struct caps_firmwareUpdate_data *caps_data)
 {
 	const char *LUS = caps_data->get_lastUpdateStatus_value(caps_data);
 	const char *state = caps_data->get_state_value(caps_data);
@@ -206,4 +178,6 @@ void captest_f_initialize(IOT_CTX *ctx)
 	// CAPTEST : set cmd usr cb
 	caps_fanSpeed_data->cmd_setFanSpeed_usr_cb = cap_fanSpeed_cmd_cb;
 	caps_fanOscillationMode_data->cmd_setFanOscillationMode_usr_cb = cap_setFanOscillationMode_cmd_cb;
+	caps_firmwareUpdate_data->cmd_updateFirmware_usr_cb = cap_firmwareUpdate_usr_cmd_cb;
+	caps_firmwareUpdate_data->cmd_checkForFirmwareUpdate_usr_cb = cap_firmwareUpdate_usr_cmd_cb;
 }
