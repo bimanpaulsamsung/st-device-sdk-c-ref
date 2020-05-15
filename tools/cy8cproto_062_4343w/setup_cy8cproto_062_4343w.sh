@@ -2,7 +2,7 @@
 
 CHIP_NAME=${1}
 
-MBED_OS_TAG="mbed-os-5.15.1"
+MBED_OS_TAG="mbed-os-5.15.2"
 
 echo "Start Setup for mbed os"
 mbed new . &> /dev/null
