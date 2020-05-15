@@ -1,14 +1,14 @@
-From a8634c309480097b9d9e5ed48ad00479d2e1035d Mon Sep 17 00:00:00 2001
-From: Biman Paul <biman.paul@samsung.com>
-Date: Mon, 13 Apr 2020 23:44:23 +0530
-Subject: [PATCH 8/9] mbedtls: rewrite net sockets for stdk
+From 5170e047f09c726c7b5d766b710ff6ad90787ae4 Mon Sep 17 00:00:00 2001
+From: Pooja <pooja.k@partner.samsung.com>
+Date: Fri, 15 May 2020 15:20:19 +0530
+Subject: [PATCH] mbedtls-rewrite-net-sockets-for-stdk
 
 ---
- features/mbedtls/src/net_sockets.c | 542 +++++++++++--------------------------
- 1 file changed, 164 insertions(+), 378 deletions(-)
+ features/mbedtls/src/net_sockets.c | 553 +++++++++--------------------
+ 1 file changed, 169 insertions(+), 384 deletions(-)
 
 diff --git a/features/mbedtls/src/net_sockets.c b/features/mbedtls/src/net_sockets.c
-index c7b358d..8223280 100644
+index dbde510db8..6af6fde82c 100644
 --- a/features/mbedtls/src/net_sockets.c
 +++ b/features/mbedtls/src/net_sockets.c
 @@ -1,7 +1,9 @@
@@ -21,7 +21,7 @@ index c7b358d..8223280 100644
   *  SPDX-License-Identifier: Apache-2.0
   *
   *  Licensed under the Apache License, Version 2.0 (the "License"); you may
-@@ -19,94 +21,34 @@
+@@ -19,95 +21,34 @@
   *  This file is part of mbed TLS (https://tls.mbed.org)
   */
  
@@ -56,6 +56,7 @@ index c7b358d..8223280 100644
  #endif
  
  #include "mbedtls/net_sockets.h"
+-#include "mbedtls/error.h"
  
  #include <string.h>
 -
@@ -122,7 +123,7 @@ index c7b358d..8223280 100644
  #include <stdint.h>
  
  /*
-@@ -114,23 +56,17 @@ static int wsa_init_done = 0;
+@@ -115,23 +56,17 @@ static int wsa_init_done = 0;
   */
  static int net_prepare( void )
  {
@@ -155,7 +156,7 @@ index c7b358d..8223280 100644
  }
  
  /*
-@@ -144,14 +80,14 @@ void mbedtls_net_init( mbedtls_net_context *ctx )
+@@ -145,14 +80,14 @@ void mbedtls_net_init( mbedtls_net_context *ctx )
  /*
   * Initiate a TCP connection with host:port and the given protocol
   */
@@ -163,7 +164,8 @@ index c7b358d..8223280 100644
 -                         const char *port, int proto )
 +int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host, const char *port, int proto )
  {
-     int ret;
+-    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
++    int ret;
      struct addrinfo hints, *addr_list, *cur;
  
 -    if( ( ret = net_prepare() ) != 0 )
@@ -174,7 +176,7 @@ index c7b358d..8223280 100644
  
      /* Do name resolution with both IPv6 and IPv4 */
      memset( &hints, 0, sizeof( hints ) );
-@@ -159,34 +95,33 @@ int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host,
+@@ -160,34 +95,33 @@ int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host,
      hints.ai_socktype = proto == MBEDTLS_NET_PROTO_UDP ? SOCK_DGRAM : SOCK_STREAM;
      hints.ai_protocol = proto == MBEDTLS_NET_PROTO_UDP ? IPPROTO_UDP : IPPROTO_TCP;
  
@@ -220,7 +222,7 @@ index c7b358d..8223280 100644
  }
  
  /*
-@@ -194,117 +129,107 @@ int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host,
+@@ -195,117 +129,107 @@ int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host,
   */
  int mbedtls_net_bind( mbedtls_net_context *ctx, const char *bind_ip, const char *port, int proto )
  {
@@ -383,8 +385,12 @@ index c7b358d..8223280 100644
  
  /*
   * Accept a connection from a remote client
-@@ -316,112 +241,79 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
-     int ret;
+@@ -314,115 +238,82 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
+                         mbedtls_net_context *client_ctx,
+                         void *client_ip, size_t buf_size, size_t *ip_len )
+ {
+-    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
++    int ret;
      int type;
  
 -    struct sockaddr_storage client_addr;
@@ -502,13 +508,13 @@ index c7b358d..8223280 100644
 -        {
 -            struct sockaddr_in *addr4 = (struct sockaddr_in *) &client_addr;
 -            *ip_len = sizeof( addr4->sin_addr.s_addr );
+-
+-            if( buf_size < *ip_len )
+-                return( MBEDTLS_ERR_NET_BUFFER_TOO_SMALL );
 +    if ( client_ip != NULL ) {
 +        struct sockaddr_in *addr4 = (struct sockaddr_in *) &client_addr;
 +        *ip_len = sizeof( addr4->sin_addr.s_addr );
  
--            if( buf_size < *ip_len )
--                return( MBEDTLS_ERR_NET_BUFFER_TOO_SMALL );
--
 -            memcpy( client_ip, &addr4->sin_addr.s_addr, *ip_len );
 +        if ( buf_size < *ip_len ) {
 +            return ( MBEDTLS_ERR_NET_BUFFER_TOO_SMALL );
@@ -517,10 +523,10 @@ index c7b358d..8223280 100644
 -        {
 -            struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *) &client_addr;
 -            *ip_len = sizeof( addr6->sin6_addr.s6_addr );
--
+ 
 -            if( buf_size < *ip_len )
 -                return( MBEDTLS_ERR_NET_BUFFER_TOO_SMALL );
- 
+-
 -            memcpy( client_ip, &addr6->sin6_addr.s6_addr, *ip_len);
 -        }
 +        memcpy( client_ip, &addr4->sin_addr.s_addr, *ip_len );
@@ -531,7 +537,7 @@ index c7b358d..8223280 100644
  }
  
  /*
-@@ -429,90 +321,12 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
+@@ -430,90 +321,12 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
   */
  int mbedtls_net_set_block( mbedtls_net_context *ctx )
  {
@@ -562,7 +568,7 @@ index c7b358d..8223280 100644
 -
 -int mbedtls_net_poll( mbedtls_net_context *ctx, uint32_t rw, uint32_t timeout )
 -{
--    int ret;
+-    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 -    struct timeval tv;
 -
 -    fd_set read_fds;
@@ -624,7 +630,7 @@ index c7b358d..8223280 100644
  }
  
  /*
-@@ -520,19 +334,10 @@ int mbedtls_net_poll( mbedtls_net_context *ctx, uint32_t rw, uint32_t timeout )
+@@ -521,19 +334,10 @@ int mbedtls_net_poll( mbedtls_net_context *ctx, uint32_t rw, uint32_t timeout )
   */
  void mbedtls_net_usleep( unsigned long usec )
  {
@@ -644,9 +650,12 @@ index c7b358d..8223280 100644
  }
  
  /*
-@@ -542,48 +347,47 @@ int mbedtls_net_recv( void *ctx, unsigned char *buf, size_t len )
+@@ -541,50 +345,49 @@ void mbedtls_net_usleep( unsigned long usec )
+  */
+ int mbedtls_net_recv( void *ctx, unsigned char *buf, size_t len )
  {
-     int ret;
+-    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
++    int ret;
      int fd = ((mbedtls_net_context *) ctx)->fd;
 +    int error = 0;
  
@@ -701,7 +710,8 @@ index c7b358d..8223280 100644
 +int mbedtls_net_recv_timeout( void *ctx, unsigned char *buf, size_t len,
 +                              uint32_t timeout )
  {
-     int ret;
+-    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
++    int ret;
      struct timeval tv;
      fd_set read_fds;
      int fd = ((mbedtls_net_context *) ctx)->fd;
@@ -714,7 +724,7 @@ index c7b358d..8223280 100644
  
      FD_ZERO( &read_fds );
      FD_SET( fd, &read_fds );
-@@ -594,25 +398,20 @@ int mbedtls_net_recv_timeout( void *ctx, unsigned char *buf,
+@@ -595,25 +398,20 @@ int mbedtls_net_recv_timeout( void *ctx, unsigned char *buf,
      ret = select( fd + 1, &read_fds, NULL, NULL, timeout == 0 ? NULL : &tv );
  
      /* Zero fds ready means we timed out */
@@ -734,13 +744,13 @@ index c7b358d..8223280 100644
 +    if ( ret == 0 ) {
 +        return ( MBEDTLS_ERR_SSL_TIMEOUT );
 +    }
- 
--        return( MBEDTLS_ERR_NET_RECV_FAILED );
++
 +    if ( ret < 0 ) {
 +        if ( errno == EINTR ) {
 +            return ( MBEDTLS_ERR_SSL_WANT_READ );
 +        }
-+
+ 
+-        return( MBEDTLS_ERR_NET_RECV_FAILED );
 +        return ( MBEDTLS_ERR_NET_RECV_FAILED );
      }
  
@@ -750,8 +760,12 @@ index c7b358d..8223280 100644
  }
  
  /*
-@@ -623,45 +422,31 @@ int mbedtls_net_send( void *ctx, const unsigned char *buf, size_t len )
-     int ret;
+@@ -621,48 +419,34 @@ int mbedtls_net_recv_timeout( void *ctx, unsigned char *buf,
+  */
+ int mbedtls_net_send( void *ctx, const unsigned char *buf, size_t len )
+ {
+-    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
++    int ret;
      int fd = ((mbedtls_net_context *) ctx)->fd;
  
 -    if( fd < 0 )
@@ -813,7 +827,7 @@ index c7b358d..8223280 100644
  }
  
  /*
-@@ -669,8 +454,9 @@ void mbedtls_net_close( mbedtls_net_context *ctx )
+@@ -670,8 +454,9 @@ void mbedtls_net_close( mbedtls_net_context *ctx )
   */
  void mbedtls_net_free( mbedtls_net_context *ctx )
  {
