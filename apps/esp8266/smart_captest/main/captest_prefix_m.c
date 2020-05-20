@@ -89,7 +89,6 @@ static void cap_mediaPresets_init_cb(struct caps_mediaPresets_data *caps_data)
 	JSON_ADD_NUMBER_TO_OBJECT(root, "date", 2020);
 
 	caps_data->set_presets_value(caps_data, root);
-	JSON_FREE(root);
 }
 
 static void cap_mediaTrackControl_init_cb(struct caps_mediaTrackControl_data *caps_data)
@@ -161,11 +160,10 @@ static void cap_mediaPlaybackShuffle_cmd_cb(struct caps_mediaPlaybackShuffle_dat
 
 static void cap_mediaPresets_cmd_cb(struct caps_mediaPresets_data *caps_data)
 {
-	JSON_H* root = caps_data->get_presets_value(caps_data);
+	const JSON_H* root = caps_data->get_presets_value(caps_data);
 	char* json_str = JSON_PRINT(root);
 	printf("[%s] json string %s\n", __func__, json_str);
 	JSON_FREE(json_str);
-	JSON_FREE(root);
 }
 
 static void cap_mediaTrackControl_nextTrack_cb(struct caps_mediaTrackControl_data *caps_data)
@@ -211,10 +209,9 @@ void send_m_test_capabilities()
 	JSON_ADD_NUMBER_TO_OBJECT(root, "count", send_count);
 	cap_mediaPresets_data->set_presets_value(cap_mediaPresets_data, root);
 	//cap_mediaPresets_data->attr_presets_send(cap_mediaPresets_data);
-	JSON_FREE(root);
 
 	//mediaTrackControl - No capability on DevWorks
-	char* control_cmd[] = {"Next", "Previous"};
+	const char* control_cmd[] = {"Next", "Previous"};
 	const char** cmd_arr = (send_count % 2)? control_cmd : mediaTrackControl_array;
 	cap_mediaTrackControl_data->set_supportedTrackControlCommands_value(cap_mediaTrackControl_data, cmd_arr, 2);
 	//cap_mediaTrackControl_data->attr_supportedTrackControlCommands_send(cap_mediaTrackControl_data);

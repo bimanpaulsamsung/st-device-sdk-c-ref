@@ -40,13 +40,6 @@ static void cap_notification_init_cb(struct caps_notification_data *caps_data)
 }
 
 // CAPTEST : make cmd_cb for test capabilities
-static void cap_networkMeter_cmd_cb(struct caps_networkMeter_data *caps_data)
-{
-	int ds = caps_data->get_downlinkSpeed_value(caps_data);
-	int us = caps_data->get_uplinkSpeed_value(caps_data);
-	printf("[%s]dlink speed : %d, ulink speed: %d\n", __func__, ds, us);
-}
-
 static void cap_notification_cmd_cb(struct caps_notification_data *caps_data)
 {
 	printf("[%s] is called\n", __func__);
