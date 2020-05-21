@@ -38,7 +38,10 @@ static void caps_objectDetection_set_detected_value(caps_objectDetection_data_t 
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->detected_value = (JSON_H *)value;
+	if (caps_data->detected_value) {
+		JSON_DELETE(caps_data->detected_value);
+	}
+	caps_data->detected_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_objectDetection_attr_detected_send(caps_objectDetection_data_t *caps_data)

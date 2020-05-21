@@ -38,7 +38,10 @@ static void caps_videoCapture_set_clip_value(caps_videoCapture_data_t *caps_data
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->clip_value = (JSON_H *)value;
+	if (caps_data->clip_value) {
+		JSON_DELETE(caps_data->clip_value);
+	}
+	caps_data->clip_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_videoCapture_attr_clip_send(caps_videoCapture_data_t *caps_data)
@@ -91,7 +94,10 @@ static void caps_videoCapture_set_stream_value(caps_videoCapture_data_t *caps_da
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->stream_value = (JSON_H *)value;
+	if (caps_data->stream_value) {
+		JSON_DELETE(caps_data->stream_value);
+	}
+	caps_data->stream_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_videoCapture_attr_stream_send(caps_videoCapture_data_t *caps_data)

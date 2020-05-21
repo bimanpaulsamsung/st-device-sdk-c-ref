@@ -82,7 +82,10 @@ static void caps_samsungTV_set_messageButton_value(caps_samsungTV_data_t *caps_d
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->messageButton_value = (JSON_H *)value;
+	if (caps_data->messageButton_value) {
+		JSON_DELETE(caps_data->messageButton_value);
+	}
+	caps_data->messageButton_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_samsungTV_attr_messageButton_send(caps_samsungTV_data_t *caps_data)

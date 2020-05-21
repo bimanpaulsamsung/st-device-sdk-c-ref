@@ -38,7 +38,10 @@ static void caps_mediaPresets_set_presets_value(caps_mediaPresets_data_t *caps_d
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->presets_value = (JSON_H *)value;
+	if (caps_data->presets_value) {
+		JSON_DELETE(caps_data->presets_value);
+	}
+	caps_data->presets_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_mediaPresets_attr_presets_send(caps_mediaPresets_data_t *caps_data)

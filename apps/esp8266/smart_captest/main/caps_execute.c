@@ -38,7 +38,10 @@ static void caps_execute_set_data_value(caps_execute_data_t *caps_data, const JS
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->data_value = (JSON_H *)value;
+	if (caps_data->data_value) {
+		JSON_DELETE(caps_data->data_value);
+	}
+	caps_data->data_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_execute_attr_data_send(caps_execute_data_t *caps_data)

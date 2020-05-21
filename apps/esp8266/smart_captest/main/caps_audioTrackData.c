@@ -126,7 +126,10 @@ static void caps_audioTrackData_set_audioTrackData_value(caps_audioTrackData_dat
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->audioTrackData_value = (JSON_H *)value;
+	if (caps_data->audioTrackData_value) {
+		JSON_DELETE(caps_data->audioTrackData_value);
+	}
+	caps_data->audioTrackData_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_audioTrackData_attr_audioTrackData_send(caps_audioTrackData_data_t *caps_data)

@@ -255,7 +255,10 @@ static void caps_gasMeter_set_gasMeterPrecision_value(caps_gasMeter_data_t *caps
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->gasMeterPrecision_value = (JSON_H *)value;
+	if (caps_data->gasMeterPrecision_value) {
+		JSON_DELETE(caps_data->gasMeterPrecision_value);
+	}
+	caps_data->gasMeterPrecision_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_gasMeter_attr_gasMeterPrecision_send(caps_gasMeter_data_t *caps_data)

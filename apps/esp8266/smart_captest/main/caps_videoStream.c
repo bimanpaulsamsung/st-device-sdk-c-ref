@@ -38,7 +38,10 @@ static void caps_videoStream_set_stream_value(caps_videoStream_data_t *caps_data
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->stream_value = (JSON_H *)value;
+	if (caps_data->stream_value) {
+		JSON_DELETE(caps_data->stream_value);
+	}
+	caps_data->stream_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_videoStream_attr_stream_send(caps_videoStream_data_t *caps_data)

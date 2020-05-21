@@ -209,7 +209,10 @@ static void caps_videoCamera_set_settings_value(caps_videoCamera_data_t *caps_da
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->settings_value = (JSON_H *)value;
+	if (caps_data->settings_value) {
+		JSON_DELETE(caps_data->settings_value);
+	}
+	caps_data->settings_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_videoCamera_attr_settings_send(caps_videoCamera_data_t *caps_data)
