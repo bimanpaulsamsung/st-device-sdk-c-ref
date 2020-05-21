@@ -13,7 +13,10 @@ static void caps_$CAPS_ID$_set_$ATTR_NAME$_value(caps_$CAPS_ID$_data_t *caps_dat
 		printf("caps_data is NULL\n");
 		return;
 	}
-	caps_data->$ATTR_NAME$_value = (JSON_H *)value;
+	if (caps_data->$ATTR_NAME$_value) {
+		JSON_DELETE(caps_data->$ATTR_NAME$_value);
+	}
+	caps_data->$ATTR_NAME$_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_$CAPS_ID$_attr_$ATTR_NAME$_send(caps_$CAPS_ID$_data_t *caps_data)
