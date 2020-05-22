@@ -1,4 +1,4 @@
-From 7ab92613ac34157eef9f1684c1ae242ccaa5d6d8 Mon Sep 17 00:00:00 2001
+From 08f2a60170eca7ae23a95ef4bffaa726db2e2ac3 Mon Sep 17 00:00:00 2001
 From: "qin.li" <qin.li@samsung.com>
 Date: Tue, 10 Mar 2020 17:39:01 +0800
 Subject: [PATCH] Enable stdk compile in emw3080, with MoCOS and MoCIP
@@ -13,17 +13,19 @@ Subject: [PATCH] Enable stdk compile in emw3080, with MoCOS and MoCIP
  MiCO/net/mbedtls/port/porting_layer.c       | 12 +++---
  MiCO/net/stdk/config.mk                     | 59 +++++++++++++++++++++++++++++
  MiCO/net/stdk/stdk.mk                       | 20 ++++++++++
+ MiCO/net/stdk/sys/socket.h                  | 18 +++++++++
  MiCO/system/system.mk                       |  2 +-
  board/MK3080B/MK3080B.mk                    |  2 +-
  include/mico_socket.h                       |  4 +-
  libraries/utilities/json_c/cJSON.c          |  2 +-
  makefiles/mico_target_config.mk             | 31 ++++++++++++---
  makefiles/micoder_host_cmd.mk               |  2 +-
- 15 files changed, 165 insertions(+), 28 deletions(-)
+ 16 files changed, 183 insertions(+), 28 deletions(-)
  create mode 100644 MiCO/iot_main.c
  create mode 100644 MiCO/mico_config.h
  create mode 100644 MiCO/net/stdk/config.mk
  create mode 100644 MiCO/net/stdk/stdk.mk
+ create mode 100644 MiCO/net/stdk/sys/socket.h
 
 diff --git a/MiCO/MiCO.mk b/MiCO/MiCO.mk
 index 28c4f83..686cfc9 100644
@@ -290,6 +292,30 @@ index 0000000..8a44c3d
 +# Get the list of header files
 +#
 +GLOBAL_INCLUDES += $(foreach inc,$(COMPONENT_ADD_INCLUDEDIRS), $(ST_IOT_CORE_DIR)/src/$(inc))
+diff --git a/MiCO/net/stdk/sys/socket.h b/MiCO/net/stdk/sys/socket.h
+new file mode 100644
+index 0000000..11e232e
+--- /dev/null
++++ b/MiCO/net/stdk/sys/socket.h
+@@ -0,0 +1,18 @@
++/**
++ ******************************************************************************
++ * @file    wrapper of sys socket.h
++ * @author  qin li
++ * @version V1.0.0
++ * @date    1-Apr-2020
++ * @brief   This file provides all the headers of BSD socket APIs.
++ ******************************************************************************
++ */
++#ifndef __MOC_SOCKET_WRAPPER_H__
++#define __MOC_SOCKET_WRAPPER_H__
++
++
++#include "mico_socket.h"
++#include "mico_common.h"
++
++
++#endif /*__MOC_SOCKET_WRAPPER_H__*/
 diff --git a/MiCO/system/system.mk b/MiCO/system/system.mk
 index 25755f8..b837867 100644
 --- a/MiCO/system/system.mk
