@@ -26,16 +26,37 @@
 
 #include "cts.h"
 
-#define TEST_DONE_BIT	(0x01)
+#define BSP_TEST_DONE_BIT	(1 << 0)
+#define OS_QUEUE_TEST_DONE_BIT	(1 << 1)
+#define OS_EVENTGROUP_TEST_DONE_BIT	(1 << 2)
 
-static void cts_task(void *arg)
+static void cts_bsp_test_task(void *arg)
 {
 	EventGroupHandle_t *event_group = (EventGroupHandle_t) arg;
 
 	CTS_iot_bsp_test();
-	CTS_iot_os_test();
 
-	xEventGroupSetBits(*event_group, TEST_DONE_BIT);
+	xEventGroupSetBits(*event_group, BSP_TEST_DONE_BIT);
+	vTaskDelete(NULL);
+}
+
+static void cts_os_queue_test_task(void *arg)
+{
+	EventGroupHandle_t *event_group = (EventGroupHandle_t) arg;
+
+	CTS_iot_os_queue_test();
+
+	xEventGroupSetBits(*event_group, OS_QUEUE_TEST_DONE_BIT);
+	vTaskDelete(NULL);
+}
+
+static void cts_os_eventgroup_test_task(void *arg)
+{
+	EventGroupHandle_t *event_group = (EventGroupHandle_t) arg;
+
+	CTS_iot_os_eventgroup_test();
+
+	xEventGroupSetBits(*event_group, OS_EVENTGROUP_TEST_DONE_BIT);
 	vTaskDelete(NULL);
 }
 
@@ -43,9 +64,14 @@ void app_main(void)
 {
 	EventGroupHandle_t event_group;
 	event_group = xEventGroupCreate();
-	xTaskCreate(cts_task, "stdk_cts_task", 4086, &event_group, 10, NULL);
+	xTaskCreate(cts_bsp_test_task, "stdk_cts_bsp_test_task", 8192, &event_group, 10, NULL);
+	xEventGroupWaitBits(event_group, BSP_TEST_DONE_BIT, pdTRUE, pdFALSE, portMAX_DELAY);
 
-	xEventGroupWaitBits(event_group, TEST_DONE_BIT, pdTRUE, pdFALSE, portMAX_DELAY);
+	xTaskCreate(cts_os_queue_test_task, "stdk_cts_os_queue_test_task", 4096, &event_group, 10, NULL);
+	xEventGroupWaitBits(event_group, OS_QUEUE_TEST_DONE_BIT, pdTRUE, pdFALSE, portMAX_DELAY);
 
-	printf("\nCTS done\n");
+	xTaskCreate(cts_os_eventgroup_test_task, "stdk_cts_os_eventgroup_test_task", 8192, &event_group, 10, NULL);
+	xEventGroupWaitBits(event_group, OS_EVENTGROUP_TEST_DONE_BIT, pdTRUE, pdFALSE, portMAX_DELAY);
+
+	printf("[==========]\n[ CTS done ]\n");
 }
