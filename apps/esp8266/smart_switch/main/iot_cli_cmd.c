@@ -1384,6 +1384,38 @@ static void _cli_cmd_pub_event(char *string)
 	}
 }
 
+static void _cli_cmd_get_log_dump(char *string)
+{
+	char buf[MAX_UART_LINE_SIZE];
+	char* log;
+	int size = 512;
+	if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+		size = strtol(buf, NULL, 10);
+	}
+	log = iot_dump_create_all_log_dump(size, true);
+	if (!log) {
+		printf("Fail to get log dump!\n");
+		return;
+	}
+	printf("all_log_dump - size: %d / %d\n", strlen(log), size);
+	printf("%s\n", log);
+	free(log);
+}
+
+static void _cli_cmd_add_log_msg(char *string)
+{
+	char buf[MAX_UART_LINE_SIZE];
+	int count = 1;
+	if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+		count = strtol(buf, NULL, 10);
+		printf("count : %d\n", count);
+	}
+	while (count >= 0) {
+		count--;
+		IOT_DUMP(IOT_DEBUG_LEVEL_ERROR, 0xfedc, 0x01234567, 0x89abcdef);
+	}
+
+}
 static struct cli_command cmd_list[] = {
 	{"heap_dump", "heap_dump start_address size OR heap_dump all", _cli_cmd_heap_dump},
 	{"heap_trace", "heap_trace [start|stop|resume|dump]", _cli_cmd_heap_trace},
@@ -1409,6 +1441,8 @@ static struct cli_command cmd_list[] = {
 	{"iperf", "run iperf : iperf -s -i 1 or iperf -c xx.xx.xx.xx -i 1", _cli_cmd_network_iperf},
 	{"wifitest", "wifi test(wifitest rssi 10, wifitest scan 10)", _cli_cmd_network_wifitest},
 	{"pub_event", "pub_event [event payload]", _cli_cmd_pub_event},
+	{"get_log_dump", "get_log_dump [size(default 512)] ",  _cli_cmd_get_log_dump},
+	{"add_log_msg", "add_log_msg [count] ",  _cli_cmd_add_log_msg},
 	{"dummy", "dummy cmd", _cli_cmd_dummy_cmd},
 };
 
