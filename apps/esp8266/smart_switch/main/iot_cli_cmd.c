@@ -1397,7 +1397,7 @@ static void _cli_cmd_get_log_dump(char *string)
 		printf("Fail to get log dump!\n");
 		return;
 	}
-	printf("all_log_dump - size: %d / %d\n", strlen(log), size);
+	printf("all_log_dump - size: %zu / %d\n", strlen(log), size);
 	printf("%s\n", log);
 	free(log);
 }
