@@ -1337,16 +1337,19 @@ static void _cli_cmd_get_log_dump(char *string)
 {
 	char buf[MAX_UART_LINE_SIZE];
 	char* log;
-	int size = 512;
+	size_t size = 2048;
+	size_t written_size = 0;
+	int ret;
+
 	if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
 		size = strtol(buf, NULL, 10);
 	}
-	log = iot_dump_create_all_log_dump(size, true);
-	if (!log) {
+	ret = iot_dump_create_all_log_dump((struct iot_context *)ctx, &log, size, &written_size, true);
+	if (ret < 0) {
 		printf("Fail to get log dump!\n");
 		return;
 	}
-	printf("all_log_dump - size: %zu / %d\n", strlen(log), size);
+	printf("all_log_dump - size: %d / %d\n", written_size, size);
 	printf("%s\n", log);
 	free(log);
 }
@@ -1355,13 +1358,14 @@ static void _cli_cmd_add_log_msg(char *string)
 {
 	char buf[MAX_UART_LINE_SIZE];
 	int count = 1;
+	static int log_arg = 0;
 	if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
 		count = strtol(buf, NULL, 10);
 		printf("count : %d\n", count);
 	}
 	while (count >= 0) {
 		count--;
-		IOT_DUMP(IOT_DEBUG_LEVEL_ERROR, 0xfedc, 0x01234567, 0x89abcdef);
+		IOT_DUMP(IOT_DEBUG_LEVEL_ERROR, 0xfedc, log_arg++, 0x89abcdef);
 	}
 
 }
