@@ -582,8 +582,6 @@ static void _cli_cmd_read_prov(char *string)
 {
         struct iot_device_prov_data prov_data;
         iot_error_t err;
-	char location_id_buf[40] = {0};
-	char room_id_buf[40] = {0};
 
         memset(&prov_data, 0, sizeof(prov_data));
 
@@ -593,24 +591,16 @@ static void _cli_cmd_read_prov(char *string)
                 printf("%s: failed to get provisioning data: %d", __func__, err);
                 return;
         }
-	if((err = iot_util_convert_uuid_str(&prov_data.cloud.location_id, location_id_buf, sizeof(location_id_buf))) != IOT_ERROR_NONE)
-		printf("%s: convert uuid fail %d", __func__, err);
-
-	if((err = iot_util_convert_uuid_str(&prov_data.cloud.room_id, room_id_buf, sizeof(room_id_buf))) != IOT_ERROR_NONE)
-		printf("%s: convert uuid fail %d", __func__, err);
 
         printf("\n\n<Provisioning data>\n"
                         "   WiFi SSID: %s\n"
                         "   WiFi PASS: %s\n"
                         "   ServerURL: %s:%d\n"
-			"   Location ID: %s\n"
-			"   Room ID: %s\n"
 			"   Label: %s\n",
                         prov_data.wifi.ssid,
                         prov_data.wifi.password,
                         prov_data.cloud.broker_url,
                         prov_data.cloud.broker_port,
-			location_id_buf, room_id_buf,
 			prov_data.cloud.label);
 
 	if(prov_data.cloud.broker_url != NULL)
@@ -678,47 +668,6 @@ static void _cli_cmd_write_prov(char *string)
 	}
 
 	strncpy(prov_data.wifi.password, input, sizeof(prov_data.wifi.password) - 1);
-
-	printf(" location id update ? [Y/n]: ");
-	if ((_cli_util_gets(confirm) > 0) && !strcasecmp(confirm, "y")) {
-	while (1) {
-		printf(" location id(uuid): ");
-		memset(input, 0, sizeof(input));
-		if (_cli_util_gets(input) > 0) {
-			snprintf(output, sizeof(output) - 1, "\nUUID: \"%s\" [Y/n]? ", input);
-			printf("%s", output);
-		if (_cli_util_gets(confirm) == 0 || !strcasecmp(confirm, "y"))
-		break;
-		}
-	}
-	err = iot_util_convert_str_uuid(input, &prov_data.cloud.location_id);
-	if (err != IOT_ERROR_NONE) {
-		printf("%s: failed to convert location_id(%s): %d", __func__,
-		input, err);
-		return;
-		}
-	}
-
-	printf(" room id update ? [Y/n]: ");
-
-	if ((_cli_util_gets(confirm) > 0) && !strcasecmp(confirm, "y")) {
-		while (1) {
-			printf(" room id(uuid): ");
-			memset(input, 0, sizeof(input));
-			if (_cli_util_gets(input) > 0) {
-				snprintf(output, sizeof(output) - 1, "\nUUID: \"%s\" [Y/n]? ", input);
-				printf("%s", output);
-			if (_cli_util_gets(confirm) == 0 || !strcasecmp(confirm, "y"))
-				break;
-			}
-		}
-	err = iot_util_convert_str_uuid(input, &prov_data.cloud.room_id);
-	if (err != IOT_ERROR_NONE) {
-		printf("%s: failed to convert profile_id(%s): %d", __func__,
-		input, err);
-		return;
-		}
-	}
 
 	printf(" Label update ? [Y/n]: ");
 
