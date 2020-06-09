@@ -38,7 +38,10 @@ static void caps_dishwasherOperatingState_set_completionTime_value(caps_dishwash
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->completionTime_value = (char *)value;
+    if (caps_data->completionTime_value) {
+        free(caps_data->completionTime_value);
+    }
+    caps_data->completionTime_value = strdup(value);
 }
 
 static void caps_dishwasherOperatingState_attr_completionTime_send(caps_dishwasherOperatingState_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_dishwasherOperatingState_attr_completionTime_send(caps_dishwash
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->completionTime_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->completionTime_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_dishwasherOperatingState.attr_completionTime.name,
         caps_data->completionTime_value, NULL);
@@ -74,51 +77,62 @@ static void caps_dishwasherOperatingState_attr_completionTime_send(caps_dishwash
 
 static const char **caps_dishwasherOperatingState_get_supportedMachineStates_value(caps_dishwasherOperatingState_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->supportedMachineStates_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->supportedMachineStates_value;
 }
 
 static void caps_dishwasherOperatingState_set_supportedMachineStates_value(caps_dishwasherOperatingState_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->supportedMachineStates_value = (char **)value;
-	caps_data->supportedMachineStates_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->supportedMachineStates_value) {
+        for (i = 0; i < caps_data->supportedMachineStates_arraySize; i++) {
+            free(caps_data->supportedMachineStates_value[i]);
+        }
+        free(caps_data->supportedMachineStates_value);
+    }
+    caps_data->supportedMachineStates_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->supportedMachineStates_value[i] = strdup(value[i]);
+    }
+
+    caps_data->supportedMachineStates_arraySize = arraySize;
 }
 
 static void caps_dishwasherOperatingState_attr_supportedMachineStates_send(caps_dishwasherOperatingState_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->supportedMachineStates_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->supportedMachineStates_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_dishwasherOperatingState.attr_supportedMachineStates.name,
-		caps_data->supportedMachineStates_arraySize, caps_data->supportedMachineStates_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_dishwasherOperatingState.attr_supportedMachineStates.name,
+        caps_data->supportedMachineStates_arraySize, caps_data->supportedMachineStates_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send supportedMachineStates value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send supportedMachineStates value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 
@@ -149,7 +163,10 @@ static void caps_dishwasherOperatingState_set_machineState_value(caps_dishwasher
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->machineState_value = (char *)value;
+    if (caps_data->machineState_value) {
+        free(caps_data->machineState_value);
+    }
+    caps_data->machineState_value = strdup(value);
 }
 
 static void caps_dishwasherOperatingState_attr_machineState_send(caps_dishwasherOperatingState_data_t *caps_data)
@@ -162,10 +179,10 @@ static void caps_dishwasherOperatingState_attr_machineState_send(caps_dishwasher
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->machineState_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->machineState_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_dishwasherOperatingState.attr_machineState.name,
         caps_data->machineState_value, NULL);
@@ -210,7 +227,10 @@ static void caps_dishwasherOperatingState_set_dishwasherJobState_value(caps_dish
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->dishwasherJobState_value = (char *)value;
+    if (caps_data->dishwasherJobState_value) {
+        free(caps_data->dishwasherJobState_value);
+    }
+    caps_data->dishwasherJobState_value = strdup(value);
 }
 
 static void caps_dishwasherOperatingState_attr_dishwasherJobState_send(caps_dishwasherOperatingState_data_t *caps_data)
@@ -223,10 +243,10 @@ static void caps_dishwasherOperatingState_attr_dishwasherJobState_send(caps_dish
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->dishwasherJobState_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->dishwasherJobState_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_dishwasherOperatingState.attr_dishwasherJobState.name,
         caps_data->dishwasherJobState_value, NULL);

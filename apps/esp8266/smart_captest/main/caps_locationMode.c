@@ -38,7 +38,10 @@ static void caps_locationMode_set_mode_value(caps_locationMode_data_t *caps_data
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->mode_value = (char *)value;
+    if (caps_data->mode_value) {
+        free(caps_data->mode_value);
+    }
+    caps_data->mode_value = strdup(value);
 }
 
 static void caps_locationMode_attr_mode_send(caps_locationMode_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_locationMode_attr_mode_send(caps_locationMode_data_t *caps_data
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->mode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->mode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_locationMode.attr_mode.name,
         caps_data->mode_value, NULL);

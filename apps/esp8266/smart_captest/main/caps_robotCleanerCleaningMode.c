@@ -50,7 +50,10 @@ static void caps_robotCleanerCleaningMode_set_robotCleanerCleaningMode_value(cap
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->robotCleanerCleaningMode_value = (char *)value;
+    if (caps_data->robotCleanerCleaningMode_value) {
+        free(caps_data->robotCleanerCleaningMode_value);
+    }
+    caps_data->robotCleanerCleaningMode_value = strdup(value);
 }
 
 static void caps_robotCleanerCleaningMode_attr_robotCleanerCleaningMode_send(caps_robotCleanerCleaningMode_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_robotCleanerCleaningMode_attr_robotCleanerCleaningMode_send(cap
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->robotCleanerCleaningMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->robotCleanerCleaningMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_robotCleanerCleaningMode.attr_robotCleanerCleaningMode.name,
         caps_data->robotCleanerCleaningMode_value, NULL);

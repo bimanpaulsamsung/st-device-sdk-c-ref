@@ -38,7 +38,10 @@ static void caps_zwMultichannel_set_epInfo_value(caps_zwMultichannel_data_t *cap
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->epInfo_value = (char *)value;
+    if (caps_data->epInfo_value) {
+        free(caps_data->epInfo_value);
+    }
+    caps_data->epInfo_value = strdup(value);
 }
 
 static void caps_zwMultichannel_attr_epInfo_send(caps_zwMultichannel_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_zwMultichannel_attr_epInfo_send(caps_zwMultichannel_data_t *cap
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->epInfo_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->epInfo_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_zwMultichannel.attr_epInfo.name,
         caps_data->epInfo_value, NULL);
@@ -87,7 +90,10 @@ static void caps_zwMultichannel_set_epEvent_value(caps_zwMultichannel_data_t *ca
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->epEvent_value = (char *)value;
+    if (caps_data->epEvent_value) {
+        free(caps_data->epEvent_value);
+    }
+    caps_data->epEvent_value = strdup(value);
 }
 
 static void caps_zwMultichannel_attr_epEvent_send(caps_zwMultichannel_data_t *caps_data)
@@ -100,10 +106,10 @@ static void caps_zwMultichannel_attr_epEvent_send(caps_zwMultichannel_data_t *ca
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->epEvent_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->epEvent_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_zwMultichannel.attr_epEvent.name,
         caps_data->epEvent_value, NULL);

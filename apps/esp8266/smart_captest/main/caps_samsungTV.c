@@ -69,57 +69,57 @@ static void caps_samsungTV_attr_volume_send(caps_samsungTV_data_t *caps_data)
 
 static const JSON_H *caps_samsungTV_get_messageButton_value(caps_samsungTV_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const JSON_H *)caps_data->messageButton_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const JSON_H *)caps_data->messageButton_value;
 }
 
 static void caps_samsungTV_set_messageButton_value(caps_samsungTV_data_t *caps_data, const JSON_H *value)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	if (caps_data->messageButton_value) {
-		JSON_DELETE(caps_data->messageButton_value);
-	}
-	caps_data->messageButton_value = JSON_DUPLICATE(value, true);
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->messageButton_value) {
+        JSON_DELETE(caps_data->messageButton_value);
+    }
+    caps_data->messageButton_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_samsungTV_attr_messageButton_send(caps_samsungTV_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
-	iot_cap_val_t value;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
+    iot_cap_val_t value;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->messageButton_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->messageButton_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
-	value.json_object = JSON_PRINT(caps_data->messageButton_value);
+    value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
+    value.json_object = JSON_PRINT(caps_data->messageButton_value);
 
-	cap_evt = st_cap_attr_create((char *)caps_helper_samsungTV.attr_messageButton.name,
-		&value, NULL, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create((char *)caps_helper_samsungTV.attr_messageButton.name,
+        &value, NULL, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send messageButton value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send messageButton value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 
@@ -150,7 +150,10 @@ static void caps_samsungTV_set_switch_value(caps_samsungTV_data_t *caps_data, co
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->switch_value = (char *)value;
+    if (caps_data->switch_value) {
+        free(caps_data->switch_value);
+    }
+    caps_data->switch_value = strdup(value);
 }
 
 static void caps_samsungTV_attr_switch_send(caps_samsungTV_data_t *caps_data)
@@ -163,10 +166,10 @@ static void caps_samsungTV_attr_switch_send(caps_samsungTV_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->switch_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->switch_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_samsungTV.attr_switch.name,
         caps_data->switch_value, NULL);
@@ -211,7 +214,10 @@ static void caps_samsungTV_set_mute_value(caps_samsungTV_data_t *caps_data, cons
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->mute_value = (char *)value;
+    if (caps_data->mute_value) {
+        free(caps_data->mute_value);
+    }
+    caps_data->mute_value = strdup(value);
 }
 
 static void caps_samsungTV_attr_mute_send(caps_samsungTV_data_t *caps_data)
@@ -224,10 +230,10 @@ static void caps_samsungTV_attr_mute_send(caps_samsungTV_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->mute_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->mute_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_samsungTV.attr_mute.name,
         caps_data->mute_value, NULL);
@@ -272,7 +278,10 @@ static void caps_samsungTV_set_pictureMode_value(caps_samsungTV_data_t *caps_dat
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->pictureMode_value = (char *)value;
+    if (caps_data->pictureMode_value) {
+        free(caps_data->pictureMode_value);
+    }
+    caps_data->pictureMode_value = strdup(value);
 }
 
 static void caps_samsungTV_attr_pictureMode_send(caps_samsungTV_data_t *caps_data)
@@ -285,10 +294,10 @@ static void caps_samsungTV_attr_pictureMode_send(caps_samsungTV_data_t *caps_dat
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->pictureMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->pictureMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_samsungTV.attr_pictureMode.name,
         caps_data->pictureMode_value, NULL);
@@ -333,7 +342,10 @@ static void caps_samsungTV_set_soundMode_value(caps_samsungTV_data_t *caps_data,
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->soundMode_value = (char *)value;
+    if (caps_data->soundMode_value) {
+        free(caps_data->soundMode_value);
+    }
+    caps_data->soundMode_value = strdup(value);
 }
 
 static void caps_samsungTV_attr_soundMode_send(caps_samsungTV_data_t *caps_data)
@@ -346,10 +358,10 @@ static void caps_samsungTV_attr_soundMode_send(caps_samsungTV_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->soundMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->soundMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_samsungTV.attr_soundMode.name,
         caps_data->soundMode_value, NULL);
@@ -476,8 +488,8 @@ static void caps_samsungTV_cmd_showMessage_cb(IOT_CAP_HANDLE *handle,
 {
     caps_samsungTV_data_t *caps_data = usr_data;
 
-	printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
-	caps_data->cmd_data = cmd_data;
+    printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
+    caps_data->cmd_data = cmd_data;
 
     if (caps_data && caps_data->cmd_showMessage_usr_cb)
         caps_data->cmd_showMessage_usr_cb(caps_data);

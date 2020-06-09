@@ -25,51 +25,62 @@
 
 static const char **caps_statelessAudioMuteButton_get_availableAudioMuteButtons_value(caps_statelessAudioMuteButton_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->availableAudioMuteButtons_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->availableAudioMuteButtons_value;
 }
 
 static void caps_statelessAudioMuteButton_set_availableAudioMuteButtons_value(caps_statelessAudioMuteButton_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->availableAudioMuteButtons_value = (char **)value;
-	caps_data->availableAudioMuteButtons_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->availableAudioMuteButtons_value) {
+        for (i = 0; i < caps_data->availableAudioMuteButtons_arraySize; i++) {
+            free(caps_data->availableAudioMuteButtons_value[i]);
+        }
+        free(caps_data->availableAudioMuteButtons_value);
+    }
+    caps_data->availableAudioMuteButtons_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->availableAudioMuteButtons_value[i] = strdup(value[i]);
+    }
+
+    caps_data->availableAudioMuteButtons_arraySize = arraySize;
 }
 
 static void caps_statelessAudioMuteButton_attr_availableAudioMuteButtons_send(caps_statelessAudioMuteButton_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->availableAudioMuteButtons_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->availableAudioMuteButtons_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_statelessAudioMuteButton.attr_availableAudioMuteButtons.name,
-		caps_data->availableAudioMuteButtons_arraySize, caps_data->availableAudioMuteButtons_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_statelessAudioMuteButton.attr_availableAudioMuteButtons.name,
+        caps_data->availableAudioMuteButtons_arraySize, caps_data->availableAudioMuteButtons_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send availableAudioMuteButtons value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send availableAudioMuteButtons value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

@@ -50,7 +50,10 @@ static void caps_smokeDetector_set_smoke_value(caps_smokeDetector_data_t *caps_d
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->smoke_value = (char *)value;
+    if (caps_data->smoke_value) {
+        free(caps_data->smoke_value);
+    }
+    caps_data->smoke_value = strdup(value);
 }
 
 static void caps_smokeDetector_attr_smoke_send(caps_smokeDetector_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_smokeDetector_attr_smoke_send(caps_smokeDetector_data_t *caps_d
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->smoke_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->smoke_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_smokeDetector.attr_smoke.name,
         caps_data->smoke_value, NULL);

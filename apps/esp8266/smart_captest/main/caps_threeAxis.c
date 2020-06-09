@@ -25,72 +25,72 @@
 
 static const JSON_H *caps_threeAxis_get_threeAxis_value(caps_threeAxis_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}  
-	return caps_data->threeAxis_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }  
+    return caps_data->threeAxis_value;
 }
 
 static void caps_threeAxis_set_threeAxis_value(caps_threeAxis_data_t *caps_data, int x, int y, int z)
 {
-	JSON_H *array = NULL;
-	JSON_H *array_obj = NULL;
+    JSON_H *array = NULL;
+    JSON_H *array_obj = NULL;
 
     if (!caps_data) {
         printf("caps_data is NULL\n");
         return;
     }
 
-	array = JSON_CREATE_ARRAY();
-	if (!array) {
-		printf("fail to create json array\n");
-		return;
-	}
-	array_obj = JSON_CREATE_NUMBER((double) x);
-	JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
-	array_obj = JSON_CREATE_NUMBER((double) y);
-	JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
-	array_obj = JSON_CREATE_NUMBER((double) z);
-	JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
-	
-	JSON_DELETE(caps_data->threeAxis_value);
-	caps_data->threeAxis_value = array;
+    array = JSON_CREATE_ARRAY();
+    if (!array) {
+        printf("fail to create json array\n");
+        return;
+    }
+    array_obj = JSON_CREATE_NUMBER((double) x);
+    JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
+    array_obj = JSON_CREATE_NUMBER((double) y);
+    JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
+    array_obj = JSON_CREATE_NUMBER((double) z);
+    JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
+    
+    JSON_DELETE(caps_data->threeAxis_value);
+    caps_data->threeAxis_value = array;
 }
 
 static void caps_threeAxis_attr_threeAxis_send(caps_threeAxis_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
-	iot_cap_val_t value;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
+    iot_cap_val_t value;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
 
-	if (!caps_data->threeAxis_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->threeAxis_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
-	value.json_object = JSON_PRINT(caps_data->threeAxis_value);
+    value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
+    value.json_object = JSON_PRINT(caps_data->threeAxis_value);
 
-	cap_evt = st_cap_attr_create((char *)caps_helper_threeAxis.attr_threeAxis.name,
-			&value, NULL, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create((char *)caps_helper_threeAxis.attr_threeAxis.name,
+            &value, NULL, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send threeAxis value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send threeAxis value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

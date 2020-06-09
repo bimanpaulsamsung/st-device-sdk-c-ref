@@ -38,7 +38,10 @@ static void caps_audioStream_set_uri_value(caps_audioStream_data_t *caps_data, c
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->uri_value = (char *)value;
+    if (caps_data->uri_value) {
+        free(caps_data->uri_value);
+    }
+    caps_data->uri_value = strdup(value);
 }
 
 static void caps_audioStream_attr_uri_send(caps_audioStream_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_audioStream_attr_uri_send(caps_audioStream_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->uri_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->uri_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_audioStream.attr_uri.name,
         caps_data->uri_value, NULL);

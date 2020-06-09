@@ -50,7 +50,10 @@ static void caps_motionSensor_set_motion_value(caps_motionSensor_data_t *caps_da
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->motion_value = (char *)value;
+    if (caps_data->motion_value) {
+        free(caps_data->motion_value);
+    }
+    caps_data->motion_value = strdup(value);
 }
 
 static void caps_motionSensor_attr_motion_send(caps_motionSensor_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_motionSensor_attr_motion_send(caps_motionSensor_data_t *caps_da
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->motion_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->motion_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_motionSensor.attr_motion.name,
         caps_data->motion_value, NULL);

@@ -50,7 +50,10 @@ static void caps_carbonMonoxideDetector_set_carbonMonoxide_value(caps_carbonMono
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->carbonMonoxide_value = (char *)value;
+    if (caps_data->carbonMonoxide_value) {
+        free(caps_data->carbonMonoxide_value);
+    }
+    caps_data->carbonMonoxide_value = strdup(value);
 }
 
 static void caps_carbonMonoxideDetector_attr_carbonMonoxide_send(caps_carbonMonoxideDetector_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_carbonMonoxideDetector_attr_carbonMonoxide_send(caps_carbonMono
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->carbonMonoxide_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->carbonMonoxide_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_carbonMonoxideDetector.attr_carbonMonoxide.name,
         caps_data->carbonMonoxide_value, NULL);

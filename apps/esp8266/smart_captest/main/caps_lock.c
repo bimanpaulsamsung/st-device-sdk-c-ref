@@ -50,7 +50,10 @@ static void caps_lock_set_lock_value(caps_lock_data_t *caps_data, const char *va
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->lock_value = (char *)value;
+    if (caps_data->lock_value) {
+        free(caps_data->lock_value);
+    }
+    caps_data->lock_value = strdup(value);
 }
 
 static void caps_lock_attr_lock_send(caps_lock_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_lock_attr_lock_send(caps_lock_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->lock_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->lock_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_lock.attr_lock.name,
         caps_data->lock_value, NULL);

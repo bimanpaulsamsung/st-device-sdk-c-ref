@@ -50,7 +50,10 @@ static void caps_doorControl_set_door_value(caps_doorControl_data_t *caps_data, 
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->door_value = (char *)value;
+    if (caps_data->door_value) {
+        free(caps_data->door_value);
+    }
+    caps_data->door_value = strdup(value);
 }
 
 static void caps_doorControl_attr_door_send(caps_doorControl_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_doorControl_attr_door_send(caps_doorControl_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->door_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->door_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_doorControl.attr_door.name,
         caps_data->door_value, NULL);

@@ -50,7 +50,10 @@ static void caps_mediaPlaybackRepeat_set_playbackRepeatMode_value(caps_mediaPlay
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->playbackRepeatMode_value = (char *)value;
+    if (caps_data->playbackRepeatMode_value) {
+        free(caps_data->playbackRepeatMode_value);
+    }
+    caps_data->playbackRepeatMode_value = strdup(value);
 }
 
 static void caps_mediaPlaybackRepeat_attr_playbackRepeatMode_send(caps_mediaPlaybackRepeat_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_mediaPlaybackRepeat_attr_playbackRepeatMode_send(caps_mediaPlay
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->playbackRepeatMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->playbackRepeatMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_mediaPlaybackRepeat.attr_playbackRepeatMode.name,
         caps_data->playbackRepeatMode_value, NULL);

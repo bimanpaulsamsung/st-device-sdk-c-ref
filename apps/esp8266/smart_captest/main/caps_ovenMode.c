@@ -25,51 +25,62 @@
 
 static const char **caps_ovenMode_get_supportedOvenModes_value(caps_ovenMode_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->supportedOvenModes_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->supportedOvenModes_value;
 }
 
 static void caps_ovenMode_set_supportedOvenModes_value(caps_ovenMode_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->supportedOvenModes_value = (char **)value;
-	caps_data->supportedOvenModes_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->supportedOvenModes_value) {
+        for (i = 0; i < caps_data->supportedOvenModes_arraySize; i++) {
+            free(caps_data->supportedOvenModes_value[i]);
+        }
+        free(caps_data->supportedOvenModes_value);
+    }
+    caps_data->supportedOvenModes_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->supportedOvenModes_value[i] = strdup(value[i]);
+    }
+
+    caps_data->supportedOvenModes_arraySize = arraySize;
 }
 
 static void caps_ovenMode_attr_supportedOvenModes_send(caps_ovenMode_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->supportedOvenModes_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->supportedOvenModes_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_ovenMode.attr_supportedOvenModes.name,
-		caps_data->supportedOvenModes_arraySize, caps_data->supportedOvenModes_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_ovenMode.attr_supportedOvenModes.name,
+        caps_data->supportedOvenModes_arraySize, caps_data->supportedOvenModes_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send supportedOvenModes value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send supportedOvenModes value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 
@@ -100,7 +111,10 @@ static void caps_ovenMode_set_ovenMode_value(caps_ovenMode_data_t *caps_data, co
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->ovenMode_value = (char *)value;
+    if (caps_data->ovenMode_value) {
+        free(caps_data->ovenMode_value);
+    }
+    caps_data->ovenMode_value = strdup(value);
 }
 
 static void caps_ovenMode_attr_ovenMode_send(caps_ovenMode_data_t *caps_data)
@@ -113,10 +127,10 @@ static void caps_ovenMode_attr_ovenMode_send(caps_ovenMode_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->ovenMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->ovenMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_ovenMode.attr_ovenMode.name,
         caps_data->ovenMode_value, NULL);

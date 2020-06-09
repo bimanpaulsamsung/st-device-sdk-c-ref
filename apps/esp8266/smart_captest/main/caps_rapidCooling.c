@@ -50,7 +50,10 @@ static void caps_rapidCooling_set_rapidCooling_value(caps_rapidCooling_data_t *c
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->rapidCooling_value = (char *)value;
+    if (caps_data->rapidCooling_value) {
+        free(caps_data->rapidCooling_value);
+    }
+    caps_data->rapidCooling_value = strdup(value);
 }
 
 static void caps_rapidCooling_attr_rapidCooling_send(caps_rapidCooling_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_rapidCooling_attr_rapidCooling_send(caps_rapidCooling_data_t *c
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->rapidCooling_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->rapidCooling_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_rapidCooling.attr_rapidCooling.name,
         caps_data->rapidCooling_value, NULL);

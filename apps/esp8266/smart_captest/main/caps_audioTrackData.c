@@ -113,57 +113,57 @@ static void caps_audioTrackData_attr_elapsedTime_send(caps_audioTrackData_data_t
 
 static const JSON_H *caps_audioTrackData_get_audioTrackData_value(caps_audioTrackData_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const JSON_H *)caps_data->audioTrackData_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const JSON_H *)caps_data->audioTrackData_value;
 }
 
 static void caps_audioTrackData_set_audioTrackData_value(caps_audioTrackData_data_t *caps_data, const JSON_H *value)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	if (caps_data->audioTrackData_value) {
-		JSON_DELETE(caps_data->audioTrackData_value);
-	}
-	caps_data->audioTrackData_value = JSON_DUPLICATE(value, true);
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->audioTrackData_value) {
+        JSON_DELETE(caps_data->audioTrackData_value);
+    }
+    caps_data->audioTrackData_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_audioTrackData_attr_audioTrackData_send(caps_audioTrackData_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
-	iot_cap_val_t value;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
+    iot_cap_val_t value;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->audioTrackData_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->audioTrackData_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
-	value.json_object = JSON_PRINT(caps_data->audioTrackData_value);
+    value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
+    value.json_object = JSON_PRINT(caps_data->audioTrackData_value);
 
-	cap_evt = st_cap_attr_create((char *)caps_helper_audioTrackData.attr_audioTrackData.name,
-		&value, NULL, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create((char *)caps_helper_audioTrackData.attr_audioTrackData.name,
+        &value, NULL, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send audioTrackData value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send audioTrackData value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

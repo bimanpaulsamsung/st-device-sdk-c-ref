@@ -50,7 +50,10 @@ static void caps_thermostatMode_set_thermostatMode_value(caps_thermostatMode_dat
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->thermostatMode_value = (char *)value;
+    if (caps_data->thermostatMode_value) {
+        free(caps_data->thermostatMode_value);
+    }
+    caps_data->thermostatMode_value = strdup(value);
 }
 
 static void caps_thermostatMode_attr_thermostatMode_send(caps_thermostatMode_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_thermostatMode_attr_thermostatMode_send(caps_thermostatMode_dat
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->thermostatMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->thermostatMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_thermostatMode.attr_thermostatMode.name,
         caps_data->thermostatMode_value, NULL);
@@ -86,51 +89,62 @@ static void caps_thermostatMode_attr_thermostatMode_send(caps_thermostatMode_dat
 
 static const char **caps_thermostatMode_get_supportedThermostatModes_value(caps_thermostatMode_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->supportedThermostatModes_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->supportedThermostatModes_value;
 }
 
 static void caps_thermostatMode_set_supportedThermostatModes_value(caps_thermostatMode_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->supportedThermostatModes_value = (char **)value;
-	caps_data->supportedThermostatModes_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->supportedThermostatModes_value) {
+        for (i = 0; i < caps_data->supportedThermostatModes_arraySize; i++) {
+            free(caps_data->supportedThermostatModes_value[i]);
+        }
+        free(caps_data->supportedThermostatModes_value);
+    }
+    caps_data->supportedThermostatModes_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->supportedThermostatModes_value[i] = strdup(value[i]);
+    }
+
+    caps_data->supportedThermostatModes_arraySize = arraySize;
 }
 
 static void caps_thermostatMode_attr_supportedThermostatModes_send(caps_thermostatMode_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->supportedThermostatModes_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->supportedThermostatModes_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_thermostatMode.attr_supportedThermostatModes.name,
-		caps_data->supportedThermostatModes_arraySize, caps_data->supportedThermostatModes_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_thermostatMode.attr_supportedThermostatModes.name,
+        caps_data->supportedThermostatModes_arraySize, caps_data->supportedThermostatModes_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send supportedThermostatModes value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send supportedThermostatModes value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

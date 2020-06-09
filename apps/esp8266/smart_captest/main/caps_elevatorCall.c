@@ -50,7 +50,10 @@ static void caps_elevatorCall_set_callStatus_value(caps_elevatorCall_data_t *cap
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->callStatus_value = (char *)value;
+    if (caps_data->callStatus_value) {
+        free(caps_data->callStatus_value);
+    }
+    caps_data->callStatus_value = strdup(value);
 }
 
 static void caps_elevatorCall_attr_callStatus_send(caps_elevatorCall_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_elevatorCall_attr_callStatus_send(caps_elevatorCall_data_t *cap
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->callStatus_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->callStatus_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_elevatorCall.attr_callStatus.name,
         caps_data->callStatus_value, NULL);

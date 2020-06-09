@@ -60,7 +60,7 @@ const static struct iot_caps_mediaPlayback {
         .name = "playbackStatus",
         .property = NULL,
         .value_type = VALUE_TYPE_STRING,
-        .values = {"paused", "playing", "stopped", "fast_forwarding", "rewinding"},
+        .values = {"paused", "playing", "stopped", "fast forwarding", "rewinding"},
     },
     .cmd_setPlaybackStatus = { .name = "setPlaybackStatus" }, // arguments: status(string) 
     .cmd_play = { .name = "play" },

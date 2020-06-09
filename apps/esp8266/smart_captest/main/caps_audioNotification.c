@@ -28,8 +28,8 @@ static void caps_audioNotification_cmd_playTrack_cb(IOT_CAP_HANDLE *handle,
 {
     caps_audioNotification_data_t *caps_data = usr_data;
 
-	printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
-	caps_data->cmd_data = cmd_data;
+    printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
+    caps_data->cmd_data = cmd_data;
 
     if (caps_data && caps_data->cmd_playTrack_usr_cb)
         caps_data->cmd_playTrack_usr_cb(caps_data);
@@ -40,8 +40,8 @@ static void caps_audioNotification_cmd_playTrackAndRestore_cb(IOT_CAP_HANDLE *ha
 {
     caps_audioNotification_data_t *caps_data = usr_data;
 
-	printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
-	caps_data->cmd_data = cmd_data;
+    printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
+    caps_data->cmd_data = cmd_data;
 
     if (caps_data && caps_data->cmd_playTrackAndRestore_usr_cb)
         caps_data->cmd_playTrackAndRestore_usr_cb(caps_data);
@@ -52,8 +52,8 @@ static void caps_audioNotification_cmd_playTrackAndResume_cb(IOT_CAP_HANDLE *han
 {
     caps_audioNotification_data_t *caps_data = usr_data;
 
-	printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
-	caps_data->cmd_data = cmd_data;
+    printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
+    caps_data->cmd_data = cmd_data;
 
     if (caps_data && caps_data->cmd_playTrackAndResume_usr_cb)
         caps_data->cmd_playTrackAndResume_usr_cb(caps_data);

@@ -38,7 +38,10 @@ static void caps_securitySystem_set_alarm_value(caps_securitySystem_data_t *caps
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->alarm_value = (char *)value;
+    if (caps_data->alarm_value) {
+        free(caps_data->alarm_value);
+    }
+    caps_data->alarm_value = strdup(value);
 }
 
 static void caps_securitySystem_attr_alarm_send(caps_securitySystem_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_securitySystem_attr_alarm_send(caps_securitySystem_data_t *caps
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->alarm_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->alarm_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_securitySystem.attr_alarm.name,
         caps_data->alarm_value, NULL);
@@ -99,7 +102,10 @@ static void caps_securitySystem_set_securitySystemStatus_value(caps_securitySyst
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->securitySystemStatus_value = (char *)value;
+    if (caps_data->securitySystemStatus_value) {
+        free(caps_data->securitySystemStatus_value);
+    }
+    caps_data->securitySystemStatus_value = strdup(value);
 }
 
 static void caps_securitySystem_attr_securitySystemStatus_send(caps_securitySystem_data_t *caps_data)
@@ -112,10 +118,10 @@ static void caps_securitySystem_attr_securitySystemStatus_send(caps_securitySyst
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->securitySystemStatus_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->securitySystemStatus_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_securitySystem.attr_securitySystemStatus.name,
         caps_data->securitySystemStatus_value, NULL);

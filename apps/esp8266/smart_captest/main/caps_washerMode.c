@@ -50,7 +50,10 @@ static void caps_washerMode_set_washerMode_value(caps_washerMode_data_t *caps_da
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->washerMode_value = (char *)value;
+    if (caps_data->washerMode_value) {
+        free(caps_data->washerMode_value);
+    }
+    caps_data->washerMode_value = strdup(value);
 }
 
 static void caps_washerMode_attr_washerMode_send(caps_washerMode_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_washerMode_attr_washerMode_send(caps_washerMode_data_t *caps_da
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->washerMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->washerMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_washerMode.attr_washerMode.name,
         caps_data->washerMode_value, NULL);

@@ -50,7 +50,10 @@ static void caps_firmwareUpdate_set_lastUpdateStatus_value(caps_firmwareUpdate_d
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->lastUpdateStatus_value = (char *)value;
+    if (caps_data->lastUpdateStatus_value) {
+        free(caps_data->lastUpdateStatus_value);
+    }
+    caps_data->lastUpdateStatus_value = strdup(value);
 }
 
 static void caps_firmwareUpdate_attr_lastUpdateStatus_send(caps_firmwareUpdate_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_firmwareUpdate_attr_lastUpdateStatus_send(caps_firmwareUpdate_d
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->lastUpdateStatus_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->lastUpdateStatus_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_firmwareUpdate.attr_lastUpdateStatus.name,
         caps_data->lastUpdateStatus_value, NULL);
@@ -111,7 +114,10 @@ static void caps_firmwareUpdate_set_state_value(caps_firmwareUpdate_data_t *caps
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->state_value = (char *)value;
+    if (caps_data->state_value) {
+        free(caps_data->state_value);
+    }
+    caps_data->state_value = strdup(value);
 }
 
 static void caps_firmwareUpdate_attr_state_send(caps_firmwareUpdate_data_t *caps_data)
@@ -124,10 +130,10 @@ static void caps_firmwareUpdate_attr_state_send(caps_firmwareUpdate_data_t *caps
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->state_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->state_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_firmwareUpdate.attr_state.name,
         caps_data->state_value, NULL);
@@ -160,7 +166,10 @@ static void caps_firmwareUpdate_set_currentVersion_value(caps_firmwareUpdate_dat
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->currentVersion_value = (char *)value;
+    if (caps_data->currentVersion_value) {
+        free(caps_data->currentVersion_value);
+    }
+    caps_data->currentVersion_value = strdup(value);
 }
 
 static void caps_firmwareUpdate_attr_currentVersion_send(caps_firmwareUpdate_data_t *caps_data)
@@ -173,10 +182,10 @@ static void caps_firmwareUpdate_attr_currentVersion_send(caps_firmwareUpdate_dat
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->currentVersion_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->currentVersion_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_firmwareUpdate.attr_currentVersion.name,
         caps_data->currentVersion_value, NULL);
@@ -209,7 +218,10 @@ static void caps_firmwareUpdate_set_lastUpdateTime_value(caps_firmwareUpdate_dat
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->lastUpdateTime_value = (char *)value;
+    if (caps_data->lastUpdateTime_value) {
+        free(caps_data->lastUpdateTime_value);
+    }
+    caps_data->lastUpdateTime_value = strdup(value);
 }
 
 static void caps_firmwareUpdate_attr_lastUpdateTime_send(caps_firmwareUpdate_data_t *caps_data)
@@ -222,10 +234,10 @@ static void caps_firmwareUpdate_attr_lastUpdateTime_send(caps_firmwareUpdate_dat
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->lastUpdateTime_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->lastUpdateTime_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_firmwareUpdate.attr_lastUpdateTime.name,
         caps_data->lastUpdateTime_value, NULL);
@@ -258,7 +270,10 @@ static void caps_firmwareUpdate_set_availableVersion_value(caps_firmwareUpdate_d
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->availableVersion_value = (char *)value;
+    if (caps_data->availableVersion_value) {
+        free(caps_data->availableVersion_value);
+    }
+    caps_data->availableVersion_value = strdup(value);
 }
 
 static void caps_firmwareUpdate_attr_availableVersion_send(caps_firmwareUpdate_data_t *caps_data)
@@ -271,10 +286,10 @@ static void caps_firmwareUpdate_attr_availableVersion_send(caps_firmwareUpdate_d
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->availableVersion_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->availableVersion_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_firmwareUpdate.attr_availableVersion.name,
         caps_data->availableVersion_value, NULL);
@@ -307,7 +322,10 @@ static void caps_firmwareUpdate_set_lastUpdateStatusReason_value(caps_firmwareUp
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->lastUpdateStatusReason_value = (char *)value;
+    if (caps_data->lastUpdateStatusReason_value) {
+        free(caps_data->lastUpdateStatusReason_value);
+    }
+    caps_data->lastUpdateStatusReason_value = strdup(value);
 }
 
 static void caps_firmwareUpdate_attr_lastUpdateStatusReason_send(caps_firmwareUpdate_data_t *caps_data)
@@ -320,10 +338,10 @@ static void caps_firmwareUpdate_attr_lastUpdateStatusReason_send(caps_firmwareUp
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->lastUpdateStatusReason_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->lastUpdateStatusReason_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_firmwareUpdate.attr_lastUpdateStatusReason.name,
         caps_data->lastUpdateStatusReason_value, NULL);

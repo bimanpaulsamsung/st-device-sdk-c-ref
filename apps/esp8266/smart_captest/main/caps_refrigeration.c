@@ -50,7 +50,10 @@ static void caps_refrigeration_set_defrost_value(caps_refrigeration_data_t *caps
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->defrost_value = (char *)value;
+    if (caps_data->defrost_value) {
+        free(caps_data->defrost_value);
+    }
+    caps_data->defrost_value = strdup(value);
 }
 
 static void caps_refrigeration_attr_defrost_send(caps_refrigeration_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_refrigeration_attr_defrost_send(caps_refrigeration_data_t *caps
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->defrost_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->defrost_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_refrigeration.attr_defrost.name,
         caps_data->defrost_value, NULL);
@@ -111,7 +114,10 @@ static void caps_refrigeration_set_rapidFreezing_value(caps_refrigeration_data_t
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->rapidFreezing_value = (char *)value;
+    if (caps_data->rapidFreezing_value) {
+        free(caps_data->rapidFreezing_value);
+    }
+    caps_data->rapidFreezing_value = strdup(value);
 }
 
 static void caps_refrigeration_attr_rapidFreezing_send(caps_refrigeration_data_t *caps_data)
@@ -124,10 +130,10 @@ static void caps_refrigeration_attr_rapidFreezing_send(caps_refrigeration_data_t
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->rapidFreezing_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->rapidFreezing_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_refrigeration.attr_rapidFreezing.name,
         caps_data->rapidFreezing_value, NULL);
@@ -172,7 +178,10 @@ static void caps_refrigeration_set_rapidCooling_value(caps_refrigeration_data_t 
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->rapidCooling_value = (char *)value;
+    if (caps_data->rapidCooling_value) {
+        free(caps_data->rapidCooling_value);
+    }
+    caps_data->rapidCooling_value = strdup(value);
 }
 
 static void caps_refrigeration_attr_rapidCooling_send(caps_refrigeration_data_t *caps_data)
@@ -185,10 +194,10 @@ static void caps_refrigeration_attr_rapidCooling_send(caps_refrigeration_data_t 
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->rapidCooling_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->rapidCooling_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_refrigeration.attr_rapidCooling.name,
         caps_data->rapidCooling_value, NULL);

@@ -50,7 +50,10 @@ static void caps_audioMute_set_mute_value(caps_audioMute_data_t *caps_data, cons
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->mute_value = (char *)value;
+    if (caps_data->mute_value) {
+        free(caps_data->mute_value);
+    }
+    caps_data->mute_value = strdup(value);
 }
 
 static void caps_audioMute_attr_mute_send(caps_audioMute_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_audioMute_attr_mute_send(caps_audioMute_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->mute_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->mute_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_audioMute.attr_mute.name,
         caps_data->mute_value, NULL);

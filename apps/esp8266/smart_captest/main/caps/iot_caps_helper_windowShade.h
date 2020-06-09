@@ -53,7 +53,7 @@ const static struct iot_caps_windowShade {
         .name = "windowShade",
         .property = ATTR_SET_VALUE_REQUIRED,
         .value_type = VALUE_TYPE_STRING,
-        .values = {"closed", "closing", "open", "opening", "partially_open", "unknown"},
+        .values = {"closed", "closing", "open", "opening", "partially open", "unknown"},
     },
     .attr_supportedWindowShadeCommands = {
         .name = "supportedWindowShadeCommands",

@@ -50,7 +50,10 @@ static void caps_alarm_set_alarm_value(caps_alarm_data_t *caps_data, const char 
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->alarm_value = (char *)value;
+    if (caps_data->alarm_value) {
+        free(caps_data->alarm_value);
+    }
+    caps_data->alarm_value = strdup(value);
 }
 
 static void caps_alarm_attr_alarm_send(caps_alarm_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_alarm_attr_alarm_send(caps_alarm_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->alarm_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->alarm_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_alarm.attr_alarm.name,
         caps_data->alarm_value, NULL);

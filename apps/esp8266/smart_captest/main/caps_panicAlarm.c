@@ -50,7 +50,10 @@ static void caps_panicAlarm_set_panicAlarm_value(caps_panicAlarm_data_t *caps_da
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->panicAlarm_value = (char *)value;
+    if (caps_data->panicAlarm_value) {
+        free(caps_data->panicAlarm_value);
+    }
+    caps_data->panicAlarm_value = strdup(value);
 }
 
 static void caps_panicAlarm_attr_panicAlarm_send(caps_panicAlarm_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_panicAlarm_attr_panicAlarm_send(caps_panicAlarm_data_t *caps_da
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->panicAlarm_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->panicAlarm_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_panicAlarm.attr_panicAlarm.name,
         caps_data->panicAlarm_value, NULL);

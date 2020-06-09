@@ -50,7 +50,10 @@ static void caps_powerSource_set_powerSource_value(caps_powerSource_data_t *caps
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->powerSource_value = (char *)value;
+    if (caps_data->powerSource_value) {
+        free(caps_data->powerSource_value);
+    }
+    caps_data->powerSource_value = strdup(value);
 }
 
 static void caps_powerSource_attr_powerSource_send(caps_powerSource_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_powerSource_attr_powerSource_send(caps_powerSource_data_t *caps
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->powerSource_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->powerSource_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_powerSource.attr_powerSource.name,
         caps_data->powerSource_value, NULL);

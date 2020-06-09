@@ -38,7 +38,10 @@ static void caps_tV_set_sound_value(caps_tV_data_t *caps_data, const char *value
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->sound_value = (char *)value;
+    if (caps_data->sound_value) {
+        free(caps_data->sound_value);
+    }
+    caps_data->sound_value = strdup(value);
 }
 
 static void caps_tV_attr_sound_send(caps_tV_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_tV_attr_sound_send(caps_tV_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->sound_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->sound_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_tV.attr_sound.name,
         caps_data->sound_value, NULL);
@@ -87,7 +90,10 @@ static void caps_tV_set_picture_value(caps_tV_data_t *caps_data, const char *val
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->picture_value = (char *)value;
+    if (caps_data->picture_value) {
+        free(caps_data->picture_value);
+    }
+    caps_data->picture_value = strdup(value);
 }
 
 static void caps_tV_attr_picture_send(caps_tV_data_t *caps_data)
@@ -100,10 +106,10 @@ static void caps_tV_attr_picture_send(caps_tV_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->picture_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->picture_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_tV.attr_picture.name,
         caps_data->picture_value, NULL);
@@ -136,7 +142,10 @@ static void caps_tV_set_movieMode_value(caps_tV_data_t *caps_data, const char *v
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->movieMode_value = (char *)value;
+    if (caps_data->movieMode_value) {
+        free(caps_data->movieMode_value);
+    }
+    caps_data->movieMode_value = strdup(value);
 }
 
 static void caps_tV_attr_movieMode_send(caps_tV_data_t *caps_data)
@@ -149,10 +158,10 @@ static void caps_tV_attr_movieMode_send(caps_tV_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->movieMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->movieMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_tV.attr_movieMode.name,
         caps_data->movieMode_value, NULL);
@@ -185,7 +194,10 @@ static void caps_tV_set_power_value(caps_tV_data_t *caps_data, const char *value
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->power_value = (char *)value;
+    if (caps_data->power_value) {
+        free(caps_data->power_value);
+    }
+    caps_data->power_value = strdup(value);
 }
 
 static void caps_tV_attr_power_send(caps_tV_data_t *caps_data)
@@ -198,10 +210,10 @@ static void caps_tV_attr_power_send(caps_tV_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->power_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->power_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_tV.attr_power.name,
         caps_data->power_value, NULL);

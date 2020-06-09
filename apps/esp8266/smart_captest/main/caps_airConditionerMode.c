@@ -38,7 +38,10 @@ static void caps_airConditionerMode_set_airConditionerMode_value(caps_airConditi
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->airConditionerMode_value = (char *)value;
+    if (caps_data->airConditionerMode_value) {
+        free(caps_data->airConditionerMode_value);
+    }
+    caps_data->airConditionerMode_value = strdup(value);
 }
 
 static void caps_airConditionerMode_attr_airConditionerMode_send(caps_airConditionerMode_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_airConditionerMode_attr_airConditionerMode_send(caps_airConditi
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->airConditionerMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->airConditionerMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_airConditionerMode.attr_airConditionerMode.name,
         caps_data->airConditionerMode_value, NULL);
@@ -74,51 +77,62 @@ static void caps_airConditionerMode_attr_airConditionerMode_send(caps_airConditi
 
 static const char **caps_airConditionerMode_get_supportedAcModes_value(caps_airConditionerMode_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->supportedAcModes_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->supportedAcModes_value;
 }
 
 static void caps_airConditionerMode_set_supportedAcModes_value(caps_airConditionerMode_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->supportedAcModes_value = (char **)value;
-	caps_data->supportedAcModes_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->supportedAcModes_value) {
+        for (i = 0; i < caps_data->supportedAcModes_arraySize; i++) {
+            free(caps_data->supportedAcModes_value[i]);
+        }
+        free(caps_data->supportedAcModes_value);
+    }
+    caps_data->supportedAcModes_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->supportedAcModes_value[i] = strdup(value[i]);
+    }
+
+    caps_data->supportedAcModes_arraySize = arraySize;
 }
 
 static void caps_airConditionerMode_attr_supportedAcModes_send(caps_airConditionerMode_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->supportedAcModes_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->supportedAcModes_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_airConditionerMode.attr_supportedAcModes.name,
-		caps_data->supportedAcModes_arraySize, caps_data->supportedAcModes_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_airConditionerMode.attr_supportedAcModes.name,
+        caps_data->supportedAcModes_arraySize, caps_data->supportedAcModes_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send supportedAcModes value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send supportedAcModes value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

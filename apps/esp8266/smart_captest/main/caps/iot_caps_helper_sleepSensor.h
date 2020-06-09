@@ -41,7 +41,7 @@ const static struct iot_caps_sleepSensor {
         .name = "sleeping",
         .property = ATTR_SET_VALUE_REQUIRED,
         .value_type = VALUE_TYPE_STRING,
-        .values = {"not_sleeping", "sleeping"},
+        .values = {"not sleeping", "sleeping"},
     },
 };
 

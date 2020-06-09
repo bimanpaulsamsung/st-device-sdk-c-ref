@@ -50,7 +50,10 @@ static void caps_mediaPlaybackShuffle_set_playbackShuffle_value(caps_mediaPlayba
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->playbackShuffle_value = (char *)value;
+    if (caps_data->playbackShuffle_value) {
+        free(caps_data->playbackShuffle_value);
+    }
+    caps_data->playbackShuffle_value = strdup(value);
 }
 
 static void caps_mediaPlaybackShuffle_attr_playbackShuffle_send(caps_mediaPlaybackShuffle_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_mediaPlaybackShuffle_attr_playbackShuffle_send(caps_mediaPlayba
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->playbackShuffle_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->playbackShuffle_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_mediaPlaybackShuffle.attr_playbackShuffle.name,
         caps_data->playbackShuffle_value, NULL);

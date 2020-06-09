@@ -176,7 +176,7 @@ static void caps_colorControl_cmd_setColor_cb(IOT_CAP_HANDLE *handle,
     double saturation = caps_helper_colorControl.attr_saturation.min - 1;
 
     printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
-	caps_data->cmd_data = cmd_data;
+    caps_data->cmd_data = cmd_data;
 
     json_object = JSON_PARSE(cmd_data->cmd_data[0].json_object);
     if (!json_object) {

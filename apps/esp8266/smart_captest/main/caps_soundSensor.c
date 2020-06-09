@@ -50,7 +50,10 @@ static void caps_soundSensor_set_sound_value(caps_soundSensor_data_t *caps_data,
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->sound_value = (char *)value;
+    if (caps_data->sound_value) {
+        free(caps_data->sound_value);
+    }
+    caps_data->sound_value = strdup(value);
 }
 
 static void caps_soundSensor_attr_sound_send(caps_soundSensor_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_soundSensor_attr_sound_send(caps_soundSensor_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->sound_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->sound_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_soundSensor.attr_sound.name,
         caps_data->sound_value, NULL);

@@ -50,7 +50,10 @@ static void caps_presenceSensor_set_presence_value(caps_presenceSensor_data_t *c
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->presence_value = (char *)value;
+    if (caps_data->presence_value) {
+        free(caps_data->presence_value);
+    }
+    caps_data->presence_value = strdup(value);
 }
 
 static void caps_presenceSensor_attr_presence_send(caps_presenceSensor_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_presenceSensor_attr_presence_send(caps_presenceSensor_data_t *c
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->presence_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->presence_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_presenceSensor.attr_presence.name,
         caps_data->presence_value, NULL);

@@ -50,7 +50,10 @@ static void caps_remoteControlStatus_set_remoteControlEnabled_value(caps_remoteC
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->remoteControlEnabled_value = (char *)value;
+    if (caps_data->remoteControlEnabled_value) {
+        free(caps_data->remoteControlEnabled_value);
+    }
+    caps_data->remoteControlEnabled_value = strdup(value);
 }
 
 static void caps_remoteControlStatus_attr_remoteControlEnabled_send(caps_remoteControlStatus_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_remoteControlStatus_attr_remoteControlEnabled_send(caps_remoteC
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->remoteControlEnabled_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->remoteControlEnabled_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_remoteControlStatus.attr_remoteControlEnabled.name,
         caps_data->remoteControlEnabled_value, NULL);

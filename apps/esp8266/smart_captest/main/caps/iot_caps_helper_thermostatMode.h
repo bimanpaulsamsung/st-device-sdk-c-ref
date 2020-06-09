@@ -87,7 +87,7 @@ const static struct iot_caps_thermostatMode {
         .name = "thermostatMode",
         .property = ATTR_SET_VALUE_REQUIRED,
         .value_type = VALUE_TYPE_STRING,
-        .values = {"asleep", "auto", "autowitheco", "autowithreset", "autochangeover", "autochangeoveractive", "autocool", "autoheat", "auxheatonly", "auxiliaryemergencyheat", "away", "cool", "custom", "dayoff", "dryair", "eco", "emergency_heat", "emergencyheat", "emergencyheatactive", "energysavecool", "energysaveheat", "fanonly", "frostguard", "furnace", "heat", "heatingoff", "home", "in", "manual", "moistair", "off", "out", "resume", "rush_hour", "rushhour", "schedule", "southernaway"},
+        .values = {"asleep", "auto", "autowitheco", "autowithreset", "autochangeover", "autochangeoveractive", "autocool", "autoheat", "auxheatonly", "auxiliaryemergencyheat", "away", "cool", "custom", "dayoff", "dryair", "eco", "emergency heat", "emergencyheat", "emergencyheatactive", "energysavecool", "energysaveheat", "fanonly", "frostguard", "furnace", "heat", "heatingoff", "home", "in", "manual", "moistair", "off", "out", "resume", "rush hour", "rushhour", "schedule", "southernaway"},
     },
     .attr_supportedThermostatModes = {
         .name = "supportedThermostatModes",

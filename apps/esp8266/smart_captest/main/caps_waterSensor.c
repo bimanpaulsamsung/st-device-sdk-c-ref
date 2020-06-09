@@ -50,7 +50,10 @@ static void caps_waterSensor_set_water_value(caps_waterSensor_data_t *caps_data,
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->water_value = (char *)value;
+    if (caps_data->water_value) {
+        free(caps_data->water_value);
+    }
+    caps_data->water_value = strdup(value);
 }
 
 static void caps_waterSensor_attr_water_send(caps_waterSensor_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_waterSensor_attr_water_send(caps_waterSensor_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->water_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->water_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_waterSensor.attr_water.name,
         caps_data->water_value, NULL);

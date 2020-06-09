@@ -25,51 +25,62 @@
 
 static const char **caps_mediaTrackControl_get_supportedTrackControlCommands_value(caps_mediaTrackControl_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->supportedTrackControlCommands_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->supportedTrackControlCommands_value;
 }
 
 static void caps_mediaTrackControl_set_supportedTrackControlCommands_value(caps_mediaTrackControl_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->supportedTrackControlCommands_value = (char **)value;
-	caps_data->supportedTrackControlCommands_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->supportedTrackControlCommands_value) {
+        for (i = 0; i < caps_data->supportedTrackControlCommands_arraySize; i++) {
+            free(caps_data->supportedTrackControlCommands_value[i]);
+        }
+        free(caps_data->supportedTrackControlCommands_value);
+    }
+    caps_data->supportedTrackControlCommands_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->supportedTrackControlCommands_value[i] = strdup(value[i]);
+    }
+
+    caps_data->supportedTrackControlCommands_arraySize = arraySize;
 }
 
 static void caps_mediaTrackControl_attr_supportedTrackControlCommands_send(caps_mediaTrackControl_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->supportedTrackControlCommands_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->supportedTrackControlCommands_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_mediaTrackControl.attr_supportedTrackControlCommands.name,
-		caps_data->supportedTrackControlCommands_arraySize, caps_data->supportedTrackControlCommands_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_mediaTrackControl.attr_supportedTrackControlCommands.name,
+        caps_data->supportedTrackControlCommands_arraySize, caps_data->supportedTrackControlCommands_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send supportedTrackControlCommands value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send supportedTrackControlCommands value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

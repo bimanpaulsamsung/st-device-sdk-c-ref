@@ -25,51 +25,62 @@
 
 static const char **caps_mediaPlayback_get_supportedPlaybackCommands_value(caps_mediaPlayback_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->supportedPlaybackCommands_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->supportedPlaybackCommands_value;
 }
 
 static void caps_mediaPlayback_set_supportedPlaybackCommands_value(caps_mediaPlayback_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->supportedPlaybackCommands_value = (char **)value;
-	caps_data->supportedPlaybackCommands_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->supportedPlaybackCommands_value) {
+        for (i = 0; i < caps_data->supportedPlaybackCommands_arraySize; i++) {
+            free(caps_data->supportedPlaybackCommands_value[i]);
+        }
+        free(caps_data->supportedPlaybackCommands_value);
+    }
+    caps_data->supportedPlaybackCommands_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->supportedPlaybackCommands_value[i] = strdup(value[i]);
+    }
+
+    caps_data->supportedPlaybackCommands_arraySize = arraySize;
 }
 
 static void caps_mediaPlayback_attr_supportedPlaybackCommands_send(caps_mediaPlayback_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->supportedPlaybackCommands_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->supportedPlaybackCommands_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_mediaPlayback.attr_supportedPlaybackCommands.name,
-		caps_data->supportedPlaybackCommands_arraySize, caps_data->supportedPlaybackCommands_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_mediaPlayback.attr_supportedPlaybackCommands.name,
+        caps_data->supportedPlaybackCommands_arraySize, caps_data->supportedPlaybackCommands_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send supportedPlaybackCommands value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send supportedPlaybackCommands value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 
@@ -100,7 +111,10 @@ static void caps_mediaPlayback_set_playbackStatus_value(caps_mediaPlayback_data_
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->playbackStatus_value = (char *)value;
+    if (caps_data->playbackStatus_value) {
+        free(caps_data->playbackStatus_value);
+    }
+    caps_data->playbackStatus_value = strdup(value);
 }
 
 static void caps_mediaPlayback_attr_playbackStatus_send(caps_mediaPlayback_data_t *caps_data)
@@ -113,10 +127,10 @@ static void caps_mediaPlayback_attr_playbackStatus_send(caps_mediaPlayback_data_
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->playbackStatus_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->playbackStatus_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_mediaPlayback.attr_playbackStatus.name,
         caps_data->playbackStatus_value, NULL);

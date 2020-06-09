@@ -50,7 +50,10 @@ static void caps_valve_set_valve_value(caps_valve_data_t *caps_data, const char 
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->valve_value = (char *)value;
+    if (caps_data->valve_value) {
+        free(caps_data->valve_value);
+    }
+    caps_data->valve_value = strdup(value);
 }
 
 static void caps_valve_attr_valve_send(caps_valve_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_valve_attr_valve_send(caps_valve_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->valve_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->valve_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_valve.attr_valve.name,
         caps_data->valve_value, NULL);

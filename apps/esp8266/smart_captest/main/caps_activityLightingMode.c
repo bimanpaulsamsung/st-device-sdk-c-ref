@@ -50,7 +50,10 @@ static void caps_activityLightingMode_set_lightingMode_value(caps_activityLighti
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->lightingMode_value = (char *)value;
+    if (caps_data->lightingMode_value) {
+        free(caps_data->lightingMode_value);
+    }
+    caps_data->lightingMode_value = strdup(value);
 }
 
 static void caps_activityLightingMode_attr_lightingMode_send(caps_activityLightingMode_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_activityLightingMode_attr_lightingMode_send(caps_activityLighti
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->lightingMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->lightingMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_activityLightingMode.attr_lightingMode.name,
         caps_data->lightingMode_value, NULL);

@@ -133,7 +133,7 @@ const static struct iot_caps_samsungTV {
         .name = "soundMode",
         .property = NULL,
         .value_type = VALUE_TYPE_STRING,
-        .values = {"clear_voice", "movie", "music", "standard", "unknown"},
+        .values = {"clear voice", "movie", "music", "standard", "unknown"},
     },
     .cmd_on = { .name = "on" },
     .cmd_off = { .name = "off" },

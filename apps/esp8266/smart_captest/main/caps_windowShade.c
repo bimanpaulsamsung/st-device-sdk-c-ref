@@ -50,7 +50,10 @@ static void caps_windowShade_set_windowShade_value(caps_windowShade_data_t *caps
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->windowShade_value = (char *)value;
+    if (caps_data->windowShade_value) {
+        free(caps_data->windowShade_value);
+    }
+    caps_data->windowShade_value = strdup(value);
 }
 
 static void caps_windowShade_attr_windowShade_send(caps_windowShade_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_windowShade_attr_windowShade_send(caps_windowShade_data_t *caps
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->windowShade_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->windowShade_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_windowShade.attr_windowShade.name,
         caps_data->windowShade_value, NULL);
@@ -86,51 +89,62 @@ static void caps_windowShade_attr_windowShade_send(caps_windowShade_data_t *caps
 
 static const char **caps_windowShade_get_supportedWindowShadeCommands_value(caps_windowShade_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->supportedWindowShadeCommands_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->supportedWindowShadeCommands_value;
 }
 
 static void caps_windowShade_set_supportedWindowShadeCommands_value(caps_windowShade_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->supportedWindowShadeCommands_value = (char **)value;
-	caps_data->supportedWindowShadeCommands_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->supportedWindowShadeCommands_value) {
+        for (i = 0; i < caps_data->supportedWindowShadeCommands_arraySize; i++) {
+            free(caps_data->supportedWindowShadeCommands_value[i]);
+        }
+        free(caps_data->supportedWindowShadeCommands_value);
+    }
+    caps_data->supportedWindowShadeCommands_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->supportedWindowShadeCommands_value[i] = strdup(value[i]);
+    }
+
+    caps_data->supportedWindowShadeCommands_arraySize = arraySize;
 }
 
 static void caps_windowShade_attr_supportedWindowShadeCommands_send(caps_windowShade_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->supportedWindowShadeCommands_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->supportedWindowShadeCommands_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_windowShade.attr_supportedWindowShadeCommands.name,
-		caps_data->supportedWindowShadeCommands_arraySize, caps_data->supportedWindowShadeCommands_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_windowShade.attr_supportedWindowShadeCommands.name,
+        caps_data->supportedWindowShadeCommands_arraySize, caps_data->supportedWindowShadeCommands_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send supportedWindowShadeCommands value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send supportedWindowShadeCommands value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

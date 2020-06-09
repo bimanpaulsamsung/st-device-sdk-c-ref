@@ -50,7 +50,10 @@ static void caps_bypassable_set_bypassStatus_value(caps_bypassable_data_t *caps_
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->bypassStatus_value = (char *)value;
+    if (caps_data->bypassStatus_value) {
+        free(caps_data->bypassStatus_value);
+    }
+    caps_data->bypassStatus_value = strdup(value);
 }
 
 static void caps_bypassable_attr_bypassStatus_send(caps_bypassable_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_bypassable_attr_bypassStatus_send(caps_bypassable_data_t *caps_
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->bypassStatus_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->bypassStatus_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_bypassable.attr_bypassStatus.name,
         caps_data->bypassStatus_value, NULL);

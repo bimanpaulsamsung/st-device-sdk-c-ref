@@ -41,7 +41,7 @@ const static struct iot_caps_soundSensor {
         .name = "sound",
         .property = ATTR_SET_VALUE_REQUIRED,
         .value_type = VALUE_TYPE_STRING,
-        .values = {"detected", "not_detected"},
+        .values = {"detected", "not detected"},
     },
 };
 

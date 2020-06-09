@@ -38,7 +38,10 @@ static void caps_imageCapture_set_image_value(caps_imageCapture_data_t *caps_dat
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->image_value = (char *)value;
+    if (caps_data->image_value) {
+        free(caps_data->image_value);
+    }
+    caps_data->image_value = strdup(value);
 }
 
 static void caps_imageCapture_attr_image_send(caps_imageCapture_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_imageCapture_attr_image_send(caps_imageCapture_data_t *caps_dat
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->image_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->image_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_imageCapture.attr_image.name,
         caps_data->image_value, NULL);
@@ -87,7 +90,10 @@ static void caps_imageCapture_set_captureTime_value(caps_imageCapture_data_t *ca
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->captureTime_value = (char *)value;
+    if (caps_data->captureTime_value) {
+        free(caps_data->captureTime_value);
+    }
+    caps_data->captureTime_value = strdup(value);
 }
 
 static void caps_imageCapture_attr_captureTime_send(caps_imageCapture_data_t *caps_data)
@@ -100,10 +106,10 @@ static void caps_imageCapture_attr_captureTime_send(caps_imageCapture_data_t *ca
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->captureTime_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->captureTime_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_imageCapture.attr_captureTime.name,
         caps_data->captureTime_value, NULL);
@@ -126,8 +132,8 @@ static void caps_imageCapture_cmd_take_cb(IOT_CAP_HANDLE *handle,
 {
     caps_imageCapture_data_t *caps_data = usr_data;
 
-	printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
-	caps_data->cmd_data = cmd_data;
+    printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
+    caps_data->cmd_data = cmd_data;
 
     if (caps_data && caps_data->cmd_take_usr_cb)
         caps_data->cmd_take_usr_cb(caps_data);

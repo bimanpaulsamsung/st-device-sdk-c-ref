@@ -50,7 +50,10 @@ static void caps_fanOscillationMode_set_fanOscillationMode_value(caps_fanOscilla
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->fanOscillationMode_value = (char *)value;
+    if (caps_data->fanOscillationMode_value) {
+        free(caps_data->fanOscillationMode_value);
+    }
+    caps_data->fanOscillationMode_value = strdup(value);
 }
 
 static void caps_fanOscillationMode_attr_fanOscillationMode_send(caps_fanOscillationMode_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_fanOscillationMode_attr_fanOscillationMode_send(caps_fanOscilla
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->fanOscillationMode_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->fanOscillationMode_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_fanOscillationMode.attr_fanOscillationMode.name,
         caps_data->fanOscillationMode_value, NULL);

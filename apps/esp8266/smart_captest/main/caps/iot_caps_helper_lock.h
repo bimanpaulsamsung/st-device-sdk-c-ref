@@ -45,7 +45,7 @@ const static struct iot_caps_lock {
         .name = "lock",
         .property = ATTR_SET_VALUE_REQUIRED,
         .value_type = VALUE_TYPE_STRING,
-        .values = {"locked", "unknown", "unlocked", "unlocked_with_timeout"},
+        .values = {"locked", "unknown", "unlocked", "unlocked with timeout"},
     },
     .cmd_lock = { .name = "lock" },
     .cmd_unlock = { .name = "unlock" },

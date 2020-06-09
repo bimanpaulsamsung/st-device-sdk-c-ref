@@ -50,7 +50,10 @@ static void caps_accelerationSensor_set_acceleration_value(caps_accelerationSens
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->acceleration_value = (char *)value;
+    if (caps_data->acceleration_value) {
+        free(caps_data->acceleration_value);
+    }
+    caps_data->acceleration_value = strdup(value);
 }
 
 static void caps_accelerationSensor_attr_acceleration_send(caps_accelerationSensor_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_accelerationSensor_attr_acceleration_send(caps_accelerationSens
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->acceleration_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->acceleration_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_accelerationSensor.attr_acceleration.name,
         caps_data->acceleration_value, NULL);

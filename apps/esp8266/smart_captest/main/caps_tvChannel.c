@@ -38,7 +38,10 @@ static void caps_tvChannel_set_tvChannel_value(caps_tvChannel_data_t *caps_data,
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->tvChannel_value = (char *)value;
+    if (caps_data->tvChannel_value) {
+        free(caps_data->tvChannel_value);
+    }
+    caps_data->tvChannel_value = strdup(value);
 }
 
 static void caps_tvChannel_attr_tvChannel_send(caps_tvChannel_data_t *caps_data)
@@ -51,10 +54,10 @@ static void caps_tvChannel_attr_tvChannel_send(caps_tvChannel_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->tvChannel_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->tvChannel_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_tvChannel.attr_tvChannel.name,
         caps_data->tvChannel_value, NULL);
@@ -87,7 +90,10 @@ static void caps_tvChannel_set_tvChannelName_value(caps_tvChannel_data_t *caps_d
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->tvChannelName_value = (char *)value;
+    if (caps_data->tvChannelName_value) {
+        free(caps_data->tvChannelName_value);
+    }
+    caps_data->tvChannelName_value = strdup(value);
 }
 
 static void caps_tvChannel_attr_tvChannelName_send(caps_tvChannel_data_t *caps_data)
@@ -100,10 +106,10 @@ static void caps_tvChannel_attr_tvChannelName_send(caps_tvChannel_data_t *caps_d
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->tvChannelName_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->tvChannelName_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_tvChannel.attr_tvChannelName.name,
         caps_data->tvChannelName_value, NULL);

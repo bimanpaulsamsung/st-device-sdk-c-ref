@@ -50,7 +50,10 @@ static void caps_videoCamera_set_mute_value(caps_videoCamera_data_t *caps_data, 
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->mute_value = (char *)value;
+    if (caps_data->mute_value) {
+        free(caps_data->mute_value);
+    }
+    caps_data->mute_value = strdup(value);
 }
 
 static void caps_videoCamera_attr_mute_send(caps_videoCamera_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_videoCamera_attr_mute_send(caps_videoCamera_data_t *caps_data)
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->mute_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->mute_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_videoCamera.attr_mute.name,
         caps_data->mute_value, NULL);
@@ -111,7 +114,10 @@ static void caps_videoCamera_set_camera_value(caps_videoCamera_data_t *caps_data
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->camera_value = (char *)value;
+    if (caps_data->camera_value) {
+        free(caps_data->camera_value);
+    }
+    caps_data->camera_value = strdup(value);
 }
 
 static void caps_videoCamera_attr_camera_send(caps_videoCamera_data_t *caps_data)
@@ -124,10 +130,10 @@ static void caps_videoCamera_attr_camera_send(caps_videoCamera_data_t *caps_data
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->camera_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->camera_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_videoCamera.attr_camera.name,
         caps_data->camera_value, NULL);
@@ -160,7 +166,10 @@ static void caps_videoCamera_set_statusMessage_value(caps_videoCamera_data_t *ca
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->statusMessage_value = (char *)value;
+    if (caps_data->statusMessage_value) {
+        free(caps_data->statusMessage_value);
+    }
+    caps_data->statusMessage_value = strdup(value);
 }
 
 static void caps_videoCamera_attr_statusMessage_send(caps_videoCamera_data_t *caps_data)
@@ -173,10 +182,10 @@ static void caps_videoCamera_attr_statusMessage_send(caps_videoCamera_data_t *ca
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->statusMessage_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->statusMessage_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_videoCamera.attr_statusMessage.name,
         caps_data->statusMessage_value, NULL);
@@ -196,57 +205,57 @@ static void caps_videoCamera_attr_statusMessage_send(caps_videoCamera_data_t *ca
 
 static const JSON_H *caps_videoCamera_get_settings_value(caps_videoCamera_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const JSON_H *)caps_data->settings_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const JSON_H *)caps_data->settings_value;
 }
 
 static void caps_videoCamera_set_settings_value(caps_videoCamera_data_t *caps_data, const JSON_H *value)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	if (caps_data->settings_value) {
-		JSON_DELETE(caps_data->settings_value);
-	}
-	caps_data->settings_value = JSON_DUPLICATE(value, true);
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->settings_value) {
+        JSON_DELETE(caps_data->settings_value);
+    }
+    caps_data->settings_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_videoCamera_attr_settings_send(caps_videoCamera_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
-	iot_cap_val_t value;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
+    iot_cap_val_t value;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->settings_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->settings_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
-	value.json_object = JSON_PRINT(caps_data->settings_value);
+    value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
+    value.json_object = JSON_PRINT(caps_data->settings_value);
 
-	cap_evt = st_cap_attr_create((char *)caps_helper_videoCamera.attr_settings.name,
-		&value, NULL, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create((char *)caps_helper_videoCamera.attr_settings.name,
+        &value, NULL, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send settings value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send settings value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

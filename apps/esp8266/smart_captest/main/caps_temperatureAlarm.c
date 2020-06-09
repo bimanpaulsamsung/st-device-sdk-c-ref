@@ -50,7 +50,10 @@ static void caps_temperatureAlarm_set_temperatureAlarm_value(caps_temperatureAla
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->temperatureAlarm_value = (char *)value;
+    if (caps_data->temperatureAlarm_value) {
+        free(caps_data->temperatureAlarm_value);
+    }
+    caps_data->temperatureAlarm_value = strdup(value);
 }
 
 static void caps_temperatureAlarm_attr_temperatureAlarm_send(caps_temperatureAlarm_data_t *caps_data)
@@ -63,10 +66,10 @@ static void caps_temperatureAlarm_attr_temperatureAlarm_send(caps_temperatureAla
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->temperatureAlarm_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->temperatureAlarm_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_temperatureAlarm.attr_temperatureAlarm.name,
         caps_data->temperatureAlarm_value, NULL);

@@ -25,107 +25,118 @@
 
 static const JSON_H *caps_objectDetection_get_detected_value(caps_objectDetection_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const JSON_H *)caps_data->detected_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const JSON_H *)caps_data->detected_value;
 }
 
 static void caps_objectDetection_set_detected_value(caps_objectDetection_data_t *caps_data, const JSON_H *value)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	if (caps_data->detected_value) {
-		JSON_DELETE(caps_data->detected_value);
-	}
-	caps_data->detected_value = JSON_DUPLICATE(value, true);
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->detected_value) {
+        JSON_DELETE(caps_data->detected_value);
+    }
+    caps_data->detected_value = JSON_DUPLICATE(value, true);
 }
 
 static void caps_objectDetection_attr_detected_send(caps_objectDetection_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
-	iot_cap_val_t value;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
+    iot_cap_val_t value;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->detected_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->detected_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
-	value.json_object = JSON_PRINT(caps_data->detected_value);
+    value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
+    value.json_object = JSON_PRINT(caps_data->detected_value);
 
-	cap_evt = st_cap_attr_create((char *)caps_helper_objectDetection.attr_detected.name,
-		&value, NULL, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create((char *)caps_helper_objectDetection.attr_detected.name,
+        &value, NULL, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send detected value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send detected value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 
 static const char **caps_objectDetection_get_supportedValues_value(caps_objectDetection_data_t *caps_data)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return NULL;
-	}
-	return (const char **)caps_data->supportedValues_value;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return NULL;
+    }
+    return (const char **)caps_data->supportedValues_value;
 }
 
 static void caps_objectDetection_set_supportedValues_value(caps_objectDetection_data_t *caps_data, const char **value, int arraySize)
 {
-	if (!caps_data) {
-		printf("caps_data is NULL\n");
-		return;
-	}
-	caps_data->supportedValues_value = (char **)value;
-	caps_data->supportedValues_arraySize = arraySize;
+    int i;
+    if (!caps_data) {
+        printf("caps_data is NULL\n");
+        return;
+    }
+    if (caps_data->supportedValues_value) {
+        for (i = 0; i < caps_data->supportedValues_arraySize; i++) {
+            free(caps_data->supportedValues_value[i]);
+        }
+        free(caps_data->supportedValues_value);
+    }
+    caps_data->supportedValues_value = malloc(sizeof(char *) * arraySize);
+    for (i = 0; i < arraySize; i++) {
+        caps_data->supportedValues_value[i] = strdup(value[i]);
+    }
+
+    caps_data->supportedValues_arraySize = arraySize;
 }
 
 static void caps_objectDetection_attr_supportedValues_send(caps_objectDetection_data_t *caps_data)
 {
-	IOT_EVENT *cap_evt;
-	uint8_t evt_num = 1;
-	int sequence_no;
+    IOT_EVENT *cap_evt;
+    uint8_t evt_num = 1;
+    int sequence_no;
 
-	if (!caps_data || !caps_data->handle) {
-		printf("fail to get handle\n");
-		return;
-	}
-	if (!caps_data->supportedValues_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data || !caps_data->handle) {
+        printf("fail to get handle\n");
+        return;
+    }
+    if (!caps_data->supportedValues_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
-	cap_evt = st_cap_attr_create_string_array((char *)caps_helper_objectDetection.attr_supportedValues.name,
-		caps_data->supportedValues_arraySize, caps_data->supportedValues_value, NULL);
-	if (!cap_evt) {
-		printf("fail to create cap_evt\n");
-		return;
-	}
+    cap_evt = st_cap_attr_create_string_array((char *)caps_helper_objectDetection.attr_supportedValues.name,
+        caps_data->supportedValues_arraySize, caps_data->supportedValues_value, NULL);
+    if (!cap_evt) {
+        printf("fail to create cap_evt\n");
+        return;
+    }
 
-	sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
-	if (sequence_no < 0)
-		printf("fail to send supportedValues value\n");
+    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    if (sequence_no < 0)
+        printf("fail to send supportedValues value\n");
 
-	printf("Sequence number return : %d\n", sequence_no);
-	st_cap_attr_free(cap_evt);
+    printf("Sequence number return : %d\n", sequence_no);
+    st_cap_attr_free(cap_evt);
 }
 
 

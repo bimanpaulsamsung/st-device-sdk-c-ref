@@ -46,7 +46,7 @@ const static struct iot_caps_thermostatOperatingState {
         .name = "thermostatOperatingState",
         .property = ATTR_SET_VALUE_REQUIRED,
         .value_type = VALUE_TYPE_STRING,
-        .values = {"cooling", "fan_only", "heating", "idle", "pending_cool", "pending_heat", "vent_economizer"},
+        .values = {"cooling", "fan only", "heating", "idle", "pending cool", "pending heat", "vent economizer"},
     },
 };
 
