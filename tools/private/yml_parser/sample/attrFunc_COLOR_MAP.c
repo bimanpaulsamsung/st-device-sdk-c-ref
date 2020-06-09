@@ -4,7 +4,9 @@ static void caps_$CAPS_ID$_set_$ATTR_NAME$_value(caps_$CAPS_ID$_data_t *caps_dat
         printf("caps_data is NULL\n");
         return;
     }
-
+    if (caps_data->$ATTR_NAME$_value) {
+        free(caps_data->$ATTR_NAME$_value);
+    }
     caps_data->hue_value = hue;
     caps_data->saturation_value = saturation;
 }

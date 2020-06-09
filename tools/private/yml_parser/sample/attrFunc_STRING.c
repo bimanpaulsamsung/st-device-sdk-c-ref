@@ -13,7 +13,10 @@ static void caps_$CAPS_ID$_set_$ATTR_NAME$_value(caps_$CAPS_ID$_data_t *caps_dat
         printf("caps_data is NULL\n");
         return;
     }
-    caps_data->$ATTR_NAME$_value = (char *)value;
+    if (caps_data->$ATTR_NAME$_value) {
+        free(caps_data->$ATTR_NAME$_value);
+    }
+    caps_data->$ATTR_NAME$_value = strdup(value);
 }
 
 static void caps_$CAPS_ID$_attr_$ATTR_NAME$_send(caps_$CAPS_ID$_data_t *caps_data)
@@ -26,10 +29,10 @@ static void caps_$CAPS_ID$_attr_$ATTR_NAME$_send(caps_$CAPS_ID$_data_t *caps_dat
         printf("fail to get handle\n");
         return;
     }
-	if (!caps_data->$ATTR_NAME$_value) {
-		printf("value is NULL\n");
-		return;
-	}
+    if (!caps_data->$ATTR_NAME$_value) {
+        printf("value is NULL\n");
+        return;
+    }
 
     cap_evt = st_cap_attr_create_string((char *)caps_helper_$CAPS_ID$.attr_$ATTR_NAME$.name,
         caps_data->$ATTR_NAME$_value, NULL);

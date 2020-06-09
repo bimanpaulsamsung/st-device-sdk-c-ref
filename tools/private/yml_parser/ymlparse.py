@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
 #!/usr/bin/env python2
+#-*- coding: utf-8 -*-
 
 import re
 import os
@@ -507,7 +507,7 @@ def make_helper_c_header_output(caps):
         if (attr.jsonSchema.enum_list):
             enum_string = ""
             for enum_value in attr.jsonSchema.enum_list:
-                enum_string = enum_string + "\""+enum_value.replace(" ","_")+"\", "
+                enum_string = enum_string + "\""+enum_value+"\", "
             output.write(    "        .values = {" + enum_string.rstrip(" ,") + "},\n")
 
         if (attr.unit_enum_list):
