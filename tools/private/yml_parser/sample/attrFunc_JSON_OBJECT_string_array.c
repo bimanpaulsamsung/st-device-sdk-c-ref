@@ -21,6 +21,11 @@ static void caps_$CAPS_ID$_set_$ATTR_NAME$_value(caps_$CAPS_ID$_data_t *caps_dat
         free(caps_data->$ATTR_NAME$_value);
     }
     caps_data->$ATTR_NAME$_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->$ATTR_NAME$_value) {
+        printf("fail to malloc for $ATTR_NAME$_value\n");
+        caps_data->$ATTR_NAME$_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->$ATTR_NAME$_value[i] = strdup(value[i]);
     }
