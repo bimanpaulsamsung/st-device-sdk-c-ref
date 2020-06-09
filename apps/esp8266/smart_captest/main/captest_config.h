@@ -19,6 +19,9 @@
  //config the capabilities wanted to test here. default use template
 #define CAPTEST_SUPPORT_TEMPLATE	0
 
+#define CAPTEST_SUPPORT_FAILED_UI	1
+//#define CAPTEST_SUPPORT_FAILED_EVENT	1
+//#define CAPTEST_SUPPORT_FAILED_COMMAND	1
 //#define CAPTEST_SUPPORT_PREFIX_A	1
 //#define CAPTEST_SUPPORT_PREFIX_B	1
 //#define CAPTEST_SUPPORT_PREFIX_C	1
@@ -37,7 +40,7 @@
 //#define CAPTEST_SUPPORT_PREFIX_T	1
 //#define CAPTEST_SUPPORT_PREFIX_U	1
 //#define CAPTEST_SUPPORT_PREFIX_V	1
-#define CAPTEST_SUPPORT_PREFIX_W	1
+//#define CAPTEST_SUPPORT_PREFIX_W	1
 //#define CAPTEST_SUPPORT_PREFIX_Z	1
  
 #if CAPTEST_SUPPORT_PREFIX_A
@@ -178,6 +181,20 @@
 
 #define custom_captest_init		captest_z_initialize
 #define custom_send_capabilities	send_z_test_capabilities
+
+#elif CAPTEST_SUPPORT_FAILED_UI
+ extern void captest_failed_ui_initialize(IOT_CTX *ctx);
+ extern void send_failed_ui_test_capabilities(void);
+
+#define custom_captest_init		captest_failed_ui_initialize
+#define custom_send_capabilities	send_failed_ui_test_capabilities
+
+#elif CAPTEST_SUPPORT_FAILED_EVENT
+ extern void captest_failed_event_initialize(IOT_CTX *ctx);
+ extern void send_failed_event_test_capabilities(void);
+
+#define custom_captest_init		captest_failed_event_initialize
+#define custom_send_capabilities	send_failed_event_test_capabilities
 
 #else
 
