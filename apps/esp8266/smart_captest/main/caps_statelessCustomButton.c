@@ -46,6 +46,11 @@ static void caps_statelessCustomButton_set_availableCustomButtons_value(caps_sta
         free(caps_data->availableCustomButtons_value);
     }
     caps_data->availableCustomButtons_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->availableCustomButtons_value) {
+        printf("fail to malloc for availableCustomButtons_value\n");
+        caps_data->availableCustomButtons_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->availableCustomButtons_value[i] = strdup(value[i]);
     }

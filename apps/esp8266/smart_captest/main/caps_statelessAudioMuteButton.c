@@ -46,6 +46,11 @@ static void caps_statelessAudioMuteButton_set_availableAudioMuteButtons_value(ca
         free(caps_data->availableAudioMuteButtons_value);
     }
     caps_data->availableAudioMuteButtons_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->availableAudioMuteButtons_value) {
+        printf("fail to malloc for availableAudioMuteButtons_value\n");
+        caps_data->availableAudioMuteButtons_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->availableAudioMuteButtons_value[i] = strdup(value[i]);
     }

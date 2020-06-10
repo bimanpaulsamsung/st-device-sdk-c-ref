@@ -46,6 +46,11 @@ static void caps_statelessChannelButton_set_availableChannelButtons_value(caps_s
         free(caps_data->availableChannelButtons_value);
     }
     caps_data->availableChannelButtons_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->availableChannelButtons_value) {
+        printf("fail to malloc for availableChannelButtons_value\n");
+        caps_data->availableChannelButtons_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->availableChannelButtons_value[i] = strdup(value[i]);
     }

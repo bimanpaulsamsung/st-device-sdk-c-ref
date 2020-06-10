@@ -46,6 +46,11 @@ static void caps_statelessPowerButton_set_availablePowerButtons_value(caps_state
         free(caps_data->availablePowerButtons_value);
     }
     caps_data->availablePowerButtons_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->availablePowerButtons_value) {
+        printf("fail to malloc for availablePowerButtons_value\n");
+        caps_data->availablePowerButtons_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->availablePowerButtons_value[i] = strdup(value[i]);
     }

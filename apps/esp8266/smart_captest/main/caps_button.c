@@ -46,6 +46,11 @@ static void caps_button_set_supportedButtonValues_value(caps_button_data_t *caps
         free(caps_data->supportedButtonValues_value);
     }
     caps_data->supportedButtonValues_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedButtonValues_value) {
+        printf("fail to malloc for supportedButtonValues_value\n");
+        caps_data->supportedButtonValues_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedButtonValues_value[i] = strdup(value[i]);
     }

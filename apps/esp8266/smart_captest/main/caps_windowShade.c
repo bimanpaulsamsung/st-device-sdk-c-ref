@@ -110,6 +110,11 @@ static void caps_windowShade_set_supportedWindowShadeCommands_value(caps_windowS
         free(caps_data->supportedWindowShadeCommands_value);
     }
     caps_data->supportedWindowShadeCommands_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedWindowShadeCommands_value) {
+        printf("fail to malloc for supportedWindowShadeCommands_value\n");
+        caps_data->supportedWindowShadeCommands_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedWindowShadeCommands_value[i] = strdup(value[i]);
     }

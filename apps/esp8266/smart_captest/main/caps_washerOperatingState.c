@@ -162,6 +162,11 @@ static void caps_washerOperatingState_set_supportedMachineStates_value(caps_wash
         free(caps_data->supportedMachineStates_value);
     }
     caps_data->supportedMachineStates_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedMachineStates_value) {
+        printf("fail to malloc for supportedMachineStates_value\n");
+        caps_data->supportedMachineStates_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedMachineStates_value[i] = strdup(value[i]);
     }

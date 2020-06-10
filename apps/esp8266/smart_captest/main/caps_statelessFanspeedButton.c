@@ -46,6 +46,11 @@ static void caps_statelessFanspeedButton_set_availableFanspeedButtons_value(caps
         free(caps_data->availableFanspeedButtons_value);
     }
     caps_data->availableFanspeedButtons_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->availableFanspeedButtons_value) {
+        printf("fail to malloc for availableFanspeedButtons_value\n");
+        caps_data->availableFanspeedButtons_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->availableFanspeedButtons_value[i] = strdup(value[i]);
     }

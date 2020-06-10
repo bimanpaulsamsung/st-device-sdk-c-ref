@@ -46,6 +46,11 @@ static void caps_mediaPlayback_set_supportedPlaybackCommands_value(caps_mediaPla
         free(caps_data->supportedPlaybackCommands_value);
     }
     caps_data->supportedPlaybackCommands_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedPlaybackCommands_value) {
+        printf("fail to malloc for supportedPlaybackCommands_value\n");
+        caps_data->supportedPlaybackCommands_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedPlaybackCommands_value[i] = strdup(value[i]);
     }

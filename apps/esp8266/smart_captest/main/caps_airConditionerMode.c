@@ -98,6 +98,11 @@ static void caps_airConditionerMode_set_supportedAcModes_value(caps_airCondition
         free(caps_data->supportedAcModes_value);
     }
     caps_data->supportedAcModes_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedAcModes_value) {
+        printf("fail to malloc for supportedAcModes_value\n");
+        caps_data->supportedAcModes_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedAcModes_value[i] = strdup(value[i]);
     }

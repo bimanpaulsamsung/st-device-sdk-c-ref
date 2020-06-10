@@ -46,6 +46,11 @@ static void caps_statelessTemperatureButton_set_availableTemperatureButtons_valu
         free(caps_data->availableTemperatureButtons_value);
     }
     caps_data->availableTemperatureButtons_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->availableTemperatureButtons_value) {
+        printf("fail to malloc for availableTemperatureButtons_value\n");
+        caps_data->availableTemperatureButtons_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->availableTemperatureButtons_value[i] = strdup(value[i]);
     }

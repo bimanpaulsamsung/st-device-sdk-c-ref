@@ -46,6 +46,11 @@ static void caps_mediaTrackControl_set_supportedTrackControlCommands_value(caps_
         free(caps_data->supportedTrackControlCommands_value);
     }
     caps_data->supportedTrackControlCommands_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedTrackControlCommands_value) {
+        printf("fail to malloc for supportedTrackControlCommands_value\n");
+        caps_data->supportedTrackControlCommands_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedTrackControlCommands_value[i] = strdup(value[i]);
     }

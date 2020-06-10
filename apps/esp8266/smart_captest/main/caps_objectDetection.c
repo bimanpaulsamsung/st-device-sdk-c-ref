@@ -102,6 +102,11 @@ static void caps_objectDetection_set_supportedValues_value(caps_objectDetection_
         free(caps_data->supportedValues_value);
     }
     caps_data->supportedValues_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedValues_value) {
+        printf("fail to malloc for supportedValues_value\n");
+        caps_data->supportedValues_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedValues_value[i] = strdup(value[i]);
     }

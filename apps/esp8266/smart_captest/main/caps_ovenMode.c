@@ -46,6 +46,11 @@ static void caps_ovenMode_set_supportedOvenModes_value(caps_ovenMode_data_t *cap
         free(caps_data->supportedOvenModes_value);
     }
     caps_data->supportedOvenModes_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedOvenModes_value) {
+        printf("fail to malloc for supportedOvenModes_value\n");
+        caps_data->supportedOvenModes_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedOvenModes_value[i] = strdup(value[i]);
     }

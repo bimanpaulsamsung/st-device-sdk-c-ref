@@ -46,6 +46,11 @@ static void caps_statelessAudioVolumeButton_set_availableAudioVolumeButtons_valu
         free(caps_data->availableAudioVolumeButtons_value);
     }
     caps_data->availableAudioVolumeButtons_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->availableAudioVolumeButtons_value) {
+        printf("fail to malloc for availableAudioVolumeButtons_value\n");
+        caps_data->availableAudioVolumeButtons_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->availableAudioVolumeButtons_value[i] = strdup(value[i]);
     }

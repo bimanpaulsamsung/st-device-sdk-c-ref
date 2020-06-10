@@ -110,6 +110,11 @@ static void caps_mediaInputSource_set_supportedInputSources_value(caps_mediaInpu
         free(caps_data->supportedInputSources_value);
     }
     caps_data->supportedInputSources_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedInputSources_value) {
+        printf("fail to malloc for supportedInputSources_value\n");
+        caps_data->supportedInputSources_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedInputSources_value[i] = strdup(value[i]);
     }

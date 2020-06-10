@@ -110,6 +110,11 @@ static void caps_thermostatMode_set_supportedThermostatModes_value(caps_thermost
         free(caps_data->supportedThermostatModes_value);
     }
     caps_data->supportedThermostatModes_value = malloc(sizeof(char *) * arraySize);
+    if (!caps_data->supportedThermostatModes_value) {
+        printf("fail to malloc for supportedThermostatModes_value\n");
+        caps_data->supportedThermostatModes_arraySize = 0;
+        return;
+    }
     for (i = 0; i < arraySize; i++) {
         caps_data->supportedThermostatModes_value[i] = strdup(value[i]);
     }
