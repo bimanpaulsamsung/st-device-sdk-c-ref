@@ -1340,11 +1340,12 @@ static void _cli_cmd_get_log_dump(char *string)
 	size_t size = 2048;
 	size_t written_size = 0;
 	int ret;
+	int mode = IOT_DUMP_MODE_NEED_BASE64 | IOT_DUMP_MODE_NEED_DUMP_STATE;
 
 	if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
 		size = strtol(buf, NULL, 10);
 	}
-	ret = iot_dump_create_all_log_dump((struct iot_context *)ctx, &log, size, &written_size, true);
+	ret = iot_dump_create_all_log_dump((struct iot_context *)ctx, &log, size, &written_size, mode);
 	if (ret < 0) {
 		printf("Fail to get log dump!\n");
 		return;
