@@ -1,0 +1,80 @@
+From 526ae5f2f8d5bfd3daa897da131607d791d747a3 Mon Sep 17 00:00:00 2001
+From: "hong.ye" <52810083+hongye-samsung@users.noreply.github.com>
+Date: Thu, 11 Jun 2020 16:31:54 +0800
+Subject: [PATCH] Increase stack size for app_main & add app configuration
+
+Signed-off-by: hong.ye <52810083+hongye-samsung@users.noreply.github.com>
+---
+ examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk       | 4 +++-
+ examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c | 8 ++++----
+ examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile        | 1 -
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk b/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
+index cce2137..b15ae2c 100644
+--- a/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
+@@ -2,6 +2,8 @@
+ # Config
+ ########################################
+ 
++include $(PROJECT_PATH)/usr_config.mk
++
+ #/* For STDK */
+ CONFIG_STDK_IOT_CORE=y
+ CONFIG_STDK_IOT_CORE_NET_MBEDTLS=y
+@@ -51,4 +53,4 @@ ifeq ($(CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS),y)
+ CFLAGS += -DCONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS
+ endif
+ 
+-CFLAGS += -DCONFIG_STDK_IOT_CORE_USE_MBEDTLS
+\ No newline at end of file
++CFLAGS += -DCONFIG_STDK_IOT_CORE_USE_MBEDTLS
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c
+index 1b678e6..d6e1d7d 100644
+--- a/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c
+@@ -55,7 +55,7 @@
+ extern void app_main(void);
+ 
+ /* Stack size in 16-bit words */
+-#define THREADSTACKSIZE    768 / sizeof(portSTACK_TYPE)
++#define THREADSTACKSIZE  (2048)
+ #define SPAWN_TASK_PRIORITY (9)
+ #define SPAWN_STACK_SIZE (2048)
+ 
+@@ -100,8 +100,8 @@ static iot_error_t iot_bsp_env_init()
+ 	retc = xTaskCreate((TaskFunction_t)_sl_task_stub,	// pvTaskCode
+ 						"_sl_task_stub", 				// pcName
+ 						SPAWN_STACK_SIZE / sizeof(portSTACK_TYPE),	// usStackDepth
+-						NULL,							// pvParameters
+-						SPAWN_TASK_PRIORITY,			// uxPriority
++						NULL,						// pvParameters
++						SPAWN_TASK_PRIORITY,				// uxPriority
+ 						&stdkHandle);					// pxCreatedTask
+ 	if (retc == pdPASS) {
+ 		vTaskSetApplicationTaskTag(stdkHandle,
+@@ -157,7 +157,7 @@ int main(void)
+ 
+ 	retc = xTaskCreate((TaskFunction_t)user_init_entry,   // pvTaskCode
+ 						"user_init_entry",                 // pcName
+-						THREADSTACKSIZE,                   // usStackDepth
++						THREADSTACKSIZE / sizeof(portSTACK_TYPE),                   // usStackDepth
+ 						NULL,                              // pvParameters
+ 						2,                                 // uxPriority
+ 						&stdkHandle);                      // pxCreatedTask
+diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile b/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile
+index 3e3f8fa..cd3079c 100644
+--- a/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile
++++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile
+@@ -37,7 +37,6 @@ CFLAGS += -I../.. \
+     "-I$(GCC_ARMCOMPILER)/arm-none-eabi/include/newlib-nano" \
+     "-I$(GCC_ARMCOMPILER)/arm-none-eabi/include" \
+     "-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/drivers/utils"
+-    #"-I$(SIMPLELINK_CC32XX_SDK_INSTALL_DIR)/source/ti/posix/gcc/"
+ 
+ ifneq ($(CONFIG_STDK_IOT_CORE_USE_LWIP),y)
+ CFLAGS +="-D__unix__"
+-- 
+2.7.4
+
