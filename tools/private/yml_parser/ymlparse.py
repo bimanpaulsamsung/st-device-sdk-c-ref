@@ -17,16 +17,16 @@ ATTR_NO_INFO_OK_LIST = ["windowShadePreset", "windowShade", "videoCamera", "medi
                         "statelessPowerToggleButton", "statelessAudioVolumeButton", "statelessCustomButton", "statelessChannelButton", "statelessTemperatureButton",
                         "statelessFanspeedButton", "refresh", "tone", "notification", "healthCheck", "audioVolume", "videoStream", "tvChannel", "ovenOperatingState",
                         "audioNotification", "mediaPresets", "videoCapture", ]
-
-STDK_REF_PATH = os.getcwd() + "/../../../"
+PARSE_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
+STDK_REF_PATH = PARSE_FILE_PATH + "/../../../"
 STC_PATH = STDK_REF_PATH + "../SmartThingsCapabilities/"
 YAML_PATH = STC_PATH + "capabilities/"
 HELPER_OUTPUT_PATH = STDK_REF_PATH + "apps/esp8266/smart_captest/main/caps/"
 CAPS_OUTPUT_PATH = STDK_REF_PATH + "apps/esp8266/smart_captest/main/"
-SAMPLE_C_PATH = os.getcwd() + "/sample/"
+SAMPLE_C_PATH = os.path.dirname(os.path.abspath(__file__)) + "/sample/"
 
-COPYRIGHT_FILE_PATH = os.getcwd() + "/COPYRIGHT"
-CAP_LIST_FILE_PATH =  os.getcwd() + "/caps_id_list.txt"
+COPYRIGHT_FILE_PATH = PARSE_FILE_PATH + "/COPYRIGHT"
+CAP_LIST_FILE_PATH =  PARSE_FILE_PATH + "/caps_id_list.txt"
 
 ENUM_PREFIX = "CAP_ENUM_"
 
@@ -204,10 +204,6 @@ def preproc_caps(caps):
 
     for attr in caps.attr_list:
     # exception:
-        # no enum print for "supported" attribute because they use other attribute's datatype.
-        if (attr.name[:len("supported")] == "supported"):
-            attr.jsonSchema.enum_list = []
-
         # if there is no MIN value, forcely set min value for init value.
         if (attr.jsonSchema.type in ["interger", "number"] and not attr.jsonSchema.min):
             print("WARN : no MIN value! //caps.id : " + caps.id + ", attr.name : " + attr.name)
@@ -432,6 +428,9 @@ def make_helper_c_header_output(caps):
     already_check_value_type = []
     for attr in caps.attr_list:
         if attr.jsonSchema.enum_list:
+            if attr.name[:len("supported")] == "supported":
+                output.write("#define " + (ENUM_PREFIX + caps.id + "_" + attr.name + "_VALUE_MAX ").upper() + str(len(attr.jsonSchema.enum_list)) + "\n")
+                continue
             if attr.jsonSchema.title and attr.jsonSchema.title in already_check_value_type:
                 continue
             already_check_value_type.append(attr.jsonSchema.title)
