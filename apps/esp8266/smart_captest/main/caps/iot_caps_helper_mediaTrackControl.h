@@ -21,12 +21,14 @@
 
 #include "iot_caps_helper.h"
 
+#define CAP_ENUM_MEDIATRACKCONTROL_SUPPORTEDTRACKCONTROLCOMMANDS_VALUE_MAX 2
 const static struct iot_caps_mediaTrackControl {
     const char *id;
     const struct mediaTrackControl_attr_supportedTrackControlCommands {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_MEDIATRACKCONTROL_SUPPORTEDTRACKCONTROLCOMMANDS_VALUE_MAX];
     } attr_supportedTrackControlCommands;
     const struct mediaTrackControl_cmd_nextTrack { const char* name; } cmd_nextTrack;
     const struct mediaTrackControl_cmd_previousTrack { const char* name; } cmd_previousTrack;
@@ -36,6 +38,7 @@ const static struct iot_caps_mediaTrackControl {
         .name = "supportedTrackControlCommands",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"previousTrack", "nextTrack"},
     },
     .cmd_nextTrack = { .name = "nextTrack" },
     .cmd_previousTrack = { .name = "previousTrack" },

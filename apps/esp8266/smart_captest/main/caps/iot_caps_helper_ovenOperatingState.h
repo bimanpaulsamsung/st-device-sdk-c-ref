@@ -32,6 +32,7 @@ enum {
     CAP_ENUM_OVENOPERATINGSTATE_OVENJOBSTATE_VALUE_MAX
 };
 
+#define CAP_ENUM_OVENOPERATINGSTATE_SUPPORTEDMACHINESTATES_VALUE_MAX 3
 enum {
     CAP_ENUM_OVENOPERATINGSTATE_MACHINESTATE_VALUE_READY,
     CAP_ENUM_OVENOPERATINGSTATE_MACHINESTATE_VALUE_RUNNING,
@@ -61,6 +62,7 @@ const static struct iot_caps_ovenOperatingState {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_OVENOPERATINGSTATE_SUPPORTEDMACHINESTATES_VALUE_MAX];
     } attr_supportedMachineStates;
     const struct ovenOperatingState_attr_progress {
         const char *name;
@@ -102,6 +104,7 @@ const static struct iot_caps_ovenOperatingState {
         .name = "supportedMachineStates",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"ready", "running", "paused"},
     },
     .attr_progress = {
         .name = "progress",

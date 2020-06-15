@@ -21,6 +21,7 @@
 
 #include "iot_caps_helper.h"
 
+#define CAP_ENUM_DRYEROPERATINGSTATE_SUPPORTEDMACHINESTATES_VALUE_MAX 3
 enum {
     CAP_ENUM_DRYEROPERATINGSTATE_MACHINESTATE_VALUE_PAUSE,
     CAP_ENUM_DRYEROPERATINGSTATE_MACHINESTATE_VALUE_RUN,
@@ -50,6 +51,7 @@ const static struct iot_caps_dryerOperatingState {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_DRYEROPERATINGSTATE_SUPPORTEDMACHINESTATES_VALUE_MAX];
     } attr_supportedMachineStates;
     const struct dryerOperatingState_attr_machineState {
         const char *name;
@@ -75,6 +77,7 @@ const static struct iot_caps_dryerOperatingState {
         .name = "supportedMachineStates",
         .property = ATTR_SET_VALUE_REQUIRED | ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"pause", "run", "stop"},
     },
     .attr_machineState = {
         .name = "machineState",

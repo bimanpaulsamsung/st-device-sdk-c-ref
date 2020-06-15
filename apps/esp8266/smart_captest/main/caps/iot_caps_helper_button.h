@@ -21,6 +21,7 @@
 
 #include "iot_caps_helper.h"
 
+#define CAP_ENUM_BUTTON_SUPPORTEDBUTTONVALUES_VALUE_MAX 22
 enum {
     CAP_ENUM_BUTTON_BUTTON_VALUE_PUSHED,
     CAP_ENUM_BUTTON_BUTTON_VALUE_HELD,
@@ -53,6 +54,7 @@ const static struct iot_caps_button {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_BUTTON_SUPPORTEDBUTTONVALUES_VALUE_MAX];
     } attr_supportedButtonValues;
     const struct button_attr_button {
         const char *name;
@@ -72,6 +74,7 @@ const static struct iot_caps_button {
         .name = "supportedButtonValues",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"pushed", "held", "double", "pushed_2x", "pushed_3x", "pushed_4x", "pushed_5x", "pushed_6x", "down", "down_2x", "down_3x", "down_4x", "down_5x", "down_6x", "down_hold", "up", "up_2x", "up_3x", "up_4x", "up_5x", "up_6x", "up_hold"},
     },
     .attr_button = {
         .name = "button",

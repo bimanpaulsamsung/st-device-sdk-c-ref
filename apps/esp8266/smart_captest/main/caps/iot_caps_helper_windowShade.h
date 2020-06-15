@@ -31,6 +31,7 @@ enum {
     CAP_ENUM_WINDOWSHADE_WINDOWSHADE_VALUE_MAX
 };
 
+#define CAP_ENUM_WINDOWSHADE_SUPPORTEDWINDOWSHADECOMMANDS_VALUE_MAX 3
 const static struct iot_caps_windowShade {
     const char *id;
     const struct windowShade_attr_windowShade {
@@ -43,6 +44,7 @@ const static struct iot_caps_windowShade {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_WINDOWSHADE_SUPPORTEDWINDOWSHADECOMMANDS_VALUE_MAX];
     } attr_supportedWindowShadeCommands;
     const struct windowShade_cmd_close { const char* name; } cmd_close;
     const struct windowShade_cmd_pause { const char* name; } cmd_pause;
@@ -59,6 +61,7 @@ const static struct iot_caps_windowShade {
         .name = "supportedWindowShadeCommands",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"open", "close", "pause"},
     },
     .cmd_close = { .name = "close" },
     .cmd_pause = { .name = "pause" },

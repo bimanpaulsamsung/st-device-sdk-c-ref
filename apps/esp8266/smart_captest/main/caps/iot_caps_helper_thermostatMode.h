@@ -62,6 +62,7 @@ enum {
     CAP_ENUM_THERMOSTATMODE_THERMOSTATMODE_VALUE_MAX
 };
 
+#define CAP_ENUM_THERMOSTATMODE_SUPPORTEDTHERMOSTATMODES_VALUE_MAX 37
 const static struct iot_caps_thermostatMode {
     const char *id;
     const struct thermostatMode_attr_thermostatMode {
@@ -74,6 +75,7 @@ const static struct iot_caps_thermostatMode {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_THERMOSTATMODE_SUPPORTEDTHERMOSTATMODES_VALUE_MAX];
     } attr_supportedThermostatModes;
     const struct thermostatMode_cmd_heat { const char* name; } cmd_heat;
     const struct thermostatMode_cmd_emergencyHeat { const char* name; } cmd_emergencyHeat;
@@ -93,6 +95,7 @@ const static struct iot_caps_thermostatMode {
         .name = "supportedThermostatModes",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"asleep", "auto", "autowitheco", "autowithreset", "autochangeover", "autochangeoveractive", "autocool", "autoheat", "auxheatonly", "auxiliaryemergencyheat", "away", "cool", "custom", "dayoff", "dryair", "eco", "emergency heat", "emergencyheat", "emergencyheatactive", "energysavecool", "energysaveheat", "fanonly", "frostguard", "furnace", "heat", "heatingoff", "home", "in", "manual", "moistair", "off", "out", "resume", "rush hour", "rushhour", "schedule", "southernaway"},
     },
     .cmd_heat = { .name = "heat" },
     .cmd_emergencyHeat = { .name = "emergencyHeat" },

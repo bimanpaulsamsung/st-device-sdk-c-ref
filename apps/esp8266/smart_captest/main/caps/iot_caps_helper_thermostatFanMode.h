@@ -29,6 +29,7 @@ enum {
     CAP_ENUM_THERMOSTATFANMODE_THERMOSTATFANMODE_VALUE_MAX
 };
 
+#define CAP_ENUM_THERMOSTATFANMODE_SUPPORTEDTHERMOSTATFANMODES_VALUE_MAX 4
 const static struct iot_caps_thermostatFanMode {
     const char *id;
     const struct thermostatFanMode_attr_thermostatFanMode {
@@ -41,6 +42,7 @@ const static struct iot_caps_thermostatFanMode {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_THERMOSTATFANMODE_SUPPORTEDTHERMOSTATFANMODES_VALUE_MAX];
     } attr_supportedThermostatFanModes;
     const struct thermostatFanMode_cmd_fanOn { const char* name; } cmd_fanOn;
     const struct thermostatFanMode_cmd_fanCirculate { const char* name; } cmd_fanCirculate;
@@ -58,6 +60,7 @@ const static struct iot_caps_thermostatFanMode {
         .name = "supportedThermostatFanModes",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"auto", "circulate", "followschedule", "on"},
     },
     .cmd_fanOn = { .name = "fanOn" },
     .cmd_fanCirculate = { .name = "fanCirculate" },

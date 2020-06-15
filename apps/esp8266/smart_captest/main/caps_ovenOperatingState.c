@@ -397,25 +397,16 @@ static void caps_ovenOperatingState_cmd_stop_cb(IOT_CAP_HANDLE *handle, iot_cap_
         caps_data->cmd_stop_usr_cb(caps_data);
 }
 
-static void caps_ovenOperatingState_cmd_setMachineState_cb(IOT_CAP_HANDLE *handle, iot_cap_cmd_data_t *cmd_data, void *usr_data)
+static void caps_ovenOperatingState_cmd_setMachineState_cb(IOT_CAP_HANDLE *handle,
+        iot_cap_cmd_data_t *cmd_data, void *usr_data)
 {
-    caps_ovenOperatingState_data_t *caps_data = (caps_ovenOperatingState_data_t *)usr_data;
-    char *value;
-    int index;
+    caps_ovenOperatingState_data_t *caps_data = usr_data;
 
-    printf("called [%s] func with num_args:%u\n", __func__, cmd_data->num_args);
+    printf("called [%s] func with : num_args:%u\n", __func__, cmd_data->num_args);
+    caps_data->cmd_data = cmd_data;
 
-    index = caps_ovenOperatingState_attr_machineState_str2idx(cmd_data->cmd_data[0].string);
-    if (index < 0) {
-        printf("%s is not supported value for setMachineState\n", cmd_data->cmd_data[0].string);
-        return;
-    }
-    value = (char *)caps_helper_ovenOperatingState.attr_machineState.values[index];
-
-    caps_ovenOperatingState_set_machineState_value(caps_data, value);
     if (caps_data && caps_data->cmd_setMachineState_usr_cb)
         caps_data->cmd_setMachineState_usr_cb(caps_data);
-    caps_ovenOperatingState_attr_machineState_send(caps_data);
 }
 
 static void caps_ovenOperatingState_init_cb(IOT_CAP_HANDLE *handle, void *usr_data)

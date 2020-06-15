@@ -21,6 +21,7 @@
 
 #include "iot_caps_helper.h"
 
+#define CAP_ENUM_OVENMODE_SUPPORTEDOVENMODES_VALUE_MAX 26
 enum {
     CAP_ENUM_OVENMODE_OVENMODE_VALUE_HEATING,
     CAP_ENUM_OVENMODE_OVENMODE_VALUE_GRILL,
@@ -57,6 +58,7 @@ const static struct iot_caps_ovenMode {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_OVENMODE_SUPPORTEDOVENMODES_VALUE_MAX];
     } attr_supportedOvenModes;
     const struct ovenMode_attr_ovenMode {
         const char *name;
@@ -71,6 +73,7 @@ const static struct iot_caps_ovenMode {
         .name = "supportedOvenModes",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"heating", "grill", "warming", "defrosting", "Conventional", "Bake", "BottomHeat", "ConvectionBake", "ConvectionRoast", "Broil", "ConvectionBroil", "SteamCook", "SteamBake", "SteamRoast", "SteamBottomHeatplusConvection", "Microwave", "MWplusGrill", "MWplusConvection", "MWplusHotBlast", "MWplusHotBlast2", "SlimMiddle", "SlimStrong", "SlowCook", "Proof", "Dehydrate", "Others"},
     },
     .attr_ovenMode = {
         .name = "ovenMode",

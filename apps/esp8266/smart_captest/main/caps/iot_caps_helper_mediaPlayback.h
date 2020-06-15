@@ -21,6 +21,7 @@
 
 #include "iot_caps_helper.h"
 
+#define CAP_ENUM_MEDIAPLAYBACK_SUPPORTEDPLAYBACKCOMMANDS_VALUE_MAX 5
 enum {
     CAP_ENUM_MEDIAPLAYBACK_PLAYBACKSTATUS_VALUE_PAUSED,
     CAP_ENUM_MEDIAPLAYBACK_PLAYBACKSTATUS_VALUE_PLAYING,
@@ -36,6 +37,7 @@ const static struct iot_caps_mediaPlayback {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_MEDIAPLAYBACK_SUPPORTEDPLAYBACKCOMMANDS_VALUE_MAX];
     } attr_supportedPlaybackCommands;
     const struct mediaPlayback_attr_playbackStatus {
         const char *name;
@@ -55,6 +57,7 @@ const static struct iot_caps_mediaPlayback {
         .name = "supportedPlaybackCommands",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"pause", "play", "stop", "fastForward", "rewind"},
     },
     .attr_playbackStatus = {
         .name = "playbackStatus",

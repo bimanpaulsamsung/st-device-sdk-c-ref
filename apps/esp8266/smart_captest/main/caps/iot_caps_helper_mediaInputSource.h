@@ -43,6 +43,7 @@ enum {
     CAP_ENUM_MEDIAINPUTSOURCE_INPUTSOURCE_VALUE_MAX
 };
 
+#define CAP_ENUM_MEDIAINPUTSOURCE_SUPPORTEDINPUTSOURCES_VALUE_MAX 18
 const static struct iot_caps_mediaInputSource {
     const char *id;
     const struct mediaInputSource_attr_inputSource {
@@ -55,6 +56,7 @@ const static struct iot_caps_mediaInputSource {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_MEDIAINPUTSOURCE_SUPPORTEDINPUTSOURCES_VALUE_MAX];
     } attr_supportedInputSources;
     const struct mediaInputSource_cmd_setInputSource { const char* name; } cmd_setInputSource;
 } caps_helper_mediaInputSource = {
@@ -69,6 +71,7 @@ const static struct iot_caps_mediaInputSource {
         .name = "supportedInputSources",
         .property = ATTR_SET_VALUE_REQUIRED | ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"AM", "CD", "FM", "HDMI", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "digitalTv", "USB", "YouTube", "aux", "bluetooth", "digital", "melon", "wifi"},
     },
     .cmd_setInputSource = { .name = "setInputSource" }, // arguments: mode(string) 
 };

@@ -28,6 +28,7 @@ enum {
     CAP_ENUM_WASHEROPERATINGSTATE_MACHINESTATE_VALUE_MAX
 };
 
+#define CAP_ENUM_WASHEROPERATINGSTATE_SUPPORTEDMACHINESTATES_VALUE_MAX 3
 enum {
     CAP_ENUM_WASHEROPERATINGSTATE_WASHERJOBSTATE_VALUE_AIRWASH,
     CAP_ENUM_WASHEROPERATINGSTATE_WASHERJOBSTATE_VALUE_COOLING,
@@ -61,6 +62,7 @@ const static struct iot_caps_washerOperatingState {
         const char *name;
         const unsigned char property;
         const unsigned char value_type;
+        const char *values[CAP_ENUM_WASHEROPERATINGSTATE_SUPPORTEDMACHINESTATES_VALUE_MAX];
     } attr_supportedMachineStates;
     const struct washerOperatingState_attr_washerJobState {
         const char *name;
@@ -86,6 +88,7 @@ const static struct iot_caps_washerOperatingState {
         .name = "supportedMachineStates",
         .property = ATTR_SET_VALUE_ARRAY,
         .value_type = VALUE_TYPE_STRING,
+        .values = {"pause", "run", "stop"},
     },
     .attr_washerJobState = {
         .name = "washerJobState",
