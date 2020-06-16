@@ -1,120 +1,78 @@
-Acceleration Sensor
-Activity Lighting Mode
-Air Conditioner Mode
-Air Quality Sensor
-Alarm
-Audio Mute
-Audio Notification
-Audio Stream
-Audio Track Data
-Audio Volume
-Battery
-Body Mass Index Measurement
-Body Weight Measurement
-Button
-Bypassable
-Carbon Dioxide Measurement
-Carbon Monoxide Detector
-Carbon Monoxide Measurement
-Color Control
-Color Temperature
-Configuration
-Contact Sensor
-Dishwasher Operating State
-Door Control
-Dryer Mode
-Dryer Operating State
-Dust Sensor
-Elevator Call
-Energy Meter
-Equivalent Carbon Dioxide Measurement
-Execute
-Fan Oscillation Mode
-Fan Speed
-Filter State
-Filter Status
-Fine Dust Sensor
-Firmware Update
-Formaldehyde Measurement
-Garage Door Control
-Gas Meter
-Health Check
-Illuminance Measurement
-Image Capture
-Infrared Level
-Location Mode
-Lock
-Media Input Source
-Media Playback
-Media Playback Repeat
-Media Playback Shuffle
-Media Presets
-Media Track Control
-Momentary
-Motion Sensor
-Network Meter
-Notification
-Object Detection
-Odor Sensor
-Oven Mode
-Oven Operating State
-Oven Setpoint
-Panic Alarm
-pH Measurement
-Power Meter
-Power Source
-Presence Sensor
-Rapid Cooling
-Refresh
-Refrigeration
-Refrigeration Setpoint
-Relative Humidity Measurement
-Remote Control Status
-Robot Cleaner Cleaning Mode
-Robot Cleaner Movement
-Robot Cleaner Turbo Mode
-Samsung TV
-Security System
-Signal Strength
-Sleep Sensor
-Smoke Detector
-Sound Pressure Level
-Sound Sensor
-Stateless Audio Mute Button
-Stateless Audio Volume Button
-Stateless Channel Button
-Stateless Custom Button
-Stateless Fanspeed Button
-Stateless Power Button
-Stateless Power Toggle Button
-Stateless Temperature Button
-Switch
-Switch Level
-Tamper Alert
-Temperature Alarm
-Temperature Measurement
-Test Capability
-Thermostat Cooling Setpoint
-Thermostat Fan Mode
-Thermostat Heating Setpoint
-Thermostat Mode
-Thermostat Operating State
-Thermostat Setpoint
-Three Axis
-Tone
-TV
-Tv Channel
-Tvoc Measurement
-Ultraviolet Index
-Valve
-Very Fine Dust Sensor
-Video Camera
-Video Capture
-Video Stream
-Voltage Measurement
-Washer Mode
-Washer Operating State
-Water Sensor
-Window Shade
-Window Shade Preset
-Zw Multichannel
+accelerationSensor
+activityLightingMode
+airQualitySensor
+alarm
+audioMute
+audioVolume
+battery
+bodyMassIndexMeasurement
+bodyWeightMeasurement
+button
+carbonDioxideMeasurement
+carbonMonoxideDetector
+carbonMonoxideMeasurement
+colorControl
+colorTemperature
+contactSensor
+dishwasherOperatingState
+doorControl
+dryerOperatingState
+dustSensor
+energyMeter
+equivalentCarbonDioxideMeasurement
+execute
+fanOscillationMode
+fanSpeed
+filterStatus
+fineDustSensor
+formaldehydeMeasurement
+garageDoorControl
+gasMeter
+illuminanceMeasurement
+imageCapture
+lock
+mediaInputSource
+mediaPlayback
+mediaPlaybackRepeat
+mediaPlaybackShuffle
+momentary
+motionSensor
+objectDetection
+odorSensor
+ovenOperatingState
+ovenSetpoint
+powerMeter
+powerSource
+presenceSensor
+rapidCooling
+refresh
+relativeHumidityMeasurement
+robotCleanerMovement
+robotCleanerTurboMode
+samsungTV
+securitySystem
+signalStrength
+sleepSensor
+smokeDetector
+soundPressureLevel
+soundSensor
+switch
+switchLevel
+tamperAlert
+temperatureAlarm
+temperatureMeasurement
+thermostatCoolingSetpoint
+thermostatFanMode
+thermostatHeatingSetpoint
+thermostatMode
+thermostatOperatingState
+thermostatSetpoint
+threeAxis
+tone
+tvocMeasurement
+ultravioletIndex
+valve
+veryFineDustSensor
+voltageMeasurement
+waterSensor
+windowShade
