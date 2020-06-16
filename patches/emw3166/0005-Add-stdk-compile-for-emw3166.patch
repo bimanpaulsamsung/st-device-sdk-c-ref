@@ -1,4 +1,4 @@
-From 915a40c07e869a5e1c732f8ca306fe335795147d Mon Sep 17 00:00:00 2001
+From caf73f911a06e306706c63e77befd511fe5b944a Mon Sep 17 00:00:00 2001
 From: "baojun.luo" <baojun.luo@samsung.com>
 Date: Wed, 15 Jan 2020 19:16:52 +0900
 Subject: [PATCH] Add stdk compile for emw3166
@@ -7,14 +7,14 @@ Signed-off-by: baojun.luo <baojun.luo@samsung.com>
 Signed-off-by: qin.li <qin.li@samsung.com>
 ---
  MiCO/MiCO.mk                                      |  6 ++-
- MiCO/iot_main.c                                   | 16 +++++++
- MiCO/mico_config.h                                | 16 +++++++
+ MiCO/iot_main.c                                   | 16 ++++++
+ MiCO/mico_config.h                                | 16 ++++++
  MiCO/system/system.mk                             |  2 +-
- makefiles/config.mk                               | 58 +++++++++++++++++++++++
+ makefiles/config.mk                               | 60 +++++++++++++++++++++++
  makefiles/mico_target_config.mk                   | 44 ++++++++++++++---
  makefiles/micoder_host_cmd.mk                     |  2 +-
- platform/MCU/STM32F4xx/peripherals/platform_rng.c | 16 ++++---
- 8 files changed, 144 insertions(+), 16 deletions(-)
+ platform/MCU/STM32F4xx/peripherals/platform_rng.c | 16 +++---
+ 8 files changed, 146 insertions(+), 16 deletions(-)
  create mode 100644 MiCO/iot_main.c
  create mode 100644 MiCO/mico_config.h
  create mode 100644 makefiles/config.mk
@@ -103,10 +103,10 @@ index 25755f8..b837867 100644
  $(NAME)_SOURCES += config_server/config_server_menu.c \
 diff --git a/makefiles/config.mk b/makefiles/config.mk
 new file mode 100644
-index 0000000..bbd0b65
+index 0000000..13011a2
 --- /dev/null
 +++ b/makefiles/config.mk
-@@ -0,0 +1,58 @@
+@@ -0,0 +1,60 @@
 +########################################
 +# Config
 +########################################
@@ -120,6 +120,7 @@ index 0000000..bbd0b65
 +CONFIG_STDK_IOT_CORE_BSP_SUPPORT_EMW3166=y
 +CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS=y
 +CONFIG_SAMSUNG_BUILD_ENG=y
++CONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG=y
 +
 +ifeq ($(CONFIG_STDK_IOT_CORE),y)
 +STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE
@@ -165,6 +166,7 @@ index 0000000..bbd0b65
 +endif
 +
 +STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519
++CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE=y
 diff --git a/makefiles/mico_target_config.mk b/makefiles/mico_target_config.mk
 old mode 100755
 new mode 100644

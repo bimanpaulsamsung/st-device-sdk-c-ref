@@ -1,4 +1,4 @@
-From 45b3a4ad3a85f2bb5da99ed71f065dfa12795970 Mon Sep 17 00:00:00 2001
+From 0d1e0d79f953750a4f168288a4c1a167c96cd0e9 Mon Sep 17 00:00:00 2001
 From: "qin.li" <qin.li@samsung.com>
 Date: Fri, 8 May 2020 14:52:07 +0800
 Subject: [PATCH] add building project and app entry
@@ -11,7 +11,7 @@ Subject: [PATCH] add building project and app entry
  .../lpc54018iotmodule/stdk/armgcc/build_debug.sh   |   4 +
  .../lpc54018iotmodule/stdk/armgcc/build_release.sh |   3 +
  boards/lpc54018iotmodule/stdk/armgcc/clean.sh      |   3 +
- boards/lpc54018iotmodule/stdk/armgcc/config.cmake  |  60 ++
+ boards/lpc54018iotmodule/stdk/armgcc/config.cmake  |  61 ++
  boards/lpc54018iotmodule/stdk/aws_wifi_config.h    |  80 ++
  boards/lpc54018iotmodule/stdk/board.c              | 227 ++++++
  boards/lpc54018iotmodule/stdk/board.h              | 232 ++++++
@@ -24,7 +24,7 @@ Subject: [PATCH] add building project and app entry
  boards/lpc54018iotmodule/stdk/stdk_freertos.xml    | 143 ++++
  middleware/wifi_qca/common_src/qapi/qcom_api.c     |  12 +-
  middleware/wifi_qca/qcom_api.h                     |  14 +-
- 20 files changed, 3165 insertions(+), 13 deletions(-)
+ 20 files changed, 3166 insertions(+), 13 deletions(-)
  create mode 100644 boards/lpc54018iotmodule/stdk/FreeRTOSConfig.h
  create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt
  create mode 100755 boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld
@@ -1349,10 +1349,10 @@ index 0000000..795ad87
 +rm -rf Makefile cmake_install.cmake CMakeCache.txt
 diff --git a/boards/lpc54018iotmodule/stdk/armgcc/config.cmake b/boards/lpc54018iotmodule/stdk/armgcc/config.cmake
 new file mode 100755
-index 0000000..72b7ceb
+index 0000000..a9ea9ae
 --- /dev/null
 +++ b/boards/lpc54018iotmodule/stdk/armgcc/config.cmake
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,61 @@
 +########################################
 +# Config
 +########################################
@@ -1367,6 +1367,7 @@ index 0000000..72b7ceb
 +option(CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP "httpd" on)
 +option(CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519 "ed25519" on)
 +option(CONFIG_SAMSUNG_BUILD_ENG "eng" on)
++option(CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE "security" on)
 +
 +
 +

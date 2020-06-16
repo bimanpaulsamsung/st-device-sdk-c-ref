@@ -1,17 +1,17 @@
-From 08f2a60170eca7ae23a95ef4bffaa726db2e2ac3 Mon Sep 17 00:00:00 2001
+From 90e7f3c24b5ef421c9443519b76376258f9569b5 Mon Sep 17 00:00:00 2001
 From: "qin.li" <qin.li@samsung.com>
 Date: Tue, 10 Mar 2020 17:39:01 +0800
 Subject: [PATCH] Enable stdk compile in emw3080, with MoCOS and MoCIP
 
 ---
  MiCO/MiCO.mk                                | 13 ++++---
- MiCO/iot_main.c                             | 17 +++++++++
+ MiCO/iot_main.c                             | 17 ++++++++
  MiCO/mico_config.h                          | 16 ++++++++
  MiCO/net/mbedtls/include/mbedtls/platform.h |  2 +-
  MiCO/net/mbedtls/library/platform.c         |  6 +--
  MiCO/net/mbedtls/port/net.c                 |  5 ++-
  MiCO/net/mbedtls/port/porting_layer.c       | 12 +++---
- MiCO/net/stdk/config.mk                     | 59 +++++++++++++++++++++++++++++
+ MiCO/net/stdk/config.mk                     | 60 +++++++++++++++++++++++++++++
  MiCO/net/stdk/stdk.mk                       | 20 ++++++++++
  MiCO/net/stdk/sys/socket.h                  | 18 +++++++++
  MiCO/system/system.mk                       |  2 +-
@@ -20,7 +20,7 @@ Subject: [PATCH] Enable stdk compile in emw3080, with MoCOS and MoCIP
  libraries/utilities/json_c/cJSON.c          |  2 +-
  makefiles/mico_target_config.mk             | 31 ++++++++++++---
  makefiles/micoder_host_cmd.mk               |  2 +-
- 16 files changed, 183 insertions(+), 28 deletions(-)
+ 16 files changed, 184 insertions(+), 28 deletions(-)
  create mode 100644 MiCO/iot_main.c
  create mode 100644 MiCO/mico_config.h
  create mode 100644 MiCO/net/stdk/config.mk
@@ -203,10 +203,10 @@ index aba0715..d169477 100644
  }
 diff --git a/MiCO/net/stdk/config.mk b/MiCO/net/stdk/config.mk
 new file mode 100644
-index 0000000..f79754d
+index 0000000..cbe9b23
 --- /dev/null
 +++ b/MiCO/net/stdk/config.mk
-@@ -0,0 +1,59 @@
+@@ -0,0 +1,60 @@
 +########################################
 +# Config
 +########################################
@@ -266,6 +266,7 @@ index 0000000..f79754d
 +
 +STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519
 +STDK_CFLAGS += -DCONFIG_SAMSUNG_RUN_TIME_STATS
++CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE=y
 diff --git a/MiCO/net/stdk/stdk.mk b/MiCO/net/stdk/stdk.mk
 new file mode 100644
 index 0000000..8a44c3d
