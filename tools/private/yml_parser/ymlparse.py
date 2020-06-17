@@ -21,8 +21,8 @@ PARSE_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 STDK_REF_PATH = PARSE_FILE_PATH + "/../../../"
 STC_PATH = STDK_REF_PATH + "../SmartThingsCapabilities/"
 YAML_PATH = STC_PATH + "capabilities/"
-HELPER_OUTPUT_PATH = STDK_REF_PATH + "apps/esp8266/smart_captest/main/caps/"
-CAPS_OUTPUT_PATH = STDK_REF_PATH + "apps/esp8266/smart_captest/main/"
+HELPER_OUTPUT_PATH = STDK_REF_PATH + "iot-core/src/include/caps/"
+CAPS_OUTPUT_PATH = STDK_REF_PATH + "apps/esp8266/capability_example/main/"
 SAMPLE_C_PATH = os.path.dirname(os.path.abspath(__file__)) + "/sample/"
 
 COPYRIGHT_FILE_PATH = PARSE_FILE_PATH + "/COPYRIGHT"
@@ -423,7 +423,10 @@ def make_helper_c_header_output(caps):
     output.write(            "\n")
     output.write(            "#include \"iot_caps_helper.h\"\n")
     output.write(            "\n")
-
+    output.write(            "#ifdef __cplusplus\n")
+    output.write(            "extern \"C\" {\n")
+    output.write(            "#endif\n")
+    output.write(            "\n")
 # HELPER C HEADER : ENUM for VALUE
     already_check_value_type = []
     for attr in caps.attr_list:
@@ -536,6 +539,10 @@ def make_helper_c_header_output(caps):
 
     output.write(            "};\n")
     output.write(            "\n")
+    output.write(            "#ifdef __cplusplus\n")
+    output.write(            "}\n")
+    output.write(            "#endif\n")
+    output.write(            "\n")
     output.write(            "#endif /* _IOT_CAPS_HERLPER_"+caps.name.replace(' ', '_').upper()+"_ */\n")
 
     output.close()
@@ -572,7 +579,10 @@ def make_caps_c_header_output(caps):
     if (caps.needJSON):
         output.write(        "#include \"JSON.h\"\n")
     output.write(            "\n")
-
+    output.write(            "#ifdef __cplusplus\n")
+    output.write(            "extern \"C\" {\n")
+    output.write(            "#endif\n")
+    output.write(            "\n")
     output.write(            "typedef struct caps_" + caps.id + "_data {\n")
     output.write(            "    IOT_CAP_HANDLE* handle;\n")
     output.write(            "    void *usr_data;\n")
@@ -596,7 +606,10 @@ def make_caps_c_header_output(caps):
     output.write(            "} caps_" + caps.id + "_data_t;\n")
     output.write(            "\n")
     output.write(            "caps_" + caps.id + "_data_t *caps_" + caps.id + "_initialize(IOT_CTX *ctx, const char *component, void *init_usr_cb, void *usr_data);\n")
-
+    output.write(            "#ifdef __cplusplus\n")
+    output.write(            "}\n")
+    output.write(            "#endif\n")
+    output.write(            "\n")
     output.close()
 
     if NEED_TO_COPY_FILE:
@@ -780,7 +793,6 @@ def make_caps_c_file_output(caps):
     output.write(            "\n")
     output.write(            "    return caps_data;\n")
     output.write(            "}\n")
-
     output.close()
 
     if NEED_TO_COPY_FILE:
