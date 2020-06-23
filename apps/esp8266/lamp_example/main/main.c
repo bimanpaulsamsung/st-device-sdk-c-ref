@@ -27,6 +27,9 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
+#include "iot_uart_cli.h"
+#include "iot_cli_cmd.h"
+
 #include "caps_switch.h"
 #include "caps_switchLevel.h"
 #include "caps_colorControl.h"
@@ -176,16 +179,6 @@ static void capability_init()
     }
 }
 
-#if defined(SET_PIN_NUMBER_CONFRIM)
-void* pin_num_memcpy(void *dest, const void *src, unsigned int count)
-{
-	unsigned int i;
-	for (i = 0; i < count; i++)
-		*((char*)dest + i) = *((char*)src + i);
-	return dest;
-}
-#endif
-
 static void iot_status_cb(iot_status_t status,
                           iot_stat_lv_t stat_lv, void *usr_data)
 {
@@ -209,7 +202,17 @@ static void iot_status_cb(iot_status_t status,
     }
 }
 
-static void connection_start(void *arg)
+#if defined(SET_PIN_NUMBER_CONFRIM)
+void* pin_num_memcpy(void *dest, const void *src, unsigned int count)
+{
+	unsigned int i;
+	for (i = 0; i < count; i++)
+		*((char*)dest + i) = *((char*)src + i);
+	return dest;
+}
+#endif
+
+void connection_start_task(void *arg)
 {
     iot_pin_t *pin_num = NULL;
     int err;
@@ -246,7 +249,7 @@ void iot_noti_cb(iot_noti_data_t *noti_data, void *noti_usr_data)
     }
 }
 
-static void button_event(IOT_CAP_HANDLE *handle, int type, int count)
+void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 {
 	if (type == BUTTON_SHORT_PRESS) {
 		printf("Button short press, count: %d\n", count);
@@ -271,7 +274,7 @@ static void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 		    case 5:
 		        printf("iot_status : %d\n", g_iot_status);
                 if (g_iot_status == IOT_STATUS_IDLE) {
-                    xTaskCreate(connection_start, "connection_task", 2048, NULL, 10, NULL);
+                    xTaskCreate(connection_start_task, "connection_task", 2048, NULL, 10, NULL);
                 }
                 break;
 			default:
@@ -297,10 +300,11 @@ static void app_main_task(void *arg)
 		if (get_button_event(&button_event_type, &button_event_count)) {
 			button_event(handle, button_event_type, button_event_count);
 		}
-
 		if (noti_led_mode != LED_ANIMATION_MODE_IDLE) {
 			change_led_state(noti_led_mode);
 		}
+
+
 		vTaskDelay(10 / portTICK_PERIOD_MS);
 	}
 }
@@ -351,6 +355,9 @@ void app_main(void)
     capability_init();
 
 	gpio_init();
+
+	register_iot_cli_cmd();
+	uart_cli_main();
 
 	// needed when it is necessary to keep monitoring the device status
 	xTaskCreate(app_main_task, "app_main_task", 1024, NULL, 10, NULL);
