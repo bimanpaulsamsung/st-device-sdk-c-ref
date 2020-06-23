@@ -64,6 +64,11 @@ enum notification_led_gpio_state {
 
 #endif
 
+enum switch_onoff_state {
+    SWITCH_OFF = 0,
+    SWITCH_ON = 1,
+};
+
 enum color_led_gpio_state {
 	COLOR_LED_OFF = 0,
 	COLOR_LED_ON = 1,

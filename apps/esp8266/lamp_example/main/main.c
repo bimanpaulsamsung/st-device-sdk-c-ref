@@ -39,11 +39,6 @@ extern const uint8_t onboarding_config_end[]	asm("_binary_onboarding_config_json
 extern const uint8_t device_info_start[]	asm("_binary_device_info_json_start");
 extern const uint8_t device_info_end[]		asm("_binary_device_info_json_end");
 
-enum switch_onoff_state {
-	SWITCH_OFF = 0,
-	SWITCH_ON = 1,
-};
-
 static caps_switch_data_t *cap_switch_data;
 static caps_switchLevel_data_t *cap_switchLevel_data;
 static caps_colorControl_data_t *cap_colorControl_data;
@@ -53,7 +48,7 @@ static int rgb_color_red = 255;
 static int rgb_color_green = 255;
 static int rgb_color_blue = 255;
 
-static iot_status_t g_iot_status;
+static iot_status_t g_iot_status = IOT_STATUS_IDLE;
 static iot_stat_lv_t g_iot_stat_lv;
 
 static int noti_led_mode = LED_ANIMATION_MODE_IDLE;
@@ -88,6 +83,15 @@ static void noti_led_onoff(int onoff)
 	}
 }
 
+static void update_color_info(void)
+{
+    double hue = cap_colorControl_data->get_hue_value(cap_colorControl_data);
+    double saturation = cap_colorControl_data->get_saturation_value(cap_colorControl_data);
+
+    update_rgb_from_hsl(hue, saturation, hsl_color_lightness,
+                        &rgb_color_red, &rgb_color_green, &rgb_color_blue);
+}
+
 static void color_led_onoff(int onoff)
 {
 	if (onoff == SWITCH_OFF) {
@@ -95,6 +99,7 @@ static void color_led_onoff(int onoff)
 		gpio_set_level(GPIO_OUTPUT_COLORLED_G, COLOR_LED_OFF);
 		gpio_set_level(GPIO_OUTPUT_COLORLED_B, COLOR_LED_OFF);
 	} else {
+        update_color_info();
 		gpio_set_level(GPIO_OUTPUT_COLORLED_R, (rgb_color_red > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
 		gpio_set_level(GPIO_OUTPUT_COLORLED_G, (rgb_color_green > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
 		gpio_set_level(GPIO_OUTPUT_COLORLED_B, (rgb_color_blue > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
@@ -117,23 +122,6 @@ static void change_switch_level(int level)
 	return;
 }
 
-static void update_color_info(void)
-{
-	int switch_state;
-	double hue = cap_colorControl_data->get_hue_value(cap_colorControl_data);
-	double saturation = cap_colorControl_data->get_saturation_value(cap_colorControl_data);
-
-	update_rgb_from_hsl(hue, saturation, hsl_color_lightness,
-			&rgb_color_red, &rgb_color_green, &rgb_color_blue);
-
-	printf("HSL (%d, %d, %d), RGB (%d, %d, %d)\n",
-			(int)hue, (int)saturation, hsl_color_lightness,
-			rgb_color_red, rgb_color_green, rgb_color_blue);
-
-	switch_state = get_switch_state();
-	color_led_onoff(switch_state);
-}
-
 void cap_switch_cmd_cb(struct caps_switch_data *caps_data)
 {
 	int switch_state = get_switch_state();
@@ -148,7 +136,114 @@ void cap_switchLevel_cmd_cb(struct caps_switchLevel_data *caps_data)
 
 void cap_colorControl_cmd_cb(struct caps_colorControl_data *caps_data)
 {
-	update_color_info();
+    int switch_state = get_switch_state();
+    color_led_onoff(switch_state);
+}
+
+static void capability_init()
+{
+    cap_switch_data = caps_switch_initialize(ctx, "main", NULL, NULL);
+    if (!cap_switch_data) {
+        int switch_init_state = CAP_ENUM_SWITCH_SWITCH_VALUE_ON;
+
+        cap_switch_data->cmd_on_usr_cb = cap_switch_cmd_cb;
+        cap_switch_data->cmd_off_usr_cb = cap_switch_cmd_cb;
+
+        cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[switch_init_state]);
+    }
+
+    cap_switchLevel_data = caps_switchLevel_initialize(ctx, "main", NULL, NULL);
+    if (cap_switchLevel_data) {
+        int switch_init_level = 50;
+
+        cap_switchLevel_data->cmd_setLevel_usr_cb = cap_switchLevel_cmd_cb;
+
+        cap_switchLevel_data->set_level_value(cap_switchLevel_data, switch_init_level);
+        cap_switchLevel_data->set_level_unit(cap_switchLevel_data, caps_helper_switchLevel.attr_level.units[CAP_ENUM_SWITCHLEVEL_LEVEL_UNIT_PERCENT]);
+    }
+
+
+    cap_colorControl_data = caps_colorControl_initialize(ctx, "main", NULL, NULL);
+    if (cap_colorControl_data) {
+        int hue_init_value = 0;
+        int saturation_init_value = 100;
+
+        cap_colorControl_data->cmd_setColor_usr_cb = cap_colorControl_cmd_cb;
+        cap_colorControl_data->cmd_setHue_usr_cb = cap_colorControl_cmd_cb;
+        cap_colorControl_data->cmd_setSaturation_usr_cb = cap_colorControl_cmd_cb;
+
+        cap_colorControl_data->set_color_value(cap_colorControl_data, hue_init_value, saturation_init_value);
+    }
+}
+
+#if defined(SET_PIN_NUMBER_CONFRIM)
+void* pin_num_memcpy(void *dest, const void *src, unsigned int count)
+{
+	unsigned int i;
+	for (i = 0; i < count; i++)
+		*((char*)dest + i) = *((char*)src + i);
+	return dest;
+}
+#endif
+
+static void iot_status_cb(iot_status_t status,
+                          iot_stat_lv_t stat_lv, void *usr_data)
+{
+    g_iot_status = status;
+    g_iot_stat_lv = stat_lv;
+
+    printf("status: %d, stat: %d\n", g_iot_status, g_iot_stat_lv);
+
+    switch(status)
+    {
+        case IOT_STATUS_NEED_INTERACT:
+            noti_led_mode = LED_ANIMATION_MODE_FAST;
+            break;
+        case IOT_STATUS_IDLE:
+        case IOT_STATUS_CONNECTING:
+            noti_led_mode = LED_ANIMATION_MODE_IDLE;
+            noti_led_onoff(get_switch_state());
+            break;
+        default:
+            break;
+    }
+}
+
+static void connection_start(void *arg)
+{
+    iot_pin_t *pin_num = NULL;
+    int err;
+
+#if defined(SET_PIN_NUMBER_CONFRIM)
+    pin_num = (iot_pin_t *) malloc(sizeof(iot_pin_t));
+    if(!pin_num)
+        printf("failed to malloc for iot_pin_t\n");
+
+    // to decide the pin confirmation number(ex. "12345678"). It will use for easysetup.
+    //    pin confirmation number must be 8 digit number.
+    pin_num_memcpy(pin_num, "12345678", sizeof(iot_pin_t));
+#endif
+
+    // process on-boarding procedure. There is nothing more to do on the app side than call the API.
+    err = st_conn_start(ctx, (st_status_cb)&iot_status_cb, IOT_STATUS_ALL, NULL, pin_num);
+    if (err) {
+        printf("fail to start connection. err:%d\n", err);
+    }
+    if (pin_num) {
+        free(pin_num);
+    }
+}
+
+void iot_noti_cb(iot_noti_data_t *noti_data, void *noti_usr_data)
+{
+    printf("Notification message received\n");
+
+    if (noti_data->type == IOT_NOTI_TYPE_DEV_DELETED) {
+        printf("[device deleted]\n");
+    } else if (noti_data->type == IOT_NOTI_TYPE_RATE_LIMIT) {
+        printf("[rate limit] Remaining time:%d, sequence number:%d\n",
+               noti_data->raw.rate_limit.remainingTime, noti_data->raw.rate_limit.sequenceNumber);
+    }
 }
 
 static void button_event(IOT_CAP_HANDLE *handle, int type, int count)
@@ -173,7 +268,12 @@ static void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 					}
 				}
 				break;
-
+		    case 5:
+		        printf("iot_status : %d\n", g_iot_status);
+                if (g_iot_status == IOT_STATUS_IDLE) {
+                    xTaskCreate(connection_start, "connection_task", 2048, NULL, 10, NULL);
+                }
+                break;
 			default:
 				led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, count);
 				break;
@@ -186,42 +286,7 @@ static void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 	}
 }
 
-static void iot_status_cb(iot_status_t status,
-		iot_stat_lv_t stat_lv, void *usr_data)
-{
-	g_iot_status = status;
-	g_iot_stat_lv = stat_lv;
-
-	printf("status: %d, stat: %d\n", g_iot_status, g_iot_stat_lv);
-
-	switch(status)
-	{
-		case IOT_STATUS_NEED_INTERACT:
-			noti_led_mode = LED_ANIMATION_MODE_FAST;
-			break;
-		case IOT_STATUS_IDLE:
-		case IOT_STATUS_CONNECTING:
-			noti_led_mode = LED_ANIMATION_MODE_IDLE;
-			noti_led_onoff(get_switch_state());
-			break;
-		default:
-			break;
-	}
-}
-
-void iot_noti_cb(iot_noti_data_t *noti_data, void *noti_usr_data)
-{
-	printf("Notification message received\n");
-
-	if (noti_data->type == IOT_NOTI_TYPE_DEV_DELETED) {
-		printf("[device deleted]\n");
-	} else if (noti_data->type == IOT_NOTI_TYPE_RATE_LIMIT) {
-		printf("[rate limit] Remaining time:%d, sequence number:%d\n",
-			noti_data->raw.rate_limit.remainingTime, noti_data->raw.rate_limit.sequenceNumber);
-	}
-}
-
-static void smartlamp_task(void *arg)
+static void app_main_task(void *arg)
 {
 	IOT_CAP_HANDLE *handle = (IOT_CAP_HANDLE *)arg;
 
@@ -238,32 +303,6 @@ static void smartlamp_task(void *arg)
 		}
 		vTaskDelay(10 / portTICK_PERIOD_MS);
 	}
-}
-
-#if defined(SET_PIN_NUMBER_CONFRIM)
-void* pin_num_memcpy(void *dest, const void *src, unsigned int count)
-{
-	unsigned int i;
-	for (i = 0; i < count; i++)
-		*((char*)dest + i) = *((char*)src + i);
-	return dest;
-}
-#endif
-
-void device_init()
-{
-	int switch_init_state = CAP_ENUM_SWITCH_SWITCH_VALUE_ON;
-	int switch_init_level = 50;
-	int hue_init_value = 0;
-	int saturation_init_value = 100;
-
-	cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[switch_init_state]);
-	cap_switchLevel_data->set_level_value(cap_switchLevel_data, switch_init_level);
-	cap_switchLevel_data->set_level_unit(cap_switchLevel_data, caps_helper_switchLevel.attr_level.units[CAP_ENUM_SWITCHLEVEL_LEVEL_UNIT_PERCENT]);
-	cap_colorControl_data->set_color_value(cap_colorControl_data, hue_init_value, saturation_init_value);
-
-	noti_led_onoff(switch_init_state);
-	update_color_info();
 }
 
 void app_main(void)
@@ -298,7 +337,7 @@ void app_main(void)
 
 	int iot_err;
 
-	// 1. create a iot context
+	// create a iot context
 	ctx = st_conn_init(onboarding_config, onboarding_config_len, device_info, device_info_len);
 	if (ctx != NULL) {
 		iot_err = st_conn_set_noti_cb(ctx, iot_noti_cb, NULL);
@@ -308,44 +347,11 @@ void app_main(void)
 		printf("fail to create the iot_context\n");
 	}
 
-	// 2. create a handle to process capability
-	//	implement init_callback function
-	cap_switch_data = caps_switch_initialize(ctx, "main", NULL, NULL);
-	cap_switchLevel_data = caps_switchLevel_initialize(ctx, "main", NULL, NULL);
-	cap_colorControl_data = caps_colorControl_initialize(ctx, "main", NULL, NULL);
-
-	// 3. register a callback function to process capability command when it comes from the SmartThings Server
-	//	implement callback function
-	cap_switch_data->cmd_on_usr_cb = cap_switch_cmd_cb;
-	cap_switch_data->cmd_off_usr_cb = cap_switch_cmd_cb;
-	cap_switchLevel_data->cmd_setLevel_usr_cb = cap_switchLevel_cmd_cb;
-	cap_colorControl_data->cmd_setColor_usr_cb = cap_colorControl_cmd_cb;
-	cap_colorControl_data->cmd_setHue_usr_cb = cap_colorControl_cmd_cb;
-	cap_colorControl_data->cmd_setSaturation_usr_cb = cap_colorControl_cmd_cb;
+    // create a handle to process capability and initialize capability info
+    capability_init();
 
 	gpio_init();
-	device_init();
 
-	// 4. needed when it is necessary to keep monitoring the device status
-	xTaskCreate(smartlamp_task, "smartlamp_task", 2048, NULL, 10, NULL);
-
-#if defined(SET_PIN_NUMBER_CONFRIM)
-	iot_pin_t *pin_num;
-
-	pin_num = (iot_pin_t *) malloc(sizeof(iot_pin_t));
-	if(!pin_num)
-		printf("failed to malloc for iot_pin_t\n");
-
-	// 5. to decide the pin confirmation number(ex. "12345678"). It will use for easysetup.
-	//    pin confirmation number must be 8 digit number.
-	pin_num_memcpy(pin_num, "12345678", sizeof(iot_pin_t));
-
-	// 6. process on-boarding procedure. There is nothing more to do on the app side than call the API.
-	st_conn_start(ctx, (st_status_cb)&iot_status_cb, IOT_STATUS_ALL, NULL, pin_num);
-
-	free(pin_num);
-#else
-	// 5. process on-boarding procedure. There is nothing more to do on the app side than call the API.
-	st_conn_start(ctx, (st_status_cb)&iot_status_cb, IOT_STATUS_ALL, NULL, NULL);
-#endif
+	// needed when it is necessary to keep monitoring the device status
+	xTaskCreate(app_main_task, "app_main_task", 1024, NULL, 10, NULL);
 }

@@ -219,7 +219,7 @@ void gpio_init(void)
 
 	gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
 
-	gpio_set_level(GPIO_OUTPUT_COLORLED_R, 0);
+	gpio_set_level(GPIO_OUTPUT_COLORLED_R, 1);
 	gpio_set_level(GPIO_OUTPUT_COLORLED_G, 0);
 	gpio_set_level(GPIO_OUTPUT_COLORLED_B, 0);
 	gpio_set_level(GPIO_OUTPUT_COLORLED_0, 0);
