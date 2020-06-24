@@ -35,12 +35,12 @@
 #include "caps_colorControl.h"
 
 // onboarding_config_start is null-terminated string
-extern const uint8_t onboarding_config_start[]	asm("_binary_onboarding_config_json_start");
-extern const uint8_t onboarding_config_end[]	asm("_binary_onboarding_config_json_end");
+extern const uint8_t onboarding_config_start[]    asm("_binary_onboarding_config_json_start");
+extern const uint8_t onboarding_config_end[]    asm("_binary_onboarding_config_json_end");
 
 // device_info_start is null-terminated string
-extern const uint8_t device_info_start[]	asm("_binary_device_info_json_start");
-extern const uint8_t device_info_end[]		asm("_binary_device_info_json_end");
+extern const uint8_t device_info_start[]    asm("_binary_device_info_json_start");
+extern const uint8_t device_info_end[]        asm("_binary_device_info_json_end");
 
 static caps_switch_data_t *cap_switch_data;
 static caps_switchLevel_data_t *cap_switchLevel_data;
@@ -62,28 +62,28 @@ IOT_CTX* ctx = NULL;
 
 static int get_switch_state(void)
 {
-	const char* switch_value = cap_switch_data->get_switch_value(cap_switch_data);
-	int switch_state = SWITCH_OFF;
+    const char* switch_value = cap_switch_data->get_switch_value(cap_switch_data);
+    int switch_state = SWITCH_OFF;
 
-	if(!switch_value) {
-		return -1;
-	}
+    if(!switch_value) {
+        return -1;
+    }
 
-	if(!strcmp(switch_value, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_ON])) {
-		switch_state = SWITCH_ON;
-	} else if(!strcmp(switch_value, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_OFF])) {
-		switch_state = SWITCH_OFF;
-	}
-	return switch_state;
+    if(!strcmp(switch_value, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_ON])) {
+        switch_state = SWITCH_ON;
+    } else if(!strcmp(switch_value, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_OFF])) {
+        switch_state = SWITCH_OFF;
+    }
+    return switch_state;
 }
 
 static void noti_led_onoff(int onoff)
 {
-	if (onoff == SWITCH_OFF) {
-		gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_OFF);
-	} else {
-		gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
-	}
+    if (onoff == SWITCH_OFF) {
+        gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_OFF);
+    } else {
+        gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
+    }
 }
 
 static void update_color_info(void)
@@ -97,44 +97,44 @@ static void update_color_info(void)
 
 static void color_led_onoff(int onoff)
 {
-	if (onoff == SWITCH_OFF) {
-		gpio_set_level(GPIO_OUTPUT_COLORLED_R, COLOR_LED_OFF);
-		gpio_set_level(GPIO_OUTPUT_COLORLED_G, COLOR_LED_OFF);
-		gpio_set_level(GPIO_OUTPUT_COLORLED_B, COLOR_LED_OFF);
-	} else {
+    if (onoff == SWITCH_OFF) {
+        gpio_set_level(GPIO_OUTPUT_COLORLED_R, COLOR_LED_OFF);
+        gpio_set_level(GPIO_OUTPUT_COLORLED_G, COLOR_LED_OFF);
+        gpio_set_level(GPIO_OUTPUT_COLORLED_B, COLOR_LED_OFF);
+    } else {
         update_color_info();
-		gpio_set_level(GPIO_OUTPUT_COLORLED_R, (rgb_color_red > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
-		gpio_set_level(GPIO_OUTPUT_COLORLED_G, (rgb_color_green > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
-		gpio_set_level(GPIO_OUTPUT_COLORLED_B, (rgb_color_blue > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
-	}
+        gpio_set_level(GPIO_OUTPUT_COLORLED_R, (rgb_color_red > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
+        gpio_set_level(GPIO_OUTPUT_COLORLED_G, (rgb_color_green > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
+        gpio_set_level(GPIO_OUTPUT_COLORLED_B, (rgb_color_blue > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
+    }
 }
 
 static void change_switch_state(int state)
 {
-	noti_led_onoff(state);
-	color_led_onoff(state);
+    noti_led_onoff(state);
+    color_led_onoff(state);
 }
 
 static void change_switch_level(int level)
 {
-	/*
-	 * YOUR CODE:
-	 * implement a ability to set switch level
-	 */
-	printf("switch level is changed to %d", level);
-	return;
+    /*
+     * YOUR CODE:
+     * implement a ability to set switch level
+     */
+    printf("switch level is changed to %d", level);
+    return;
 }
 
 void cap_switch_cmd_cb(struct caps_switch_data *caps_data)
 {
-	int switch_state = get_switch_state();
-	change_switch_state(switch_state);
+    int switch_state = get_switch_state();
+    change_switch_state(switch_state);
 }
 
 void cap_switchLevel_cmd_cb(struct caps_switchLevel_data *caps_data)
 {
-	int switch_level = caps_data->get_level_value(caps_data);
-	change_switch_level(switch_level);
+    int switch_level = caps_data->get_level_value(caps_data);
+    change_switch_level(switch_level);
 }
 
 void cap_colorControl_cmd_cb(struct caps_colorControl_data *caps_data)
@@ -205,10 +205,10 @@ static void iot_status_cb(iot_status_t status,
 #if defined(SET_PIN_NUMBER_CONFRIM)
 void* pin_num_memcpy(void *dest, const void *src, unsigned int count)
 {
-	unsigned int i;
-	for (i = 0; i < count; i++)
-		*((char*)dest + i) = *((char*)src + i);
-	return dest;
+    unsigned int i;
+    for (i = 0; i < count; i++)
+        *((char*)dest + i) = *((char*)src + i);
+    return dest;
 }
 #endif
 
@@ -257,115 +257,115 @@ void iot_noti_cb(iot_noti_data_t *noti_data, void *noti_usr_data)
 
 void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 {
-	if (type == BUTTON_SHORT_PRESS) {
-		printf("Button short press, count: %d\n", count);
-		switch(count) {
-			case 1:
-				if (g_iot_status == IOT_STATUS_NEED_INTERACT) {
-					st_conn_ownership_confirm(ctx, true);
-					noti_led_onoff(SWITCH_OFF);
-					noti_led_mode = LED_ANIMATION_MODE_IDLE;
-				} else {
-					if (get_switch_state() == SWITCH_ON) {
-						change_switch_state(SWITCH_OFF);
-						cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_OFF]);
-						cap_switch_data->attr_switch_send(cap_switch_data);
-					} else {
-						change_switch_state(SWITCH_ON);
-						cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_ON]);
-						cap_switch_data->attr_switch_send(cap_switch_data);
-					}
-				}
-				break;
-		    case 5:
+    if (type == BUTTON_SHORT_PRESS) {
+        printf("Button short press, count: %d\n", count);
+        switch(count) {
+            case 1:
+                if (g_iot_status == IOT_STATUS_NEED_INTERACT) {
+                    st_conn_ownership_confirm(ctx, true);
+                    noti_led_onoff(SWITCH_OFF);
+                    noti_led_mode = LED_ANIMATION_MODE_IDLE;
+                } else {
+                    if (get_switch_state() == SWITCH_ON) {
+                        change_switch_state(SWITCH_OFF);
+                        cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_OFF]);
+                        cap_switch_data->attr_switch_send(cap_switch_data);
+                    } else {
+                        change_switch_state(SWITCH_ON);
+                        cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_ON]);
+                        cap_switch_data->attr_switch_send(cap_switch_data);
+                    }
+                }
+                break;
+            case 5:
                 /* clean-up provisioning & registered data with reboot option*/
                 st_conn_cleanup(ctx, true);
 
                 break;
-			default:
-				led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, count);
-				break;
-		}
-	} else if (type == BUTTON_LONG_PRESS) {
-		printf("Button long press, iot_status: %d\n", g_iot_status);
-		led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, 3);
-		st_conn_cleanup(ctx, false);
-		xTaskCreate(connection_start_task, "connection_task", 2048, NULL, 10, NULL);
-	}
+            default:
+                led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, count);
+                break;
+        }
+    } else if (type == BUTTON_LONG_PRESS) {
+        printf("Button long press, iot_status: %d\n", g_iot_status);
+        led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, 3);
+        st_conn_cleanup(ctx, false);
+        xTaskCreate(connection_start_task, "connection_task", 2048, NULL, 10, NULL);
+    }
 }
 
 static void app_main_task(void *arg)
 {
-	IOT_CAP_HANDLE *handle = (IOT_CAP_HANDLE *)arg;
+    IOT_CAP_HANDLE *handle = (IOT_CAP_HANDLE *)arg;
 
-	int button_event_type;
-	int button_event_count;
+    int button_event_type;
+    int button_event_count;
 
-	for (;;) {
-		if (get_button_event(&button_event_type, &button_event_count)) {
-			button_event(handle, button_event_type, button_event_count);
-		}
-		if (noti_led_mode != LED_ANIMATION_MODE_IDLE) {
-			change_led_state(noti_led_mode);
-		}
+    for (;;) {
+        if (get_button_event(&button_event_type, &button_event_count)) {
+            button_event(handle, button_event_type, button_event_count);
+        }
+        if (noti_led_mode != LED_ANIMATION_MODE_IDLE) {
+            change_led_state(noti_led_mode);
+        }
 
 
-		vTaskDelay(10 / portTICK_PERIOD_MS);
-	}
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
 }
 
 void app_main(void)
 {
-	/**
-	  SmartThings Device SDK(STDK) aims to make it easier to develop IoT devices by providing
-	  additional st_iot_core layer to the existing chip vendor SW Architecture.
+    /**
+      SmartThings Device SDK(STDK) aims to make it easier to develop IoT devices by providing
+      additional st_iot_core layer to the existing chip vendor SW Architecture.
 
-	  That is, you can simply develop a basic application by just calling the APIs provided by st_iot_core layer
-	  like below. st_iot_core currently offers 14 API.
+      That is, you can simply develop a basic application by just calling the APIs provided by st_iot_core layer
+      like below. st_iot_core currently offers 14 API.
 
-	  //create a iot context
-	  1. st_conn_init();
+      //create a iot context
+      1. st_conn_init();
 
-	  //create a handle to process capability
-	  2. st_cap_handle_init();
+      //create a handle to process capability
+      2. st_cap_handle_init();
 
-	  //register a callback function to process capability command when it comes from the SmartThings Server.
-	  3. st_cap_cmd_set_cb();
+      //register a callback function to process capability command when it comes from the SmartThings Server.
+      3. st_cap_cmd_set_cb();
 
-	  //needed when it is necessary to keep monitoring the device status
-	  4. user_defined_task()
+      //needed when it is necessary to keep monitoring the device status
+      4. user_defined_task()
 
-	  //process on-boarding procedure. There is nothing more to do on the app side than call the API.
-	  5. st_conn_start();
-	 */
+      //process on-boarding procedure. There is nothing more to do on the app side than call the API.
+      5. st_conn_start();
+     */
 
-	unsigned char *onboarding_config = (unsigned char *) onboarding_config_start;
-	unsigned int onboarding_config_len = onboarding_config_end - onboarding_config_start;
-	unsigned char *device_info = (unsigned char *) device_info_start;
-	unsigned int device_info_len = device_info_end - device_info_start;
+    unsigned char *onboarding_config = (unsigned char *) onboarding_config_start;
+    unsigned int onboarding_config_len = onboarding_config_end - onboarding_config_start;
+    unsigned char *device_info = (unsigned char *) device_info_start;
+    unsigned int device_info_len = device_info_end - device_info_start;
 
-	int iot_err;
+    int iot_err;
 
-	// create a iot context
-	ctx = st_conn_init(onboarding_config, onboarding_config_len, device_info, device_info_len);
-	if (ctx != NULL) {
-		iot_err = st_conn_set_noti_cb(ctx, iot_noti_cb, NULL);
-		if (iot_err)
-			printf("fail to set notification callback function\n");
-	} else {
-		printf("fail to create the iot_context\n");
-	}
+    // create a iot context
+    ctx = st_conn_init(onboarding_config, onboarding_config_len, device_info, device_info_len);
+    if (ctx != NULL) {
+        iot_err = st_conn_set_noti_cb(ctx, iot_noti_cb, NULL);
+        if (iot_err)
+            printf("fail to set notification callback function\n");
+    } else {
+        printf("fail to create the iot_context\n");
+    }
 
     // create a handle to process capability and initialize capability info
     capability_init();
 
-	gpio_init();
+    gpio_init();
 
-	register_iot_cli_cmd();
-	uart_cli_main();
+    register_iot_cli_cmd();
+    uart_cli_main();
 
-	// needed when it is necessary to keep monitoring the device status
-	xTaskCreate(app_main_task, "app_main_task", 2048, NULL, 10, NULL);
+    // needed when it is necessary to keep monitoring the device status
+    xTaskCreate(app_main_task, "app_main_task", 2048, NULL, 10, NULL);
 
-	connection_start();
+    connection_start();
 }
