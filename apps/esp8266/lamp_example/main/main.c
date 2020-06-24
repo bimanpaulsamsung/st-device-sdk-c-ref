@@ -146,7 +146,7 @@ void cap_colorControl_cmd_cb(struct caps_colorControl_data *caps_data)
 static void capability_init()
 {
     cap_switch_data = caps_switch_initialize(ctx, "main", NULL, NULL);
-    if (!cap_switch_data) {
+    if (cap_switch_data) {
         int switch_init_state = CAP_ENUM_SWITCH_SWITCH_VALUE_ON;
 
         cap_switch_data->cmd_on_usr_cb = cap_switch_cmd_cb;
@@ -212,7 +212,7 @@ void* pin_num_memcpy(void *dest, const void *src, unsigned int count)
 }
 #endif
 
-void connection_start_task(void *arg)
+static void connection_start(void)
 {
     iot_pin_t *pin_num = NULL;
     int err;
@@ -235,6 +235,12 @@ void connection_start_task(void *arg)
     if (pin_num) {
         free(pin_num);
     }
+}
+
+static void connection_start_task(void *arg)
+{
+    connection_start();
+    vTaskDelete(NULL);
 }
 
 void iot_noti_cb(iot_noti_data_t *noti_data, void *noti_usr_data)
@@ -272,20 +278,19 @@ void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 				}
 				break;
 		    case 5:
-		        printf("iot_status : %d\n", g_iot_status);
-                if (g_iot_status == IOT_STATUS_IDLE) {
-                    xTaskCreate(connection_start_task, "connection_task", 2048, NULL, 10, NULL);
-                }
+                /* clean-up provisioning & registered data with reboot option*/
+                st_conn_cleanup(ctx, true);
+
                 break;
 			default:
 				led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, count);
 				break;
 		}
 	} else if (type == BUTTON_LONG_PRESS) {
-		printf("Button long press, count: %d\n", count);
+		printf("Button long press, iot_status: %d\n", g_iot_status);
 		led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, 3);
-		/* clean-up provisioning & registered data with reboot option*/
-		st_conn_cleanup(ctx, true);
+		st_conn_cleanup(ctx, false);
+		xTaskCreate(connection_start_task, "connection_task", 2048, NULL, 10, NULL);
 	}
 }
 
@@ -360,5 +365,7 @@ void app_main(void)
 	uart_cli_main();
 
 	// needed when it is necessary to keep monitoring the device status
-	xTaskCreate(app_main_task, "app_main_task", 1024, NULL, 10, NULL);
+	xTaskCreate(app_main_task, "app_main_task", 2048, NULL, 10, NULL);
+
+	connection_start();
 }
