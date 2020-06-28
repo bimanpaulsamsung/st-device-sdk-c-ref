@@ -1,0 +1,4728 @@
+From cf21777b01af3b53434a5520a4e74735f60ed202 Mon Sep 17 00:00:00 2001
+From: "hong.ye" <52810083+hongye-samsung@users.noreply.github.com>
+Date: Wed, 1 Jul 2020 16:41:52 +0800
+Subject: [PATCH] Mbedos patch for rda5981c
+
+Signed-off-by: hong.ye <52810083+hongye-samsung@users.noreply.github.com>
+---
+ features/lwipstack/.mbedignore                     |  13 +-
+ features/lwipstack/lwip/src/api/lwip_if_api.c      |   2 +-
+ features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c  |   6 +
+ features/lwipstack/lwip/src/core/lwip_dns.c        |   5 +-
+ .../lwip/src/include/lwip/apps/sntp_opts.h         |   2 +-
+ features/lwipstack/lwip/src/include/lwip/opt.h     |   2 +-
+ features/lwipstack/lwip/src/include/lwip/sockets.h |   5 +-
+ features/lwipstack/lwipopts.h                      |   8 +-
+ features/lwipstack/mbed_lib.json                   |   2 +-
+ features/mbedtls/inc/mbedtls/config.h              |   2 +-
+ features/mbedtls/src/net_sockets.c                 | 542 +++++++--------------
+ .../emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.cpp | 455 +++++++++++++++++
+ .../emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.h   | 138 ++++++
+ .../TARGET_RDA_EMAC/RdaSoftAPInterface.cpp         | 122 +++++
+ .../TARGET_RDA_EMAC/RdaSoftAPInterface.h           |  92 ++++
+ .../TARGET_RDA_EMAC/RdaStaInterface.cpp            | 322 ++++++++++++
+ .../emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.h | 139 ++++++
+ .../TARGET_RDA_EMAC/RdaWiFiInterface.cpp           | 364 --------------
+ .../TARGET_RDA_EMAC/RdaWiFiInterface.h             | 148 ------
+ .../TARGET_UNO_91H/inc/rda_sys_wrapper.h           |   8 +
+ .../TARGET_RDA/TARGET_UNO_91H/src/rda5991h_wland.c |  20 +-
+ .../TARGET_UNO_91H/src/rda_sys_wrapper.c           |   8 +
+ .../emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.cpp | 322 ++++++------
+ .../emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.h   | 285 ++++++-----
+ .../TARGET_RDA_EMAC/rda5981x_emac_config.h         |   6 +-
+ .../TARGET_RDA_EMAC/rda_dhcp_server_debug.cpp      | 405 +++++++++++++++
+ .../emac-drivers/TARGET_RDA_EMAC/rda_interface.cpp |  34 ++
+ .../emac-drivers/TARGET_RDA_EMAC/rda_interface.h   |  51 ++
+ .../TARGET_RDA_EMAC/rda_network_utils.c            |  88 ++++
+ .../TARGET_RDA_EMAC/rda_network_utils.h            |  97 ++++
+ platform/mbed_lib.json                             |   2 +-
+ platform/mbed_retarget.h                           |   3 +
+ platform/source/mbed_rtc_time.cpp                  | 104 ++--
+ targets/TARGET_RDA/TARGET_UNO_91H/PinNames.h       |   5 +-
+ targets/TARGET_RDA/TARGET_UNO_91H/rtc_api.c        |  92 ++++
+ targets/targets.json                               |   1 +
+ 36 files changed, 2661 insertions(+), 1239 deletions(-)
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.cpp
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.h
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaSoftAPInterface.cpp
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaSoftAPInterface.h
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.cpp
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.h
+ delete mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaWiFiInterface.cpp
+ delete mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaWiFiInterface.h
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_dhcp_server_debug.cpp
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_interface.cpp
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_interface.h
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_network_utils.c
+ create mode 100644 features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_network_utils.h
+ create mode 100644 targets/TARGET_RDA/TARGET_UNO_91H/rtc_api.c
+
+diff --git a/features/lwipstack/.mbedignore b/features/lwipstack/.mbedignore
+index b86f9de..0f089d8 100644
+--- a/features/lwipstack/.mbedignore
++++ b/features/lwipstack/.mbedignore
+@@ -1,6 +1,17 @@
+ lwip/doc/*
+ lwip/test/*
+-lwip/src/apps/*
++
++lwip/src/apps/altcp_tls/
++lwip/src/apps/http/
++lwip/src/apps/lwiperf/
++lwip/src/apps/mdns/
++lwip/src/apps/mqtt/
++lwip/src/apps/netbiosns/
++lwip/src/apps/smtp/
++lwip/src/apps/snmp/
++#lwip/src/apps/sntp/
++lwip/src/apps/tftp/
++
+ lwip/src/netif/lwip_slipif.c
+ lwip/src/include/lwip/apps/*
+ lwip/src/include/compat/stdc/*
+diff --git a/features/lwipstack/lwip/src/api/lwip_if_api.c b/features/lwipstack/lwip/src/api/lwip_if_api.c
+index 8e094d0..e3cae32 100644
+--- a/features/lwipstack/lwip/src/api/lwip_if_api.c
++++ b/features/lwipstack/lwip/src/api/lwip_if_api.c
+@@ -43,7 +43,7 @@
+ 
+ #if LWIP_SOCKET
+ 
+-#include "lwip/errno.h"
++#include "lwip/lwip_errno.h"
+ #include "lwip/if_api.h"
+ #include "lwip/netifapi.h"
+ #include "lwip/priv/sockets_priv.h"
+diff --git a/features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c b/features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c
+index b7ff56a..cb6a164 100644
+--- a/features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c
++++ b/features/lwipstack/lwip/src/apps/sntp/lwip_sntp.c
+@@ -327,6 +327,12 @@ sntp_process(const struct sntp_timestamps *timestamps)
+   LWIP_UNUSED_ARG(frac); /* might be unused if only seconds are set */
+   LWIP_DEBUGF(SNTP_DEBUG_TRACE, ("sntp_process: %s, %" U32_F " us\n",
+                                  sntp_format_time(sec), SNTP_FRAC_TO_US(frac)));
++
++  /* NTP gives seconds since 01-01-1900 epoch
++   * 2208988800L is 01-01-1970 in seconds since 1900
++   * set_time() expects seconds elaspsed since 01-01-1970 epoch
++   */
++  set_time(sec - 2208988800L);
+ }
+ 
+ /**
+diff --git a/features/lwipstack/lwip/src/core/lwip_dns.c b/features/lwipstack/lwip/src/core/lwip_dns.c
+index f742221..2737ea5 100644
+--- a/features/lwipstack/lwip/src/core/lwip_dns.c
++++ b/features/lwipstack/lwip/src/core/lwip_dns.c
+@@ -367,7 +367,7 @@ void
+ dns_setserver(u8_t numdns, const ip_addr_t *dnsserver, struct netif *netif)
+ {
+ 
+-  if (netif == NULL ) {
++//  if (netif == NULL ) {
+     if (numdns < DNS_MAX_SERVERS) {
+       if (dnsserver != NULL) {
+         dns_servers[numdns] = (*dnsserver);
+@@ -375,7 +375,8 @@ dns_setserver(u8_t numdns, const ip_addr_t *dnsserver, struct netif *netif)
+         dns_servers[numdns] = *IP_ADDR_ANY;
+       }
+     }
+-  } else {
++//  } else
++  if (netif) {
+     char name[INTERFACE_NAME_MAX_SIZE];
+     sprintf(name, "%c%c%d", netif->name[0], netif->name[1], netif->num);
+     dns_add_interface_server(numdns, name, dnsserver);
+diff --git a/features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h b/features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h
+index ed98040..6422b88 100644
+--- a/features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h
++++ b/features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h
+@@ -72,7 +72,7 @@
+  * \#define SNTP_SERVER_ADDRESS "pool.ntp.org"
+  */
+ #if !defined SNTP_SERVER_DNS || defined __DOXYGEN__
+-#define SNTP_SERVER_DNS            0
++#define SNTP_SERVER_DNS            1
+ #endif
+ 
+ /**
+diff --git a/features/lwipstack/lwip/src/include/lwip/opt.h b/features/lwipstack/lwip/src/include/lwip/opt.h
+index 070284c..0c57815 100644
+--- a/features/lwipstack/lwip/src/include/lwip/opt.h
++++ b/features/lwipstack/lwip/src/include/lwip/opt.h
+@@ -950,7 +950,7 @@
+  * The maximum of NTP servers requested
+  */
+ #if !defined LWIP_DHCP_MAX_NTP_SERVERS || defined __DOXYGEN__
+-#define LWIP_DHCP_MAX_NTP_SERVERS       1
++#define LWIP_DHCP_MAX_NTP_SERVERS       10
+ #endif
+ 
+ /**
+diff --git a/features/lwipstack/lwip/src/include/lwip/sockets.h b/features/lwipstack/lwip/src/include/lwip/sockets.h
+index d70d36c..f2b271c 100644
+--- a/features/lwipstack/lwip/src/include/lwip/sockets.h
++++ b/features/lwipstack/lwip/src/include/lwip/sockets.h
+@@ -47,7 +47,7 @@
+ #include "lwip/netif.h"
+ #include "lwip/err.h"
+ #include "lwip/inet.h"
+-#include "lwip/errno.h"
++#include "lwip/lwip_errno.h"
+ 
+ #include <string.h>
+ 
+@@ -504,12 +504,15 @@ typedef struct fd_set
+ #define POLLWRBAND 0x100
+ #define POLLHUP    0x200
+ typedef unsigned int nfds_t;
++#ifndef POLL_FD_LWIP_SOCKET
++#define POLL_FD_LWIP_SOCKET
+ struct pollfd
+ {
+   int fd;
+   short events;
+   short revents;
+ };
++#endif /* POLL_FD_LWIP_SOCKET */
+ #endif
+ 
+ /** LWIP_TIMEVAL_PRIVATE: if you want to use the struct timeval provided
+diff --git a/features/lwipstack/lwipopts.h b/features/lwipstack/lwipopts.h
+index 0a866f3..ec86ef4 100644
+--- a/features/lwipstack/lwipopts.h
++++ b/features/lwipstack/lwipopts.h
+@@ -194,8 +194,8 @@
+ 
+ #define LWIP_DNS                    1
+ // Only DNS address storage is enabled
+-#define LWIP_FULL_DNS               0
+-#define LWIP_SOCKET                 0
++#define LWIP_FULL_DNS               1
++#define LWIP_SOCKET                 1
+ 
+ #define SO_REUSE                    1
+ 
+@@ -204,8 +204,8 @@
+ #define LWIP_IGMP                   LWIP_IPV4
+ #define LWIP_RAND()                 lwip_get_random()
+ 
+-#define LWIP_COMPAT_SOCKETS         0
+-#define LWIP_POSIX_SOCKETS_IO_NAMES 0
++#define LWIP_COMPAT_SOCKETS         1
++#define LWIP_POSIX_SOCKETS_IO_NAMES 1
+ #define LWIP_SO_RCVTIMEO            1
+ 
+ #define LWIP_BROADCAST_PING         1
+diff --git a/features/lwipstack/mbed_lib.json b/features/lwipstack/mbed_lib.json
+index 53d46ec..08960ad 100644
+--- a/features/lwipstack/mbed_lib.json
++++ b/features/lwipstack/mbed_lib.json
+@@ -84,7 +84,7 @@
+         },
+         "memp-num-tcpip-msg-inpkt": {
+             "help": "Number of simultaneously queued TCP messages that are received",
+-            "value": 8
++            "value": 32
+         },
+         "tcp-mss": {
+             "help": "TCP Maximum segment size, see LWIP opt.h for more information. Current default is 536.",
+diff --git a/features/mbedtls/inc/mbedtls/config.h b/features/mbedtls/inc/mbedtls/config.h
+index e6b459d..a45898e 100644
+--- a/features/mbedtls/inc/mbedtls/config.h
++++ b/features/mbedtls/inc/mbedtls/config.h
+@@ -2978,7 +2978,7 @@
+  *            on it, and considering stronger message digests instead.
+  *
+  */
+-//#define MBEDTLS_SHA1_C
++#define MBEDTLS_SHA1_C
+ 
+ /**
+  * \def MBEDTLS_SHA256_C
+diff --git a/features/mbedtls/src/net_sockets.c b/features/mbedtls/src/net_sockets.c
+index c7b358d..6af6fde 100644
+--- a/features/mbedtls/src/net_sockets.c
++++ b/features/mbedtls/src/net_sockets.c
+@@ -1,7 +1,9 @@
+ /*
+  *  TCP/IP or UDP/IP networking functions
++ *  modified for LWIP support on ESP32
+  *
+  *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
++ *  Additions Copyright (C) 2015 Angus Gratton
+  *  SPDX-License-Identifier: Apache-2.0
+  *
+  *  Licensed under the Apache License, Version 2.0 (the "License"); you may
+@@ -19,94 +21,34 @@
+  *  This file is part of mbed TLS (https://tls.mbed.org)
+  */
+ 
+-/* Enable definition of getaddrinfo() even when compiling with -std=c99. Must
+- * be set before config.h, which pulls in glibc's features.h indirectly.
+- * Harmless on other platforms. */
+-#define _POSIX_C_SOURCE 200112L
+-
+ #if !defined(MBEDTLS_CONFIG_FILE)
+ #include "mbedtls/config.h"
+ #else
+ #include MBEDTLS_CONFIG_FILE
+ #endif
+ 
+-#if defined(MBEDTLS_NET_C)
+-
+-#if !defined(unix) && !defined(__unix__) && !defined(__unix) && \
+-    !defined(__APPLE__) && !defined(_WIN32) && !defined(__QNXNTO__) && \
+-    !defined(__HAIKU__)
+-#error "This module only works on Unix and Windows, see MBEDTLS_NET_C in config.h"
+-#endif
++#if !defined(MBEDTLS_NET_C)
+ 
+ #if defined(MBEDTLS_PLATFORM_C)
+ #include "mbedtls/platform.h"
+ #else
+ #include <stdlib.h>
++#define mbedtls_calloc    calloc
++#define mbedtls_free      free
++#define mbedtls_time      time
++#define mbedtls_time_t    time_t
+ #endif
+ 
+ #include "mbedtls/net_sockets.h"
+ 
+ #include <string.h>
+-
+-#if (defined(_WIN32) || defined(_WIN32_WCE)) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-
+-#define IS_EINTR( ret ) ( ( ret ) == WSAEINTR )
+-
+-#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0501)
+-#undef _WIN32_WINNT
+-/* Enables getaddrinfo() & Co */
+-#define _WIN32_WINNT 0x0501
+-#endif
+-
+-#include <ws2tcpip.h>
+-
+-#include <winsock2.h>
+-#include <windows.h>
+-
+-#if defined(_MSC_VER)
+-#if defined(_WIN32_WCE)
+-#pragma comment( lib, "ws2.lib" )
+-#else
+-#pragma comment( lib, "ws2_32.lib" )
+-#endif
+-#endif /* _MSC_VER */
+-
+-#define read(fd,buf,len)        recv( fd, (char*)( buf ), (int)( len ), 0 )
+-#define write(fd,buf,len)       send( fd, (char*)( buf ), (int)( len ), 0 )
+-#define close(fd)               closesocket(fd)
+-
+-static int wsa_init_done = 0;
+-
+-#else /* ( _WIN32 || _WIN32_WCE ) && !EFIX64 && !EFI32 */
+-
+ #include <sys/types.h>
+ #include <sys/socket.h>
+-#include <netinet/in.h>
+-#include <arpa/inet.h>
+-#include <sys/time.h>
+ #include <unistd.h>
+-#include <signal.h>
+-#include <fcntl.h>
+ #include <netdb.h>
+-#include <errno.h>
+-
+-#define IS_EINTR( ret ) ( ( ret ) == EINTR )
+-
+-#endif /* ( _WIN32 || _WIN32_WCE ) && !EFIX64 && !EFI32 */
+-
+-/* Some MS functions want int and MSVC warns if we pass size_t,
+- * but the standard functions use socklen_t, so cast only for MSVC */
+-#if defined(_MSC_VER)
+-#define MSVC_INT_CAST   (int)
+-#else
+-#define MSVC_INT_CAST
+-#endif
+-
++#include <stdlib.h>
+ #include <stdio.h>
+-
+ #include <time.h>
+-
+ #include <stdint.h>
+ 
+ /*
+@@ -114,23 +56,17 @@ static int wsa_init_done = 0;
+  */
+ static int net_prepare( void )
+ {
+-#if ( defined(_WIN32) || defined(_WIN32_WCE) ) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-    WSADATA wsaData;
++    return ( 0 );
++}
+ 
+-    if( wsa_init_done == 0 )
+-    {
+-        if( WSAStartup( MAKEWORD(2,0), &wsaData ) != 0 )
+-            return( MBEDTLS_ERR_NET_SOCKET_FAILED );
++static int mbedtls_net_errno(int fd)
++{
++    int sock_errno = 0;
++    u32_t optlen = sizeof(sock_errno);
+ 
+-        wsa_init_done = 1;
+-    }
+-#else
+-#if !defined(EFIX64) && !defined(EFI32)
+-    signal( SIGPIPE, SIG_IGN );
+-#endif
+-#endif
+-    return( 0 );
++    getsockopt(fd, SOL_SOCKET, SO_ERROR, &sock_errno, &optlen);
++
++    return sock_errno;
+ }
+ 
+ /*
+@@ -144,14 +80,14 @@ void mbedtls_net_init( mbedtls_net_context *ctx )
+ /*
+  * Initiate a TCP connection with host:port and the given protocol
+  */
+-int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host,
+-                         const char *port, int proto )
++int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host, const char *port, int proto )
+ {
+     int ret;
+     struct addrinfo hints, *addr_list, *cur;
+ 
+-    if( ( ret = net_prepare() ) != 0 )
+-        return( ret );
++    if ( ( ret = net_prepare() ) != 0 ) {
++        return ( ret );
++    }
+ 
+     /* Do name resolution with both IPv6 and IPv4 */
+     memset( &hints, 0, sizeof( hints ) );
+@@ -159,34 +95,33 @@ int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host,
+     hints.ai_socktype = proto == MBEDTLS_NET_PROTO_UDP ? SOCK_DGRAM : SOCK_STREAM;
+     hints.ai_protocol = proto == MBEDTLS_NET_PROTO_UDP ? IPPROTO_UDP : IPPROTO_TCP;
+ 
+-    if( getaddrinfo( host, port, &hints, &addr_list ) != 0 )
+-        return( MBEDTLS_ERR_NET_UNKNOWN_HOST );
++    if ( getaddrinfo( host, port, &hints, &addr_list ) != 0 ) {
++        return ( MBEDTLS_ERR_NET_UNKNOWN_HOST );
++    }
+ 
+     /* Try the sockaddrs until a connection succeeds */
+     ret = MBEDTLS_ERR_NET_UNKNOWN_HOST;
+-    for( cur = addr_list; cur != NULL; cur = cur->ai_next )
+-    {
+-        ctx->fd = (int) socket( cur->ai_family, cur->ai_socktype,
+-                            cur->ai_protocol );
+-        if( ctx->fd < 0 )
+-        {
++    for ( cur = addr_list; cur != NULL; cur = cur->ai_next ) {
++        int fd = socket( cur->ai_family, cur->ai_socktype, cur->ai_protocol );
++
++        if ( fd < 0 ) {
+             ret = MBEDTLS_ERR_NET_SOCKET_FAILED;
+             continue;
+         }
+ 
+-        if( connect( ctx->fd, cur->ai_addr, MSVC_INT_CAST cur->ai_addrlen ) == 0 )
+-        {
++        if ( connect( fd, cur->ai_addr, cur->ai_addrlen ) == 0 ) {
++            ctx->fd = fd; // connected!
+             ret = 0;
+             break;
+         }
+ 
+-        close( ctx->fd );
++        close( fd );
+         ret = MBEDTLS_ERR_NET_CONNECT_FAILED;
+     }
+ 
+     freeaddrinfo( addr_list );
+ 
+-    return( ret );
++    return ( ret );
+ }
+ 
+ /*
+@@ -194,117 +129,107 @@ int mbedtls_net_connect( mbedtls_net_context *ctx, const char *host,
+  */
+ int mbedtls_net_bind( mbedtls_net_context *ctx, const char *bind_ip, const char *port, int proto )
+ {
+-    int n, ret;
++    int ret;
+     struct addrinfo hints, *addr_list, *cur;
++    struct sockaddr_in *serv_addr = NULL;
++#if SO_REUSE
++    int n = 1;
++#endif
+ 
+-    if( ( ret = net_prepare() ) != 0 )
+-        return( ret );
++    if ( ( ret = net_prepare() ) != 0 ) {
++        return ( ret );
++    }
+ 
+     /* Bind to IPv6 and/or IPv4, but only in the desired protocol */
+     memset( &hints, 0, sizeof( hints ) );
+     hints.ai_family = AF_UNSPEC;
+     hints.ai_socktype = proto == MBEDTLS_NET_PROTO_UDP ? SOCK_DGRAM : SOCK_STREAM;
+     hints.ai_protocol = proto == MBEDTLS_NET_PROTO_UDP ? IPPROTO_UDP : IPPROTO_TCP;
+-    if( bind_ip == NULL )
+-        hints.ai_flags = AI_PASSIVE;
+ 
+-    if( getaddrinfo( bind_ip, port, &hints, &addr_list ) != 0 )
+-        return( MBEDTLS_ERR_NET_UNKNOWN_HOST );
++    if ( getaddrinfo( bind_ip, port, &hints, &addr_list ) != 0 ) {
++        return ( MBEDTLS_ERR_NET_UNKNOWN_HOST );
++    }
+ 
+     /* Try the sockaddrs until a binding succeeds */
+     ret = MBEDTLS_ERR_NET_UNKNOWN_HOST;
+-    for( cur = addr_list; cur != NULL; cur = cur->ai_next )
+-    {
+-        ctx->fd = (int) socket( cur->ai_family, cur->ai_socktype,
+-                            cur->ai_protocol );
+-        if( ctx->fd < 0 )
+-        {
++    for ( cur = addr_list; cur != NULL; cur = cur->ai_next ) {
++        int fd = socket( cur->ai_family, cur->ai_socktype, cur->ai_protocol );
++        if ( fd < 0 ) {
+             ret = MBEDTLS_ERR_NET_SOCKET_FAILED;
+             continue;
+         }
+ 
+-        n = 1;
+-        if( setsockopt( ctx->fd, SOL_SOCKET, SO_REUSEADDR,
+-                        (const char *) &n, sizeof( n ) ) != 0 )
+-        {
+-            close( ctx->fd );
++        /*SO_REUSEADDR option dafault is disable in source code(lwip)*/
++#if SO_REUSE
++        if ( setsockopt( fd, SOL_SOCKET, SO_REUSEADDR,
++                         (const char *) &n, sizeof( n ) ) != 0 ) {
++            close( fd );
+             ret = MBEDTLS_ERR_NET_SOCKET_FAILED;
+             continue;
+         }
+-
+-        if( bind( ctx->fd, cur->ai_addr, MSVC_INT_CAST cur->ai_addrlen ) != 0 )
+-        {
+-            close( ctx->fd );
++#endif
++        /*bind interface dafault don't process the addr is 0xffffffff for TCP Protocol*/
++        serv_addr = (struct sockaddr_in *)cur->ai_addr;
++        serv_addr->sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
++        if ( bind( fd, (struct sockaddr *)serv_addr, cur->ai_addrlen ) != 0 ) {
++            close( fd );
+             ret = MBEDTLS_ERR_NET_BIND_FAILED;
+             continue;
+         }
+ 
+         /* Listen only makes sense for TCP */
+-        if( proto == MBEDTLS_NET_PROTO_TCP )
+-        {
+-            if( listen( ctx->fd, MBEDTLS_NET_LISTEN_BACKLOG ) != 0 )
+-            {
+-                close( ctx->fd );
++        if ( proto == MBEDTLS_NET_PROTO_TCP ) {
++            if ( listen( fd, MBEDTLS_NET_LISTEN_BACKLOG ) != 0 ) {
++                close( fd );
+                 ret = MBEDTLS_ERR_NET_LISTEN_FAILED;
+                 continue;
+             }
+         }
+ 
+-        /* Bind was successful */
++        /* I we ever get there, it's a success */
++        ctx->fd = fd;
+         ret = 0;
+         break;
+     }
+ 
+     freeaddrinfo( addr_list );
+ 
+-    return( ret );
++    return ( ret );
+ 
+ }
+ 
+-#if ( defined(_WIN32) || defined(_WIN32_WCE) ) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-/*
+- * Check if the requested operation would be blocking on a non-blocking socket
+- * and thus 'failed' with a negative return value.
+- */
+-static int net_would_block( const mbedtls_net_context *ctx )
+-{
+-    ((void) ctx);
+-    return( WSAGetLastError() == WSAEWOULDBLOCK );
+-}
+-#else
+ /*
+  * Check if the requested operation would be blocking on a non-blocking socket
+  * and thus 'failed' with a negative return value.
+  *
+  * Note: on a blocking socket this function always returns 0!
+  */
+-static int net_would_block( const mbedtls_net_context *ctx )
++static int net_would_block( const mbedtls_net_context *ctx, int *errout )
+ {
+-    int err = errno;
++    int error = mbedtls_net_errno(ctx->fd);
++
++    if ( errout ) {
++        *errout = error;
++    }
+ 
+     /*
+-     * Never return 'WOULD BLOCK' on a blocking socket
++     * Never return 'WOULD BLOCK' on a non-blocking socket
+      */
+-    if( ( fcntl( ctx->fd, F_GETFL ) & O_NONBLOCK ) != O_NONBLOCK )
+-    {
+-        errno = err;
+-        return( 0 );
++    if ( ( fcntl( ctx->fd, F_GETFL, 0) & O_NONBLOCK ) != O_NONBLOCK ) {
++        return ( 0 );
+     }
+ 
+-    switch( errno = err )
+-    {
++    switch ( error ) {
+ #if defined EAGAIN
+-        case EAGAIN:
++    case EAGAIN:
+ #endif
+ #if defined EWOULDBLOCK && EWOULDBLOCK != EAGAIN
+-        case EWOULDBLOCK:
++    case EWOULDBLOCK:
+ #endif
+-            return( 1 );
++        return ( 1 );
+     }
+-    return( 0 );
++    return ( 0 );
+ }
+-#endif /* ( _WIN32 || _WIN32_WCE ) && !EFIX64 && !EFI32 */
+ 
+ /*
+  * Accept a connection from a remote client
+@@ -316,112 +241,79 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
+     int ret;
+     int type;
+ 
+-    struct sockaddr_storage client_addr;
++    struct sockaddr_in client_addr;
+ 
+-#if defined(__socklen_t_defined) || defined(_SOCKLEN_T) ||  \
+-    defined(_SOCKLEN_T_DECLARED) || defined(__DEFINED_socklen_t)
+     socklen_t n = (socklen_t) sizeof( client_addr );
+     socklen_t type_len = (socklen_t) sizeof( type );
+-#else
+-    int n = (int) sizeof( client_addr );
+-    int type_len = (int) sizeof( type );
+-#endif
+ 
+     /* Is this a TCP or UDP socket? */
+-    if( getsockopt( bind_ctx->fd, SOL_SOCKET, SO_TYPE,
+-                    (void *) &type, &type_len ) != 0 ||
+-        ( type != SOCK_STREAM && type != SOCK_DGRAM ) )
+-    {
+-        return( MBEDTLS_ERR_NET_ACCEPT_FAILED );
++    if ( getsockopt( bind_ctx->fd, SOL_SOCKET, SO_TYPE,
++                     (void *) &type, (socklen_t *) &type_len ) != 0 ||
++            ( type != SOCK_STREAM && type != SOCK_DGRAM ) ) {
++        return ( MBEDTLS_ERR_NET_ACCEPT_FAILED );
+     }
+ 
+-    if( type == SOCK_STREAM )
+-    {
++    if ( type == SOCK_STREAM ) {
+         /* TCP: actual accept() */
+         ret = client_ctx->fd = (int) accept( bind_ctx->fd,
+                                              (struct sockaddr *) &client_addr, &n );
+-    }
+-    else
+-    {
++    } else {
+         /* UDP: wait for a message, but keep it in the queue */
+         char buf[1] = { 0 };
+ 
+-        ret = (int) recvfrom( bind_ctx->fd, buf, sizeof( buf ), MSG_PEEK,
++        ret = recvfrom( bind_ctx->fd, buf, sizeof( buf ), MSG_PEEK,
+                         (struct sockaddr *) &client_addr, &n );
+ 
+-#if defined(_WIN32)
+-        if( ret == SOCKET_ERROR &&
+-            WSAGetLastError() == WSAEMSGSIZE )
+-        {
+-            /* We know buf is too small, thanks, just peeking here */
+-            ret = 0;
+-        }
+-#endif
+     }
+ 
+-    if( ret < 0 )
+-    {
+-        if( net_would_block( bind_ctx ) != 0 )
+-            return( MBEDTLS_ERR_SSL_WANT_READ );
++    if ( ret < 0 ) {
++        if ( net_would_block( bind_ctx, NULL ) != 0 ) {
++            return ( MBEDTLS_ERR_SSL_WANT_READ );
++        }
+ 
+-        return( MBEDTLS_ERR_NET_ACCEPT_FAILED );
++        return ( MBEDTLS_ERR_NET_ACCEPT_FAILED );
+     }
+ 
+     /* UDP: hijack the listening socket to communicate with the client,
+      * then bind a new socket to accept new connections */
+-    if( type != SOCK_STREAM )
+-    {
+-        struct sockaddr_storage local_addr;
++    if ( type != SOCK_STREAM ) {
++        struct sockaddr_in local_addr;
+         int one = 1;
+ 
+-        if( connect( bind_ctx->fd, (struct sockaddr *) &client_addr, n ) != 0 )
+-            return( MBEDTLS_ERR_NET_ACCEPT_FAILED );
++        if ( connect( bind_ctx->fd, (struct sockaddr *) &client_addr, n ) != 0 ) {
++            return ( MBEDTLS_ERR_NET_ACCEPT_FAILED );
++        }
+ 
+         client_ctx->fd = bind_ctx->fd;
+         bind_ctx->fd   = -1; /* In case we exit early */
+ 
+-        n = sizeof( struct sockaddr_storage );
+-        if( getsockname( client_ctx->fd,
+-                         (struct sockaddr *) &local_addr, &n ) != 0 ||
+-            ( bind_ctx->fd = (int) socket( local_addr.ss_family,
+-                                           SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ||
+-            setsockopt( bind_ctx->fd, SOL_SOCKET, SO_REUSEADDR,
+-                        (const char *) &one, sizeof( one ) ) != 0 )
+-        {
+-            return( MBEDTLS_ERR_NET_SOCKET_FAILED );
++        n = sizeof( struct sockaddr_in );
++        if ( getsockname( client_ctx->fd,
++                          (struct sockaddr *) &local_addr, &n ) != 0 ||
++                ( bind_ctx->fd = (int) socket( AF_INET,
++                                               SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ||
++                setsockopt( bind_ctx->fd, SOL_SOCKET, SO_REUSEADDR,
++                            (const char *) &one, sizeof( one ) ) != 0 ) {
++            return ( MBEDTLS_ERR_NET_SOCKET_FAILED );
+         }
+ 
+-        if( bind( bind_ctx->fd, (struct sockaddr *) &local_addr, n ) != 0 )
+-        {
+-            return( MBEDTLS_ERR_NET_BIND_FAILED );
++        if ( bind( bind_ctx->fd, (struct sockaddr *) &local_addr, n ) != 0 ) {
++            return ( MBEDTLS_ERR_NET_BIND_FAILED );
+         }
+     }
+ 
+-    if( client_ip != NULL )
+-    {
+-        if( client_addr.ss_family == AF_INET )
+-        {
+-            struct sockaddr_in *addr4 = (struct sockaddr_in *) &client_addr;
+-            *ip_len = sizeof( addr4->sin_addr.s_addr );
++    if ( client_ip != NULL ) {
++        struct sockaddr_in *addr4 = (struct sockaddr_in *) &client_addr;
++        *ip_len = sizeof( addr4->sin_addr.s_addr );
+ 
+-            if( buf_size < *ip_len )
+-                return( MBEDTLS_ERR_NET_BUFFER_TOO_SMALL );
+-
+-            memcpy( client_ip, &addr4->sin_addr.s_addr, *ip_len );
++        if ( buf_size < *ip_len ) {
++            return ( MBEDTLS_ERR_NET_BUFFER_TOO_SMALL );
+         }
+-        else
+-        {
+-            struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *) &client_addr;
+-            *ip_len = sizeof( addr6->sin6_addr.s6_addr );
+-
+-            if( buf_size < *ip_len )
+-                return( MBEDTLS_ERR_NET_BUFFER_TOO_SMALL );
+ 
+-            memcpy( client_ip, &addr6->sin6_addr.s6_addr, *ip_len);
+-        }
++        memcpy( client_ip, &addr4->sin_addr.s_addr, *ip_len );
+     }
+ 
+-    return( 0 );
++    return ( 0 );
+ }
+ 
+ /*
+@@ -429,90 +321,12 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
+  */
+ int mbedtls_net_set_block( mbedtls_net_context *ctx )
+ {
+-#if ( defined(_WIN32) || defined(_WIN32_WCE) ) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-    u_long n = 0;
+-    return( ioctlsocket( ctx->fd, FIONBIO, &n ) );
+-#else
+-    return( fcntl( ctx->fd, F_SETFL, fcntl( ctx->fd, F_GETFL ) & ~O_NONBLOCK ) );
+-#endif
++    return ( fcntl( ctx->fd, F_SETFL, fcntl( ctx->fd, F_GETFL, 0 ) & ~O_NONBLOCK ) );
+ }
+ 
+ int mbedtls_net_set_nonblock( mbedtls_net_context *ctx )
+ {
+-#if ( defined(_WIN32) || defined(_WIN32_WCE) ) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-    u_long n = 1;
+-    return( ioctlsocket( ctx->fd, FIONBIO, &n ) );
+-#else
+-    return( fcntl( ctx->fd, F_SETFL, fcntl( ctx->fd, F_GETFL ) | O_NONBLOCK ) );
+-#endif
+-}
+-
+-/*
+- * Check if data is available on the socket
+- */
+-
+-int mbedtls_net_poll( mbedtls_net_context *ctx, uint32_t rw, uint32_t timeout )
+-{
+-    int ret;
+-    struct timeval tv;
+-
+-    fd_set read_fds;
+-    fd_set write_fds;
+-
+-    int fd = ctx->fd;
+-
+-    if( fd < 0 )
+-        return( MBEDTLS_ERR_NET_INVALID_CONTEXT );
+-
+-#if defined(__has_feature)
+-#if __has_feature(memory_sanitizer)
+-    /* Ensure that memory sanitizers consider read_fds and write_fds as
+-     * initialized even on platforms such as Glibc/x86_64 where FD_ZERO
+-     * is implemented in assembly. */
+-    memset( &read_fds, 0, sizeof( read_fds ) );
+-    memset( &write_fds, 0, sizeof( write_fds ) );
+-#endif
+-#endif
+-
+-    FD_ZERO( &read_fds );
+-    if( rw & MBEDTLS_NET_POLL_READ )
+-    {
+-        rw &= ~MBEDTLS_NET_POLL_READ;
+-        FD_SET( fd, &read_fds );
+-    }
+-
+-    FD_ZERO( &write_fds );
+-    if( rw & MBEDTLS_NET_POLL_WRITE )
+-    {
+-        rw &= ~MBEDTLS_NET_POLL_WRITE;
+-        FD_SET( fd, &write_fds );
+-    }
+-
+-    if( rw != 0 )
+-        return( MBEDTLS_ERR_NET_BAD_INPUT_DATA );
+-
+-    tv.tv_sec  = timeout / 1000;
+-    tv.tv_usec = ( timeout % 1000 ) * 1000;
+-
+-    do
+-    {
+-        ret = select( fd + 1, &read_fds, &write_fds, NULL,
+-                      timeout == (uint32_t) -1 ? NULL : &tv );
+-    }
+-    while( IS_EINTR( ret ) );
+-
+-    if( ret < 0 )
+-        return( MBEDTLS_ERR_NET_POLL_FAILED );
+-
+-    ret = 0;
+-    if( FD_ISSET( fd, &read_fds ) )
+-        ret |= MBEDTLS_NET_POLL_READ;
+-    if( FD_ISSET( fd, &write_fds ) )
+-        ret |= MBEDTLS_NET_POLL_WRITE;
+-
+-    return( ret );
++	return ( fcntl( ctx->fd, F_SETFL, fcntl( ctx->fd, F_GETFL, 0 ) & ~O_NONBLOCK ) );
+ }
+ 
+ /*
+@@ -520,19 +334,10 @@ int mbedtls_net_poll( mbedtls_net_context *ctx, uint32_t rw, uint32_t timeout )
+  */
+ void mbedtls_net_usleep( unsigned long usec )
+ {
+-#if defined(_WIN32)
+-    Sleep( ( usec + 999 ) / 1000 );
+-#else
+     struct timeval tv;
+     tv.tv_sec  = usec / 1000000;
+-#if defined(__unix__) || defined(__unix) || \
+-    ( defined(__APPLE__) && defined(__MACH__) )
+-    tv.tv_usec = (suseconds_t) usec % 1000000;
+-#else
+     tv.tv_usec = usec % 1000000;
+-#endif
+     select( 0, NULL, NULL, NULL, &tv );
+-#endif
+ }
+ 
+ /*
+@@ -542,48 +347,47 @@ int mbedtls_net_recv( void *ctx, unsigned char *buf, size_t len )
+ {
+     int ret;
+     int fd = ((mbedtls_net_context *) ctx)->fd;
++    int error = 0;
+ 
+-    if( fd < 0 )
+-        return( MBEDTLS_ERR_NET_INVALID_CONTEXT );
++    if ( fd < 0 ) {
++        return ( MBEDTLS_ERR_NET_INVALID_CONTEXT );
++    }
+ 
+     ret = (int) read( fd, buf, len );
+ 
+-    if( ret < 0 )
+-    {
+-        if( net_would_block( ctx ) != 0 )
+-            return( MBEDTLS_ERR_SSL_WANT_READ );
++    if ( ret < 0 ) {
++        if ( net_would_block( ctx, &error ) != 0 ) {
++            return ( MBEDTLS_ERR_SSL_WANT_READ );
++        }
+ 
+-#if ( defined(_WIN32) || defined(_WIN32_WCE) ) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-        if( WSAGetLastError() == WSAECONNRESET )
+-            return( MBEDTLS_ERR_NET_CONN_RESET );
+-#else
+-        if( errno == EPIPE || errno == ECONNRESET )
+-            return( MBEDTLS_ERR_NET_CONN_RESET );
++        if ( error == EPIPE || error == ECONNRESET ) {
++            return ( MBEDTLS_ERR_NET_CONN_RESET );
++        }
+ 
+-        if( errno == EINTR )
+-            return( MBEDTLS_ERR_SSL_WANT_READ );
+-#endif
++        if ( error == EINTR ) {
++            return ( MBEDTLS_ERR_SSL_WANT_READ );
++        }
+ 
+-        return( MBEDTLS_ERR_NET_RECV_FAILED );
++        return ( MBEDTLS_ERR_NET_RECV_FAILED );
+     }
+ 
+-    return( ret );
++    return ( ret );
+ }
+ 
+ /*
+  * Read at most 'len' characters, blocking for at most 'timeout' ms
+  */
+-int mbedtls_net_recv_timeout( void *ctx, unsigned char *buf,
+-                              size_t len, uint32_t timeout )
++int mbedtls_net_recv_timeout( void *ctx, unsigned char *buf, size_t len,
++                              uint32_t timeout )
+ {
+     int ret;
+     struct timeval tv;
+     fd_set read_fds;
+     int fd = ((mbedtls_net_context *) ctx)->fd;
+ 
+-    if( fd < 0 )
+-        return( MBEDTLS_ERR_NET_INVALID_CONTEXT );
++    if ( fd < 0 ) {
++        return ( MBEDTLS_ERR_NET_INVALID_CONTEXT );
++    }
+ 
+     FD_ZERO( &read_fds );
+     FD_SET( fd, &read_fds );
+@@ -594,25 +398,20 @@ int mbedtls_net_recv_timeout( void *ctx, unsigned char *buf,
+     ret = select( fd + 1, &read_fds, NULL, NULL, timeout == 0 ? NULL : &tv );
+ 
+     /* Zero fds ready means we timed out */
+-    if( ret == 0 )
+-        return( MBEDTLS_ERR_SSL_TIMEOUT );
+-
+-    if( ret < 0 )
+-    {
+-#if ( defined(_WIN32) || defined(_WIN32_WCE) ) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-        if( WSAGetLastError() == WSAEINTR )
+-            return( MBEDTLS_ERR_SSL_WANT_READ );
+-#else
+-        if( errno == EINTR )
+-            return( MBEDTLS_ERR_SSL_WANT_READ );
+-#endif
++    if ( ret == 0 ) {
++        return ( MBEDTLS_ERR_SSL_TIMEOUT );
++    }
+ 
+-        return( MBEDTLS_ERR_NET_RECV_FAILED );
++    if ( ret < 0 ) {
++        if ( errno == EINTR ) {
++            return ( MBEDTLS_ERR_SSL_WANT_READ );
++        }
++
++        return ( MBEDTLS_ERR_NET_RECV_FAILED );
+     }
+ 
+     /* This call will not block */
+-    return( mbedtls_net_recv( ctx, buf, len ) );
++    return ( mbedtls_net_recv( ctx, buf, len ) );
+ }
+ 
+ /*
+@@ -623,45 +422,31 @@ int mbedtls_net_send( void *ctx, const unsigned char *buf, size_t len )
+     int ret;
+     int fd = ((mbedtls_net_context *) ctx)->fd;
+ 
+-    if( fd < 0 )
+-        return( MBEDTLS_ERR_NET_INVALID_CONTEXT );
++    int error = 0;
++
++    if ( fd < 0 ) {
++        return ( MBEDTLS_ERR_NET_INVALID_CONTEXT );
++    }
+ 
+     ret = (int) write( fd, buf, len );
+ 
+-    if( ret < 0 )
+-    {
+-        if( net_would_block( ctx ) != 0 )
+-            return( MBEDTLS_ERR_SSL_WANT_WRITE );
++    if ( ret < 0 ) {
++        if ( net_would_block( ctx, &error ) != 0 ) {
++            return ( MBEDTLS_ERR_SSL_WANT_WRITE );
++        }
+ 
+-#if ( defined(_WIN32) || defined(_WIN32_WCE) ) && !defined(EFIX64) && \
+-    !defined(EFI32)
+-        if( WSAGetLastError() == WSAECONNRESET )
+-            return( MBEDTLS_ERR_NET_CONN_RESET );
+-#else
+-        if( errno == EPIPE || errno == ECONNRESET )
+-            return( MBEDTLS_ERR_NET_CONN_RESET );
++        if ( error == EPIPE || error == ECONNRESET ) {
++            return ( MBEDTLS_ERR_NET_CONN_RESET );
++        }
+ 
+-        if( errno == EINTR )
+-            return( MBEDTLS_ERR_SSL_WANT_WRITE );
+-#endif
++        if ( error == EINTR ) {
++            return ( MBEDTLS_ERR_SSL_WANT_WRITE );
++        }
+ 
+-        return( MBEDTLS_ERR_NET_SEND_FAILED );
++        return ( MBEDTLS_ERR_NET_SEND_FAILED );
+     }
+ 
+-    return( ret );
+-}
+-
+-/*
+- * Close the connection
+- */
+-void mbedtls_net_close( mbedtls_net_context *ctx )
+-{
+-    if( ctx->fd == -1 )
+-        return;
+-
+-    close( ctx->fd );
+-
+-    ctx->fd = -1;
++    return ( ret );
+ }
+ 
+ /*
+@@ -669,8 +454,9 @@ void mbedtls_net_close( mbedtls_net_context *ctx )
+  */
+ void mbedtls_net_free( mbedtls_net_context *ctx )
+ {
+-    if( ctx->fd == -1 )
++    if ( ctx->fd == -1 ) {
+         return;
++    }
+ 
+     shutdown( ctx->fd, 2 );
+     close( ctx->fd );
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.cpp b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.cpp
+new file mode 100644
+index 0000000..e403902
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.cpp
+@@ -0,0 +1,455 @@
++/*
++ * Copyright (c) 2018-2019 ARM Limited
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "RdaDhcpServer.h"
++#include "Callback.h"
++#include "def.h"
++
++#define DHCP_EXTENSIVE_DEBUG 1
++
++
++#ifdef DHCP_EXTENSIVE_DEBUG
++extern "C" void dhcp_server_print_header_info(dhcp_packet_t *header, uint32_t datalen, const char *title);
++#endif
++
++/* UDP port numbers for DHCP server and client */
++#define IP_PORT_DHCP_SERVER                         (67)
++#define IP_PORT_DHCP_CLIENT                         (68)
++
++/* BOOTP operations */
++#define BOOTP_OP_REQUEST                            (1)
++#define BOOTP_OP_REPLY                              (2)
++
++/* DCHP message types */
++#define DHCP_MSG_TYPE_DISCOVER                      (1)
++#define DHCP_MSG_TYPE_OFFER                         (2)
++#define DHCP_MSG_TYPE_REQUEST                       (3)
++#define DHCP_MSG_TYPE_DECLINE                       (4)
++#define DHCP_MSG_TYPE_ACK                           (5)
++#define DHCP_MSG_TYPE_NACK                          (6)
++#define DHCP_MSG_TYPE_RELEASE                       (7)
++#define DHCP_MSG_TYPE_INFORM                        (8)
++#define DHCP_MSG_TYPE_INVALID                       (255)
++
++#define DHCP_MSG_MAGIC_COOKIE                       (0x63825363)
++
++#define DHCP_STACK_SIZE                             (8*1024)
++
++
++/********************* Options manipulation functions ***********************************/
++static void addOption(dhcp_packet_t *dhcp, uint32_t &index, uint8_t optype)
++{
++    if (index + sizeof(dhcp_packet_t) - 1 + 1 >= DHCP_PACKET_SIZE) {
++        printf("DHCP ERROR: Option index %d (Optype: %d) written to exceeds size of the packet", (int)index, (int)optype);
++        return;
++    }
++
++    dhcp->Options[index++] = optype;
++
++    return;
++}
++
++static void addOption(dhcp_packet_t *dhcp, uint32_t &index, uint8_t optype, uint8_t value)
++{
++    if (index + sizeof(dhcp_packet_t) - 1 + 3 >= DHCP_PACKET_SIZE) {
++        printf("DHCP ERROR: Option index %d (Optype: %d) written to exceeds size of the packet", (int)index, (int)optype);
++        return;
++    }
++
++    dhcp->Options[index++] = optype;
++    dhcp->Options[index++] = 0x01;
++    dhcp->Options[index++] = value;
++
++    return;
++}
++
++static void addOption(dhcp_packet_t *dhcp, uint32_t &index, uint8_t optype, uint16_t value)
++{
++    if (index + sizeof(dhcp_packet_t) - 1 + 4 >= DHCP_PACKET_SIZE) {
++        printf("DHCP ERROR: Option index %d (Optype: %d) written to exceeds size of the packet", (int)index, (int)optype);
++        return;
++    }
++
++    dhcp->Options[index++] = optype;
++    dhcp->Options[index++] = 0x02;
++    dhcp->Options[index++] = static_cast<uint8_t>((value >> 0) & 0xFF);
++    dhcp->Options[index++] = static_cast<uint8_t>((value >> 8) & 0xFF);
++
++    return;
++}
++
++static void addOption(dhcp_packet_t *dhcp, uint32_t &index, uint8_t optype, uint32_t value)
++{
++    if (index + sizeof(dhcp_packet_t) - 1 + 6 >= DHCP_PACKET_SIZE) {
++        printf("DHCP ERROR: Option index %d (Optype: %d) written to exceeds size of the packet", (int)index, (int)optype);
++        return;
++    }
++
++    dhcp->Options[index++] = optype;
++    dhcp->Options[index++] = 0x04;
++    dhcp->Options[index++] = static_cast<uint8_t>((value >> 0) & 0xFF);
++    dhcp->Options[index++] = static_cast<uint8_t>((value >> 8) & 0xFF);
++    dhcp->Options[index++] = static_cast<uint8_t>((value >> 16) & 0xFF);
++    dhcp->Options[index++] = static_cast<uint8_t>((value >> 24) & 0xFF);
++
++    return;
++}
++
++static void addOption(dhcp_packet_t *dhcp, uint32_t &index, uint8_t optype, uint8_t *value, uint32_t size)
++{
++    if (index + sizeof(dhcp_packet_t) - 1 + 2 + size >= DHCP_PACKET_SIZE) {
++        printf("DHCP ERROR: Option index %d (Optype: %d) written to exceeds size of the packet", (int)index, (int)optype);
++        return;
++    }
++
++    dhcp->Options[index++] = optype;
++    dhcp->Options[index++] = size;
++    memcpy(&dhcp->Options[index], value, size);
++    index += size;
++
++    return;
++}
++
++static const uint8_t *findOption(const dhcp_packet_t *request, uint8_t option_num)
++{
++    const uint8_t *option_ptr = request->Options;
++    while ((option_ptr[0] != DHCP_END_OPTION_CODE) &&
++            (option_ptr[0] != option_num) &&
++            (option_ptr < ((const uint8_t *)request) + DHCP_PACKET_SIZE)) {
++        option_ptr += option_ptr[1] + 2;
++    }
++
++    /* Was the option found? */
++    if (option_ptr[0] == option_num) {
++        return &option_ptr[2];
++    }
++    return NULL;
++}
++
++static void addCommonOptions(dhcp_packet_t *dhcp, uint32_t &index, const uint32_t server_addr, const uint32_t netmask)
++{
++    /* Prepare the Web proxy auto discovery URL */
++    char wpad_sample_url[] = "http://xxx.xxx.xxx.xxx/wpad.dat";
++    char ip_str[16];
++    ipv4_to_string(ip_str, htonl(server_addr));
++    memcpy(&wpad_sample_url[7], &ip_str[0], 15);
++
++    /* Server identifier */
++    addOption(dhcp, index, DHCP_SERVER_IDENTIFIER_OPTION_CODE, server_addr);
++    /* Lease Time */
++    addOption(dhcp, index, DHCP_LEASETIME_OPTION_CODE, static_cast<uint32_t>(0x00015180));
++    /* Subnet Mask */
++    addOption(dhcp, index, DHCP_SUBNETMASK_OPTION_CODE, htonl(netmask));
++    /* Web proxy auto discovery URL */
++    addOption(dhcp, index, DHCP_WPAD_OPTION_CODE, (uint8_t *)&wpad_sample_url[0], strlen(wpad_sample_url));
++    /* Router (gateway) */
++    addOption(dhcp, index, DHCP_ROUTER_OPTION_CODE, htonl(server_addr));
++    /* DNS server */
++    addOption(dhcp, index, DHCP_DNS_SERVER_OPTION_CODE, htonl(server_addr));
++    /* Interface MTU */
++    addOption(dhcp, index, DHCP_MTU_OPTION_CODE, static_cast<uint16_t>(RDA_PAYLOAD_MTU));
++}
++
++static void sendPacket(UDPSocket *socket, dhcp_packet_t *dhcp, uint32_t size)
++{
++    nsapi_size_or_error_t err;
++    uint32_t broadcast_ip = 0xFFFFFFFF;
++    char string_addr[16];
++    ipv4_to_string(string_addr, htonl(broadcast_ip));
++
++    err = socket->sendto(string_addr, IP_PORT_DHCP_CLIENT, reinterpret_cast<uint8_t *>(dhcp), size);
++    if (err < 0) {
++        printf("DHCP ERROR: Packet send failure with error %d.\r\n", err);
++    } else if (err != (int)size) {
++        printf("DHCP ERROR: Could not send entire packet. Only %d bytes were sent.\r\n", err);
++    }
++
++	printf("sendPacket OK!!!!!!!!!!!!!!!!!!!!!/r/n");
++}
++
++/********************* Cache utility functions ***********************************/
++void RdaDhcpServer::setAddress(const rda_mac_addr_t &mac_id, const rda_ip_addr_t &addr)
++{
++    uint32_t a;
++    uint32_t first_empty_slot;
++    uint32_t cached_slot;
++    char empty_cache[NSAPI_IPv6_SIZE] = "";
++
++    /* Search for empty slot in cache */
++    for (a = 0, first_empty_slot = DHCP_IP_ADDRESS_CACHE_MAX, cached_slot = DHCP_IP_ADDRESS_CACHE_MAX; a < DHCP_IP_ADDRESS_CACHE_MAX; a++) {
++        /* Check for matching MAC address */
++        if (memcmp(&_mac_addr_cache[a], &mac_id, sizeof(mac_id)) == 0) {
++            /* Cached device found */
++            cached_slot = a;
++            break;
++        } else if (first_empty_slot == DHCP_IP_ADDRESS_CACHE_MAX && memcmp(&_mac_addr_cache[a], &empty_cache, sizeof(rda_mac_addr_t)) == 0) {
++            /* Device not found in cache. Return the first empty slot */
++            first_empty_slot = a;
++        }
++    }
++
++    if (cached_slot != DHCP_IP_ADDRESS_CACHE_MAX) {
++        /* Update IP address of cached device */
++        _ip_addr_cache[cached_slot] = addr;
++    } else if (first_empty_slot != DHCP_IP_ADDRESS_CACHE_MAX) {
++        /* Add device to the first empty slot */
++        _mac_addr_cache[first_empty_slot] = mac_id;
++        _ip_addr_cache[first_empty_slot] = addr;
++    } else {
++        /* Cache is full. Add device to slot 0 */
++        _mac_addr_cache[0] = mac_id;
++        _ip_addr_cache [0] = addr;
++    }
++}
++
++bool RdaDhcpServer::lookupAddress(const rda_mac_addr_t &mac_id, rda_ip_addr_t &addr)
++{
++    /* Check whether device is already cached */
++    for (uint32_t a = 0; a < DHCP_IP_ADDRESS_CACHE_MAX; a++) {
++        if (memcmp(&_mac_addr_cache[a], &mac_id, sizeof(mac_id)) == 0) {
++            addr = _ip_addr_cache[a];
++            return true;
++        }
++    }
++    return false;
++}
++
++void RdaDhcpServer::freeAddress(const rda_mac_addr_t &mac_id)
++{
++    /* Check whether device is already cached */
++    for (uint32_t a = 0; a < DHCP_IP_ADDRESS_CACHE_MAX; a++) {
++        if (memcmp(&_mac_addr_cache[a], &mac_id, sizeof(mac_id)) == 0) {
++            memset(&_mac_addr_cache[a], 0, sizeof(_mac_addr_cache[a]));
++            memset(&_ip_addr_cache[a], 0, sizeof(_ip_addr_cache[a]));
++        }
++    }
++}
++
++void RdaDhcpServer::handleDiscover(dhcp_packet_t *dhcp)
++{
++#ifdef DHCP_EXTENSIVE_DEBUG
++    dhcp_server_print_header_info(dhcp, DHCP_PACKET_SIZE, "\n\nDHCP DISCOVER RECEIVED");
++#endif
++
++    uint32_t index;
++    rda_mac_addr_t client_mac;
++    rda_ip_addr_t client_ip;
++
++    memcpy(&client_mac, dhcp->ClientHwAddr, sizeof(client_mac));
++    if (!lookupAddress(client_mac, client_ip)) {
++        client_ip = _available_addr;
++    }
++
++    memset(&dhcp->Legacy, 0, sizeof(dhcp->Legacy));
++    memset(&dhcp->Options[0], 0, DHCP_PACKET_SIZE - sizeof(dhcp_packet_t) + 3);
++
++    dhcp->Opcode = BOOTP_OP_REPLY;
++    dhcp->YourIpAddr = htonl(client_ip.addrv4.addr);
++    dhcp->MagicCookie = htonl(static_cast<uint32_t>(DHCP_MSG_MAGIC_COOKIE));
++
++    /* Add options */
++    index = 0;
++    addOption(dhcp, index, DHCP_MESSAGETYPE_OPTION_CODE, static_cast<uint8_t>(DHCP_MSG_TYPE_OFFER));
++    addCommonOptions(dhcp, index, _server_addr.addrv4.addr, _netmask.addrv4.addr);
++    addOption(dhcp, index, static_cast<uint8_t>(DHCP_END_OPTION_CODE));
++
++    uint32_t size = sizeof(dhcp_packet_t) + index - 1;
++
++#ifdef DHCP_EXTENSIVE_DEBUG
++    dhcp_server_print_header_info(dhcp, size, "\n\nDHCP OFFER SENT");
++#endif
++    sendPacket(&_socket, dhcp, size);
++}
++
++void RdaDhcpServer::handleRequest(dhcp_packet_t *dhcp)
++{
++#ifdef DHCP_EXTENSIVE_DEBUG
++    dhcp_server_print_header_info(dhcp, DHCP_PACKET_SIZE, "\n\nDHCP REQUEST RECEIVED");
++#endif
++
++    rda_mac_addr_t client_mac;
++    rda_ip_addr_t client_ip;
++    rda_ip_addr_t req_ip;
++    bool increment = false;
++    uint32_t index;
++
++    /* Check that the REQUEST is for this server */
++    uint32_t *server_id_req = (uint32_t *)findOption(dhcp, DHCP_SERVER_IDENTIFIER_OPTION_CODE);
++    if ((server_id_req == NULL) || ((server_id_req != NULL) && (_server_addr.addrv4.addr != *server_id_req))) {
++        return; /* Server ID was not found or does not match local IP address */
++    }
++
++    /* Locate the requested address in the options and keep requested address */
++    req_ip.addrv4.addr = ntohl(*(uint32_t *)findOption(dhcp, DHCP_REQUESTED_IP_ADDRESS_OPTION_CODE));
++
++    memcpy(&client_mac, dhcp->ClientHwAddr, sizeof(client_mac));
++    if (!lookupAddress(client_mac, client_ip)) {
++        client_ip = _available_addr;
++        increment = true;
++    }
++
++    memset(&dhcp->Legacy, 0, sizeof(dhcp->Legacy));
++    memset(&dhcp->Options[0], 0, DHCP_PACKET_SIZE - sizeof(dhcp_packet_t) + 3);
++
++    dhcp->Opcode = BOOTP_OP_REPLY;
++    dhcp->MagicCookie = htonl(static_cast<uint32_t>(DHCP_MSG_MAGIC_COOKIE));
++
++    index = 0;
++    /* Check if the requested IP address matches one we have assigned */
++    if (req_ip.addrv4.addr != client_ip.addrv4.addr) {
++        /* Request is not for the assigned IP - force client to take next available IP by sending NAK */
++        addOption(dhcp, index, DHCP_MESSAGETYPE_OPTION_CODE, static_cast<uint8_t>(DHCP_MSG_TYPE_NACK));
++        addOption(dhcp, index, DHCP_SERVER_IDENTIFIER_OPTION_CODE, _server_addr.addrv4.addr);
++        printf("\n\nDHCP_THREAD: %d REQUEST NAK\n", __LINE__);
++    } else {
++        dhcp->YourIpAddr = htonl(client_ip.addrv4.addr);
++
++        addOption(dhcp, index, DHCP_MESSAGETYPE_OPTION_CODE, static_cast<uint8_t>(DHCP_MSG_TYPE_ACK));
++        addCommonOptions(dhcp, index, _server_addr.addrv4.addr, _netmask.addrv4.addr);
++
++        if (increment) {
++            uint32_t ip_mask = ~(_netmask.addrv4.addr);
++            uint32_t subnet = _server_addr.addrv4.addr & _netmask.addrv4.addr;
++            do {
++                _available_addr.addrv4.addr = subnet | ((_available_addr.addrv4.addr + 1) & ip_mask);
++            } while (_available_addr.addrv4.addr == _server_addr.addrv4.addr);
++        }
++        setAddress(client_mac, client_ip);
++    }
++    addOption(dhcp, index, static_cast<uint8_t>(DHCP_END_OPTION_CODE));
++
++    uint32_t size = sizeof(dhcp_packet_t) + index - 1;
++
++#ifdef DHCP_EXTENSIVE_DEBUG
++    dhcp_server_print_header_info(dhcp, DHCP_PACKET_SIZE, "\n\nDHCP REQUEST REPLY SENT");
++#endif
++    sendPacket(&_socket, dhcp, size);
++}
++
++void RdaDhcpServer::runServer(void)
++{
++    nsapi_size_or_error_t err_or_size;
++
++    _running = true;
++
++    /* Create receive DHCP socket */
++    _socket.open(_nstack);
++    char iface_name[8] = {0};
++    _niface->get_interface_name(iface_name);
++    _socket.setsockopt(NSAPI_SOCKET, NSAPI_BIND_TO_DEVICE, iface_name, strlen(iface_name));
++    _socket.bind((uint16_t)IP_PORT_DHCP_SERVER);
++
++    /* Save the current netmask to be sent in DHCP packets as the 'subnet mask option' */
++    _server_addr.addrv4.addr = string_to_ipv4(_niface->get_ip_address());
++    _netmask.addrv4.addr = string_to_ipv4(_niface->get_netmask());
++
++
++    printf("DHCP Server started.\r\n");
++    printf("DHCP Server: IP     : %s\r\n", _niface->get_ip_address());
++    printf("DHCP Server: Netmask: %s\r\n", _niface->get_netmask());
++    printf("DHCP Server: Gateway: %s\r\n", _niface->get_gateway());
++    printf("DHCP Server: MAC    : %s\r\n\n", _niface->get_mac_address());
++
++    /* Calculate the first available IP address which will be served - based on the netmask and the local IP */
++    uint32_t ip_mask = ~(_netmask.addrv4.addr);
++    uint32_t subnet = _server_addr.addrv4.addr & _netmask.addrv4.addr;
++    _available_addr.addrv4.addr = subnet | ((_server_addr.addrv4.addr + 1) & ip_mask);
++
++    while (_running) {
++        /* Sleep until data is received from socket. */
++        err_or_size = _socket.recv(_buff, DHCP_PACKET_SIZE);
++        /* Options field in DHCP header is variable length. We are looking for option "DHCP Message Type" that is 3 octets in size (code, length and type) */
++        /* If the return value is <0, it is an error; if it is >=0, it is the received length */
++        if (err_or_size < 0 || err_or_size < (int32_t)sizeof(dhcp_packet_t)) {
++            continue;
++        }
++
++        dhcp_packet_t *dhcp = reinterpret_cast<dhcp_packet_t *>(_buff);
++        /* Check if the option in the dhcp header is "DHCP Message Type", code value for option "DHCP Message Type" is 53 as per rfc2132 */
++        if (dhcp->Options[0] != DHCP_MESSAGETYPE_OPTION_CODE) {
++            printf("%d: %s received option code wrong: %d != %d\n", __LINE__, __func__, dhcp->Options[0], DHCP_MESSAGETYPE_OPTION_CODE);
++            continue;
++        }
++
++        uint8_t msg_type = dhcp->Options[2];
++        switch (msg_type) {
++            case DHCP_MSG_TYPE_DISCOVER:
++                handleDiscover(dhcp);
++                break;
++            case DHCP_MSG_TYPE_REQUEST:
++                handleRequest(dhcp);
++                break;
++            default:
++                printf("DHCP ERROR: Unhandled dhcp packet type, %d", msg_type);
++                break;
++        }
++    }
++}
++
++void RdaDhcpServer::threadWrapper(RdaDhcpServer *obj)
++{
++    obj->runServer();
++}
++
++RdaDhcpServer::RdaDhcpServer(NetworkStack *nstack, NetworkInterface *niface)
++    : _nstack(nstack),
++      _niface(niface),
++      _thread(osPriorityNormal, DHCP_STACK_SIZE, NULL, "DHCPserver") {}
++
++RdaDhcpServer::~RdaDhcpServer()
++{
++    stop();
++}
++
++rda_rslt_t RdaDhcpServer::start(void)
++{
++
++printf("RdaDhcpServer::start!\r\n");
++    rda_rslt_t result = RDA_RSLT_SUCCESS;
++    if (!_running) {
++        if (_nstack == NULL) {
++			return RDA_RSLT_FAILE;
++		}
++
++        /* Clear cache */
++        memset(_mac_addr_cache, 0, sizeof(_mac_addr_cache));
++        memset(_ip_addr_cache, 0, sizeof(_ip_addr_cache));
++
++        /* Start DHCP server */
++        if (osOK != _thread.start(mbed::callback(threadWrapper, this))) {
++            result = RDA_RSLT_FAILE;
++        }
++    }
++    return result;
++}
++
++rda_rslt_t RdaDhcpServer::stop(void)
++{
++    rda_rslt_t result = RDA_RSLT_SUCCESS;
++    if (_running) {
++        _running = false;
++        if (NSAPI_ERROR_OK != _socket.close()) {
++            printf("DHCP ERROR: DHCP socket closure failed.\n");
++            result = RDA_RSLT_FAILE;
++        }
++        if (osOK != _thread.join()) {
++            printf("DHCP ERROR: DHCP thread join failed.\n");
++            result = RDA_RSLT_FAILE;
++        }
++    }
++    return result;
++}
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.h
+new file mode 100644
+index 0000000..bbf45a4
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaDhcpServer.h
+@@ -0,0 +1,138 @@
++/*
++ * Copyright (c) 2018-2019 ARM Limited
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#ifndef RDA_DHCP_SERVER_H
++#define RDA_DHCP_SERVER_H
++
++
++
++#include "rda_network_utils.h"
++#include "UDPSocket.h"
++#include "netsocket/NetworkInterface.h"
++#include "netsocket/NetworkStack.h"
++#include "rtos.h"
++
++
++typedef uint32_t rda_rslt_t;
++
++/** @ref rda_rslt_t return value indicating success */
++#define RDA_RSLT_SUCCESS       (0U)
++#define RDA_RSLT_FAILE         (1U)
++
++#ifndef RDA_PAYLOAD_MTU
++#define RDA_PAYLOAD_MTU           (1500)
++#endif
++
++
++
++/* DHCP data structure */
++typedef struct {
++    uint8_t  Opcode;            /* packet opcode type */
++    uint8_t  HwType;            /* hardware addr type */
++    uint8_t  HwLen;             /* hardware addr length */
++    uint8_t  Hops;              /* gateway hops */
++    uint32_t TransactionId;     /* transaction ID */
++    uint16_t SecsElapsed;       /* seconds since boot began */
++    uint16_t Flags;
++    uint32_t ClientIpAddr;      /* client IP address */
++    uint32_t YourIpAddr;        /* 'your' IP address */
++    uint32_t ServerIpAddr;      /* server IP address */
++    uint32_t GatewayIpAddr;     /* gateway IP address */
++    uint8_t  ClientHwAddr[16];  /* client hardware address */
++    uint8_t  Legacy[192];       /* SName, File */
++    uint32_t MagicCookie;
++    uint8_t  Options[3];        /* options area */
++    /* as of RFC2131 it is variable length */
++} dhcp_packet_t;
++
++#define DHCP_SUBNETMASK_OPTION_CODE                 (1)
++#define DHCP_ROUTER_OPTION_CODE                     (3)
++#define DHCP_DNS_SERVER_OPTION_CODE                 (6)
++#define DHCP_HOST_NAME_OPTION_CODE                  (12)
++#define DHCP_MTU_OPTION_CODE                        (26)
++#define DHCP_REQUESTED_IP_ADDRESS_OPTION_CODE       (50)
++#define DHCP_LEASETIME_OPTION_CODE                  (51)
++#define DHCP_MESSAGETYPE_OPTION_CODE                (53)
++#define DHCP_SERVER_IDENTIFIER_OPTION_CODE          (54)
++#define DHCP_PARAM_REQUEST_LIST_OPTION_CODE         (55)
++#define DHCP_WPAD_OPTION_CODE                       (252)
++#define DHCP_END_OPTION_CODE                        (255)
++
++#define DHCP_IP_ADDRESS_CACHE_MAX                   (5)
++#define ADDITIONAL_OPTION_BYTES                     (272)
++#define DHCP_PACKET_SIZE                            (sizeof(dhcp_packet_t) + ADDITIONAL_OPTION_BYTES)
++
++/** DHCP thread could not be started */
++//#define CY_DHCP_THREAD_CREATION_FAILED  CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_MIDDLEWARE_BASE, 0)
++
++/** Error while trying to stop the DHCP server */
++//#define CY_DHCP_STOP_FAILED  CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_MIDDLEWARE_BASE, 1)
++
++/**
++ *  Implementation of a DHCP sever
++ */
++class RdaDhcpServer {
++public:
++    /**
++     * Create a DHCP server.
++     */
++    RdaDhcpServer(NetworkStack *nstack, NetworkInterface *niface);
++
++    /**
++     * Delete the DHCP server.
++     */
++    virtual ~RdaDhcpServer();
++
++    /**
++     *  Start a DHCP server instance.
++     * @return RDA_RSLT_SUCCESS on success otherwise error.
++     */
++    rda_rslt_t start(void);
++
++    /**
++     *  Stop a DHCP server instance.
++     * @return RDA_RSLT_SUCCESS on success otherwise error.
++     */
++    rda_rslt_t stop(void);
++
++private:
++    NetworkStack *_nstack = NULL;
++    NetworkInterface *_niface = NULL;
++    UDPSocket _socket;
++    Thread _thread;
++    bool _running = false;
++
++    rda_ip_addr_t _available_addr;
++    rda_ip_addr_t _server_addr;
++    rda_ip_addr_t _netmask;
++
++    rda_mac_addr_t _mac_addr_cache[DHCP_IP_ADDRESS_CACHE_MAX];
++    rda_ip_addr_t _ip_addr_cache[DHCP_IP_ADDRESS_CACHE_MAX];
++    uint8_t _buff[DHCP_PACKET_SIZE];
++
++    static void threadWrapper(RdaDhcpServer *obj);
++    void runServer(void);
++
++    void setAddress(const rda_mac_addr_t &mac_id, const rda_ip_addr_t &addr);
++    bool lookupAddress(const rda_mac_addr_t &mac_id, rda_ip_addr_t &addr);
++    void freeAddress(const rda_mac_addr_t &mac_id);
++
++    void handleDiscover(dhcp_packet_t *dhcp);
++    void handleRequest(dhcp_packet_t *dhcp);
++};
++
++#endif /* WHD_DHCP_SERVER_H */
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaSoftAPInterface.cpp b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaSoftAPInterface.cpp
+new file mode 100644
+index 0000000..894cab4
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaSoftAPInterface.cpp
+@@ -0,0 +1,122 @@
++/*
++ * Copyright (c) 2018-2019 ARM Limited
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "RdaSoftAPInterface.h"
++#include "rda5991h_wland.h"
++#include "nsapi_types.h"
++#include "wland_types.h"
++#include "rda_sys_wrapper.h"
++#include <inet.h>
++
++
++
++RdaSoftAPInterface::RdaSoftAPInterface(RDA5981x_EMAC &emac, OnboardNetworkStack &stack)
++    : EMACInterface(emac, stack), _rda5981x_emac(emac)
++{
++
++}
++
++nsapi_error_t RdaSoftAPInterface::init()
++{
++	if (!_interface) {
++		nsapi_error_t err = _stack.add_ethernet_interface(_emac, true, &_interface);
++		if (err != NSAPI_ERROR_OK) {
++			_interface = NULL;
++			return err;
++		}
++		_interface->attach(_connection_status_cb);
++	} else {
++		_rda5981x_emac.power_up();
++		_stack.set_default_interface(_interface);
++	}
++
++    return NSAPI_ERROR_OK;
++}
++
++int RdaSoftAPInterface::start_ap(const char *ssid, const char *pass, int channel, char mode, bool start_dhcp_server)
++{
++	nsapi_error_t err;
++
++	// Set static IP address for SoftAP and bring up
++	set_dhcp(false);
++
++	init();
++
++	_rda5981x_emac.emac_wifi_link_state_changed(true);
++
++	err = _interface->bringup(_dhcp,
++							  _ip_address[0] ? _ip_address : 0,
++							  _netmask[0] ? _netmask : 0,
++							  _gateway[0] ? _gateway : 0,
++							  DEFAULT_STACK);
++	if (err != NSAPI_ERROR_OK) {
++		printf("bringup() ERROR: %d\r\n", err);
++		return err;
++	}
++
++	//Start AP
++	memcpy(gssid_ap, ssid, strlen(ssid));
++	memcpy(gpass_ap, pass, strlen(pass));
++	gssid_ap[strlen(ssid)] = gpass_ap[strlen(pass)] = '\0';
++	if(channel > 0 && channel < 14) {
++		gchannel_ap = channel;
++	}
++	
++	rda5981_set_AP_hidden_type(mode);
++	
++	rda_msg msg;
++	msg.type = WLAND_STARTAP;
++	rda_mail_put(wland_msgQ, (void*)&msg, osWaitForever);
++
++	if (start_dhcp_server) {
++		_dhcp_server = std::make_unique<RdaDhcpServer>(get_stack(), this);
++		
++		if (RDA_RSLT_SUCCESS != _dhcp_server->start()) {
++			err = NSAPI_ERROR_DHCP_FAILURE;
++		}
++	}
++
++	return err;
++}
++
++
++int RdaSoftAPInterface::stop_ap(void)
++{
++	rda_msg msg;
++
++	if (_dhcp_server && RDA_RSLT_SUCCESS != _dhcp_server->stop()) {
++		return NSAPI_ERROR_DHCP_FAILURE;
++	}
++
++	_dhcp_server.reset();
++
++	_rda5981x_emac.emac_wifi_link_state_changed(false);
++	_rda5981x_emac.remove_rx_thread();
++
++	EMACInterface::disconnect();
++
++	//Stop Ap
++	memset(gssid_ap, 0, strlen((const char *)gssid_ap));
++	memset(gpass_ap, 0, strlen((const char *)gpass_ap));
++
++	msg.type = WLAND_STOPAP;
++	rda_mail_put(wland_msgQ, (void*)&msg, osWaitForever);
++
++	return 0;
++}
++
++
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaSoftAPInterface.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaSoftAPInterface.h
+new file mode 100644
+index 0000000..d7ba724
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaSoftAPInterface.h
+@@ -0,0 +1,92 @@
++/*
++ * Copyright (c) 2018-2019 ARM Limited
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++
++#ifndef RDA_SOFTAP_INTERFACE_H
++#define RDA_SOFTAP_INTERFACE_H
++
++
++#include "EMACInterface.h"
++#include "OnboardNetworkStack.h"
++#include "RdaDhcpServer.h"
++#include "rda5981x_emac.h"
++#include <memory>
++
++
++
++/** RdaSoftAPInterface class*/
++class RdaSoftAPInterface : public EMACInterface {
++public:
++	/** Create an EMAC-based ethernet interface.
++	 *
++	 * The default arguments obtain the default EMAC, which will be target-
++	 * dependent (and the target may have some JSON option to choose which
++	 * is the default, if there are multiple). The default stack is configured
++	 * by JSON option nsapi.default-stack.
++	 *
++	 * Due to inability to return errors from the constructor, no real
++	 * work is done until the first call to connect().
++	 *
++	 * @param emac  Reference to EMAC to use
++	 * @param stack Reference to onboard-network stack to use
++	 */
++	RdaSoftAPInterface(
++			RDA5981x_EMAC &emac = RDA5981x_EMAC::get_instance(RDA_AP_ROLE),
++			OnboardNetworkStack &stack = OnboardNetworkStack::get_default_instance());
++
++	static RdaSoftAPInterface *get_default_instance();
++
++    /** Start a Access Point
++     *
++     *  @param ssid     Access Point name
++     *  @param pass     Access Point password
++     *  @param channel  Access Point channel
++     *  @param mode     Access Point hidden mode
++     *  @return         0 on success, negative error code on failure
++     */
++    int start_ap(const char *ssid, const char *pass, int channel, char mode, bool start_dhcp_server);
++
++    /** Stop a Access Point
++     *
++     *  @return         0 on success, negative error code on failure
++     */
++    int stop_ap(void);
++
++    /** Set blocking status of interface. 
++     *  Nonblocking mode unsupported.
++     *
++     *  @param blocking true if connect is blocking
++     *  @return         0 on success, negative error code on failure
++     */
++    nsapi_error_t set_blocking(bool blocking)
++    {
++        if (blocking) {
++            _blocking = blocking;
++            return NSAPI_ERROR_OK;
++        } else {
++            return NSAPI_ERROR_UNSUPPORTED;
++        }
++    }
++
++	virtual nsapi_size_or_error_t init();
++
++protected:
++	RDA5981x_EMAC &_rda5981x_emac;
++	std::unique_ptr<RdaDhcpServer> _dhcp_server;
++};
++
++#endif
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.cpp b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.cpp
+new file mode 100644
+index 0000000..5d15498
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.cpp
+@@ -0,0 +1,322 @@
++/* Copyright (c) 2019 Unisoc Communications Inc.
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "WiFiInterface.h"
++#include "RdaStaInterface.h"
++#include "rda5991h_wland.h"
++#include "nsapi_types.h"
++#include "wland_types.h"
++#include "rda_sys_wrapper.h"
++
++typedef enum {
++    WIFI_CONNECTED,
++    WIFI_DISCONNECTED,	
++}WIFI_STATE;
++
++static WIFI_STATE wifi_state = WIFI_DISCONNECTED;
++
++
++RdaStaInterface::RdaStaInterface(RDA5981x_EMAC &emac, OnboardNetworkStack &stack)
++	: EMACInterface(emac, stack), _rda5981x_emac(emac)
++{
++	_ssid[0] = '\0';
++	_pass[0] = '\0';
++	_channel = 0;
++	_security = NSAPI_SECURITY_NONE;
++}
++
++nsapi_error_t RdaStaInterface::set_channel(uint8_t channel)
++{
++	int ret = 0;
++
++	if (channel > 13)
++		return NSAPI_ERROR_PARAMETER;
++
++	if (channel == 0) {
++		_channel = 0;
++		return NSAPI_ERROR_OK;
++	}
++
++	ret = rda5981_set_channel(channel);
++	if (ret == 0) {
++		_channel = channel;
++		return NSAPI_ERROR_OK;
++	} else {
++		return NSAPI_ERROR_TIMEOUT;
++	}
++}
++
++int8_t RdaStaInterface::get_rssi()
++{
++	return rda5981_get_rssi();
++}
++
++nsapi_error_t RdaStaInterface::init()
++{
++	if (!_interface) {
++		nsapi_error_t err = _stack.add_ethernet_interface(_emac, true, &_interface);
++		if (err != NSAPI_ERROR_OK) {
++			_interface = NULL;
++			return err;
++		}
++		_interface->attach(_connection_status_cb);
++	} else {
++		_rda5981x_emac.power_up();
++		_stack.set_default_interface(_interface);
++	}
++
++    return NSAPI_ERROR_OK;
++}
++
++nsapi_error_t RdaStaInterface::set_credentials(const char *ssid, const char *pass,
++                nsapi_security_t security)
++{
++	if (ssid == 0 || strlen(ssid) == 0) {
++		return NSAPI_ERROR_PARAMETER;
++	}
++	if (security != NSAPI_SECURITY_NONE && (pass == 0 || strlen(pass) == 0)) {
++		return NSAPI_ERROR_PARAMETER;
++	}
++	if (strlen(ssid) > 32 || strlen(pass) > 63) {
++		return NSAPI_ERROR_PARAMETER;
++	}
++	memcpy((void*)_ssid, (void*)ssid, strlen(ssid));
++	_ssid[strlen(ssid)] = '\0';
++	memcpy((void*)_pass, (void*)pass, strlen(pass));
++	_pass[strlen(pass)] = '\0';
++	_security = security;
++	return NSAPI_ERROR_OK;
++}
++
++nsapi_error_t RdaStaInterface::connect(const char *ssid, const char *pass,
++                nsapi_security_t security, uint8_t channel)
++{
++	rda_msg msg;
++	int ret = 0;
++	bool find = false;
++	int i = 0;
++	rda5981_scan_result bss;
++
++	if(wifi_state == WIFI_CONNECTED) {
++		return NSAPI_ERROR_IS_CONNECTED;
++	}
++	
++	if (ssid == NULL || ssid[0] == 0) {
++		return NSAPI_ERROR_PARAMETER;
++	}
++
++	init();
++
++	set_credentials(ssid, pass, security);
++	set_channel(channel);
++
++	//reset all scan result to avoid any previous stored SSID/PW/CHANNEL
++	rda5981_del_scan_all_result();
++	rda5981_scan(NULL,0,0);
++	if(rda5981_check_scan_result_name(ssid) != 0) {
++		for (i = 0; i< 5; i++) {
++			rda5981_scan(NULL, 0, 0);
++			if(rda5981_check_scan_result_name(ssid) == 0) {
++				find = true;
++				break;
++			}
++		}
++	} else {
++		find = true;
++	}
++
++	if (find == false) {
++		LWIP_DEBUGF(NETIF_DEBUG,("can not find the ap.\r\n"));
++		return NSAPI_ERROR_NO_SSID;
++	}
++	bss.channel = 15;
++	rda5981_get_scan_result_name(&bss, ssid);
++	if ((channel !=0) && (bss.channel != channel)) {
++		LWIP_DEBUGF(NETIF_DEBUG, ("invalid channel\r\n"));
++		return NSAPI_ERROR_CONNECTION_TIMEOUT;
++	}
++
++	memcpy(gssid, ssid, strlen(ssid));
++	if (pass[0] != 0) {
++		memcpy(gpass, pass, strlen(pass));
++	}
++	memset(gbssid, 0, NSAPI_MAC_BYTES);
++	gssid[strlen(ssid)] = gpass[strlen(pass)] = '\0';
++
++	msg.type = WLAND_CONNECT;
++	rda_mail_put(wland_msgQ, (void*)&msg, osWaitForever);
++	ret = rda_sem_wait(wifi_auth_sem, 10000);
++	if (ret) {
++		return NSAPI_ERROR_CONNECTION_TIMEOUT;
++	}
++
++	set_dhcp(true);
++	_rda5981x_emac.emac_wifi_link_state_changed(true);
++	ret = EMACInterface::connect();
++	if (ret) {
++		return ret;
++	}
++
++	wifi_state = WIFI_CONNECTED;
++
++	return NSAPI_ERROR_OK;
++}
++
++nsapi_error_t RdaStaInterface::connect()
++{
++	return connect(_ssid, _pass, _security, _channel);
++}
++
++nsapi_error_t RdaStaInterface::disconnect()
++{
++	rda_msg msg;
++
++	if(wifi_state == WIFI_DISCONNECTED) {
++		return NSAPI_ERROR_NO_CONNECTION;
++	}
++	wifi_state = WIFI_DISCONNECTED;
++
++	_rda5981x_emac.emac_wifi_link_state_changed(false);
++	EMACInterface::disconnect();
++
++	void* wifi_disconnect_sem = rda_sem_create(0);
++	msg.type = WLAND_DISCONNECT;
++	msg.arg1 = (unsigned int)wifi_disconnect_sem;
++	rda_mail_put(wland_msgQ, (void*)&msg, osWaitForever);
++	rda_sem_wait(wifi_disconnect_sem, osWaitForever);
++	rda_sem_delete(wifi_disconnect_sem);
++	
++	_rda5981x_emac.remove_rx_thread();
++
++	return NSAPI_ERROR_OK;
++}
++
++nsapi_error_t RdaStaInterface::reconnect()
++{
++	rda_msg msg;
++	bool find = false;
++	int i = 0;
++	rda5981_scan_result bss;
++	int ret = 0;
++
++	if (_ssid == NULL || _ssid[0] == 0) {
++		return NSAPI_ERROR_PARAMETER;
++	}
++
++	init();
++
++	rda5981_del_scan_all_result();
++	if(rda5981_check_scan_result_name(_ssid) != 0) {
++		for (i = 0; i< 5; i++) {
++			rda5981_scan(NULL, 0, 0);
++			if(rda5981_check_scan_result_name(_ssid) == 0) {
++				find = true;
++				break;
++			}
++		}
++	} else {
++		find = true;
++	}
++
++	if (find == false) {
++		LWIP_DEBUGF(NETIF_DEBUG,"can not find the ap.\r\n");
++		return NSAPI_ERROR_CONNECTION_TIMEOUT;
++	}
++	bss.channel = 15;
++	rda5981_get_scan_result_name(&bss, _ssid);
++	if ((_channel !=0) && (bss.channel != _channel)) {
++		LWIP_DEBUGF(NETIF_DEBUG, "invalid channel\r\n");
++		return NSAPI_ERROR_CONNECTION_TIMEOUT;
++	}
++
++    memcpy(gssid, _ssid, strlen(_ssid));
++	if (_pass[0] != 0) {
++		memcpy(gpass, _pass, strlen(_pass));
++	}
++	memset(gbssid, 0, NSAPI_MAC_BYTES);
++	gssid[strlen(_ssid)] = gpass[strlen(_pass)] = '\0';
++
++	msg.type = WLAND_CONNECT;
++	rda_mail_put(wland_msgQ, (void*)&msg, osWaitForever);
++	ret = rda_sem_wait(wifi_auth_sem, 10000);
++	if (ret) {
++		return NSAPI_ERROR_CONNECTION_TIMEOUT;
++	}
++
++	if(_dhcp) {
++		memset(_ip_address, 0, sizeof(_ip_address));
++		memset(_netmask, 0, sizeof(_netmask));
++		memset(_gateway, 0, sizeof(_gateway));
++	}
++
++	ret = _interface->bringup(_dhcp,
++			_ip_address[0] ? _ip_address : 0,
++			_netmask[0] ? _netmask : 0,
++			_gateway[0] ? _gateway : 0,
++			DEFAULT_STACK,
++			_blocking);
++	LWIP_DEBUGF(NETIF_DEBUG,("Interface bringup up status:%d\r\n",ret));
++
++	if( ret == NSAPI_ERROR_OK || ret == NSAPI_ERROR_IS_CONNECTED ) {
++		ret = NSAPI_ERROR_OK;
++		wifi_state = WIFI_CONNECTED;
++	}
++	else if( ret == NSAPI_ERROR_DHCP_FAILURE) {
++		disconnect();
++	}
++	return ret;
++}
++
++nsapi_size_or_error_t RdaStaInterface::scan(WiFiAccessPoint *res, nsapi_size_t count)
++{
++	int bss_num = 0, i;
++	rda5981_scan_result *bss;
++	nsapi_wifi_ap_t ap;
++
++	rda5981_scan(NULL, 0, 0);
++	bss_num = rda5981_get_scan_num();
++	if (count != 0) {
++		bss_num = (bss_num < count) ? bss_num : count;
++	}
++	if (res) {
++		bss = (rda5981_scan_result *)malloc(bss_num * sizeof(rda5981_scan_result));
++		rda5981_get_scan_result(bss, bss_num);
++		for (i = 0; i < bss_num; i++) {
++			memset(&ap, 0, sizeof(nsapi_wifi_ap_t));
++			memcpy(ap.bssid, bss[i].BSSID, 6);
++			memcpy(ap.ssid, bss[i].SSID, bss[i].SSID_len);
++			ap.channel = bss[i].channel;
++			ap.rssi = bss[i].RSSI;
++			if (bss[i].secure_type == ENCRYPT_NONE) {
++				ap.security = NSAPI_SECURITY_NONE;
++			} else if(bss[i].secure_type & ENCRYPT_WEP) {
++				ap.security = NSAPI_SECURITY_WEP;
++			} else if((bss[i].secure_type & (ENCRYPT_WPA_TKIP | ENCRYPT_WPA_CCMP)) && \
++						(bss[i].secure_type & (ENCRYPT_WPA2_TKIP | ENCRYPT_WPA2_CCMP))) {
++				ap.security = NSAPI_SECURITY_WPA_WPA2;
++			} else if((bss[i].secure_type & (ENCRYPT_WPA_TKIP | ENCRYPT_WPA_CCMP))) {
++				ap.security = NSAPI_SECURITY_WPA;
++			} else {
++				ap.security = NSAPI_SECURITY_WPA2;
++			}
++			WiFiAccessPoint ap_temp(ap);
++			memcpy(&res[i], &ap_temp, sizeof(WiFiAccessPoint));
++		}
++		free(bss);
++	}
++	return bss_num;
++}
++
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.h
+new file mode 100644
+index 0000000..f9912b4
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaStaInterface.h
+@@ -0,0 +1,139 @@
++/* LWIP implementation of NetworkInterfaceAPI
++ * Copyright (c) 2019 Unisoc Communications Inc.
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#ifndef RDA_STA_INTERFACE_H
++#define RDA_STA_INTERFACE_H
++
++#include "nsapi.h"
++#include "rtos.h"
++#include "EMACInterface.h"
++#include "WiFiInterface.h"
++#include "rda5981x_emac.h"
++#include "rda_interface.h"
++
++
++/** RdaStaInterface class
++ *  Implementation of the NetworkStack for an EMAC-based Ethernet driver
++ */
++class RdaStaInterface : public EMACInterface, public WiFiInterface
++{
++    public:
++        /** Create an EMAC-based ethernet interface.
++         *
++         * The default arguments obtain the default EMAC, which will be target-
++         * dependent (and the target may have some JSON option to choose which
++         * is the default, if there are multiple). The default stack is configured
++         * by JSON option nsapi.default-stack.
++         *
++         * Due to inability to return errors from the constructor, no real
++         * work is done until the first call to connect().
++         *
++         * @param emac  Reference to EMAC to use
++         * @param stack Reference to onboard-network stack to use
++         */
++        RdaStaInterface(
++                RDA5981x_EMAC &emac = RDA5981x_EMAC::get_instance(RDA_STA_ROLE),
++                OnboardNetworkStack &stack = OnboardNetworkStack::get_default_instance()); 
++		
++        /** Set the WiFi network credentials
++         *
++         *  @param ssid      Name of the network to connect to
++         *  @param pass      Security passphrase to connect to the network
++         *  @param security  Type of encryption for connection
++         *                   (defaults to NSAPI_SECURITY_NONE)
++         *  @return          0 on success, or error code on failure
++         */
++        virtual nsapi_error_t set_credentials(const char *ssid, const char *pass,
++                nsapi_security_t security = NSAPI_SECURITY_NONE);
++
++        /** Set the WiFi network channel
++         *
++         *  @param channel   Channel on which the connection is to be made, or 0 for any (Default: 0)
++         *  @return          0 on success, or error code on failure
++         */
++        virtual nsapi_error_t set_channel(uint8_t channel);
++
++        /** Gets the current radio signal strength for active connection
++         *
++         *  @return         Connection strength in dBm (negative value),
++         *                  or 0 if measurement impossible
++         */
++        virtual int8_t get_rssi();
++
++        /** Start the interface
++         *
++         *  Attempts to connect to a WiFi network.
++         *
++         *  @param ssid      Name of the network to connect to
++         *  @param pass      Security passphrase to connect to the network
++         *  @param security  Type of encryption for connection (Default: NSAPI_SECURITY_NONE)
++         *  @param channel   Channel on which the connection is to be made, or 0 for any (Default: 0)
++         *  @return          0 on success, or error code on failure
++         */
++        virtual nsapi_error_t connect(const char *ssid, const char *pass,
++                nsapi_security_t security = NSAPI_SECURITY_NONE, uint8_t channel = 0);
++
++        /** Start the interface
++         *
++         *  Attempts to connect to a WiFi network. Requires ssid and passphrase to be set.
++         *  If passphrase is invalid, NSAPI_ERROR_AUTH_ERROR is returned.
++         *
++         *  @return         0 on success, negative error code on failure
++         */
++        virtual nsapi_error_t connect();
++
++        /** Stop the interface
++         *
++         *  @return         0 on success, or error code on failure
++         */
++        virtual nsapi_error_t disconnect();
++
++        /** Restart the interface
++        *
++        *  Attempts to reconnect to a WiFi network. Ssid and passphrase has been stored.
++        *
++        *  @return         0 on success, negative error code on failure
++        */
++        virtual nsapi_error_t reconnect();
++
++        /** Scan for available networks
++         *
++         *  This function will block. If the @a count is 0, function will only return count of available networks, so that
++         *  user can allocated necessary memory. If the \p count is grater than 0 and the a \p res is not NULL it'll be populated
++         *  with discovered networks up to value of \p count.
++         *
++         *  @param  res      Pointer to allocated array to store discovered AP
++         *  @param  count    Size of allocated @a res array, or 0 to only count available AP
++         *  @return          Number of entries in \p count, or if \p count was 0 number of available networks,
++         *                   negative on error see @a nsapi_error
++         */
++        virtual nsapi_size_or_error_t scan(WiFiAccessPoint *res, nsapi_size_t count);
++
++        virtual nsapi_size_or_error_t init();
++
++		void set_sta_mode();
++
++    private:
++		RDA5981x_EMAC &_rda5981x_emac;
++		char _ssid[33];
++		char _pass[65];
++		uint8_t _channel;
++		nsapi_security_t _security;
++};
++
++#endif
++
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaWiFiInterface.cpp b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaWiFiInterface.cpp
+deleted file mode 100644
+index c68b732..0000000
+--- a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaWiFiInterface.cpp
++++ /dev/null
+@@ -1,364 +0,0 @@
+-/* Copyright (c) 2019 Unisoc Communications Inc.
+- * SPDX-License-Identifier: Apache-2.0
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#include "WiFiInterface.h"
+-#include "RdaWiFiInterface.h"
+-#include "rda5991h_wland.h"
+-#include "nsapi_types.h"
+-#include "wland_types.h"
+-#include "rda_sys_wrapper.h"
+-
+-typedef enum {
+-    WIFI_CONNECTED,
+-    WIFI_DISCONNECTED,	
+-}WIFI_STATE;
+-
+-static WIFI_STATE wifi_state = WIFI_DISCONNECTED;
+-
+-void daemon(void *para)
+-{
+-    void *main_msgQ = NULL;
+-    rda_msg msg;
+-    int ret;
+-    RDAWiFiInterface *wifi = (RDAWiFiInterface *)para;
+-    main_msgQ = rda_mail_create(10, sizeof(unsigned int)*4);
+-    wifi->set_msg_queue(main_msgQ);
+-    while(1){
+-        rda_mail_get(main_msgQ, (void*)&msg, osWaitForever);
+-        switch(msg.type)
+-        {
+-            case MAIN_RECONNECT:
+-                printf("wifi disconnect!\r\n");
+-                ret = wifi->disconnect();
+-                if(ret != 0){
+-                    printf("disconnect failed!\r\n");
+-                    break;
+-                }
+-                ret = wifi->reconnect();
+-                while(ret != 0){
+-                    osDelay(5*1000);
+-                    ret = wifi->reconnect();
+-                };
+-                break;
+-            default:
+-                printf("unknown msg\r\n");
+-                break;
+-        }
+-    }
+-}
+-
+-nsapi_error_t RDAWiFiInterface::set_channel(uint8_t channel)
+-{
+-    int ret= 0;
+-    init();
+-
+-    if (channel > 13)
+-        return NSAPI_ERROR_PARAMETER;
+-
+-    if (channel == 0) {
+-        _channel = 0;
+-        return NSAPI_ERROR_OK;
+-    }
+-
+-    ret = rda5981_set_channel(channel);
+-    if (ret == 0) {
+-        _channel = channel;
+-        return NSAPI_ERROR_OK;
+-    } else {
+-        return NSAPI_ERROR_TIMEOUT;
+-    }
+-}
+-
+-int8_t RDAWiFiInterface::get_rssi()
+-{
+-    return rda5981_get_rssi();
+-}
+-
+-nsapi_error_t RDAWiFiInterface::init()
+-{
+-    if (!_interface) {
+-        if (!_emac.power_up()) {
+-            LWIP_DEBUGF(NETIF_DEBUG,("power up failed!\n"));
+-        }
+-        nsapi_error_t err = _stack.add_ethernet_interface(_emac, true, &_interface);
+-        if (err != NSAPI_ERROR_OK) {
+-            _interface = NULL;
+-            return err;
+-        }
+-        _interface->attach(_connection_status_cb);
+-        //rda_thread_new("daemon", daemon, this, DEFAULT_THREAD_STACKSIZE*4, osPriorityNormal);
+-    }
+-    return NSAPI_ERROR_OK;
+-}
+-
+-nsapi_error_t RDAWiFiInterface::set_credentials(const char *ssid, const char *pass,
+-                nsapi_security_t security)
+-{
+-    if (ssid == 0 || strlen(ssid) == 0) {
+-        return NSAPI_ERROR_PARAMETER;
+-    }
+-    if (security != NSAPI_SECURITY_NONE && (pass == 0 || strlen(pass) == 0)) {
+-        return NSAPI_ERROR_PARAMETER;
+-    }
+-    if (strlen(ssid) > 32 || strlen(pass) > 63) {
+-        return NSAPI_ERROR_PARAMETER;
+-    }
+-    memcpy((void*)_ssid, (void*)ssid, strlen(ssid));
+-    _ssid[strlen(ssid)] = '\0';
+-    memcpy((void*)_pass, (void*)pass, strlen(pass));
+-    _pass[strlen(pass)] = '\0';
+-    _security = security;
+-    return NSAPI_ERROR_OK;
+-}
+-
+-nsapi_error_t RDAWiFiInterface::connect(const char *ssid, const char *pass,
+-                nsapi_security_t security, uint8_t channel)
+-{
+-    rda_msg msg;
+-    bool find = false;
+-    int i = 0;
+-    rda5981_scan_result bss;
+-    int ret = 0;
+-
+-    if(wifi_state == WIFI_CONNECTED) {
+-        return NSAPI_ERROR_IS_CONNECTED;
+-    }
+-	
+-    if (ssid == NULL || ssid[0] == 0) {
+-        return NSAPI_ERROR_PARAMETER;
+-    }
+-	
+-    set_credentials(ssid, pass, security);
+-    set_channel(channel);
+-	
+-    init();
+-
+-    //reset all scan result to avoid any previous stored SSID/PW/CHANNEL
+-    rda5981_del_scan_all_result();
+-    rda5981_scan(NULL,0,0);
+-    if(rda5981_check_scan_result_name(ssid) != 0) {
+-        for (i = 0; i< 5; i++) {
+-            rda5981_scan(NULL, 0, 0);
+-            if(rda5981_check_scan_result_name(ssid) == 0) {
+-                find = true;
+-                break;
+-            }
+-        }
+-    } else {
+-        find = true;
+-    }
+-
+-    if (find == false) {
+-        LWIP_DEBUGF(NETIF_DEBUG,("can not find the ap.\r\n"));
+-        return NSAPI_ERROR_NO_SSID;
+-    }
+-    bss.channel = 15;
+-    rda5981_get_scan_result_name(&bss, ssid);
+-    if ((channel !=0) && (bss.channel != channel)) {
+-        LWIP_DEBUGF(NETIF_DEBUG, ("invalid channel\r\n"));
+-        return NSAPI_ERROR_CONNECTION_TIMEOUT;
+-    }
+-
+-    memcpy(gssid, ssid, strlen(ssid));
+-    if (pass[0] != 0) {
+-        memcpy(gpass, pass, strlen(pass));
+-    }
+-    memset(gbssid, 0, NSAPI_MAC_BYTES);
+-    gssid[strlen(ssid)] = gpass[strlen(pass)] = '\0';
+-
+-    msg.type = WLAND_CONNECT;
+-    rda_mail_put(wland_msgQ, (void*)&msg, osWaitForever);
+-    ret = rda_sem_wait(wifi_auth_sem, 10000);
+-    if (ret) {
+-        return NSAPI_ERROR_CONNECTION_TIMEOUT;
+-    }
+-	
+-	wifi_state = WIFI_CONNECTED;
+-
+-    ret = _interface->bringup(_dhcp,
+-          _ip_address[0] ? _ip_address : 0,
+-          _netmask[0] ? _netmask : 0,
+-          _gateway[0] ? _gateway : 0,
+-          DEFAULT_STACK,
+-          _blocking);
+-    LWIP_DEBUGF(NETIF_DEBUG,("Interface bringup up status:%d\r\n",ret));
+-
+-    if( ret == NSAPI_ERROR_OK || ret == NSAPI_ERROR_IS_CONNECTED ) {
+-        ret = NSAPI_ERROR_OK;
+-    }
+-    else if( ret == NSAPI_ERROR_DHCP_FAILURE) {
+-        disconnect();
+-    }
+-
+-    return ret;
+-}
+-
+-
+-nsapi_error_t RDAWiFiInterface::connect()
+-{
+-    return connect(_ssid, _pass, _security, _channel);
+-}
+-
+-nsapi_error_t RDAWiFiInterface::disconnect()
+-{
+-    rda_msg msg;
+-
+-    if(wifi_state == WIFI_DISCONNECTED) {
+-        return NSAPI_ERROR_NO_CONNECTION;
+-    }
+-    wifi_state = WIFI_DISCONNECTED;
+-    void* wifi_disconnect_sem = rda_sem_create(0);
+-    msg.type = WLAND_DISCONNECT;
+-    msg.arg1 = (unsigned int)wifi_disconnect_sem;
+-    rda_mail_put(wland_msgQ, (void*)&msg, osWaitForever);
+-    rda_sem_wait(wifi_disconnect_sem, osWaitForever);
+-    rda_sem_delete(wifi_disconnect_sem);
+-    if (_interface) {
+-        return _interface->bringdown();
+-    }
+-
+-    return NSAPI_ERROR_NO_CONNECTION;
+-}
+-
+-nsapi_error_t RDAWiFiInterface::reconnect()
+-{
+-    rda_msg msg;
+-    bool find = false;
+-    int i = 0;
+-    rda5981_scan_result bss;
+-    int ret = 0;
+-
+-    if (_ssid == NULL || _ssid[0] == 0) {
+-        return NSAPI_ERROR_PARAMETER;
+-    }
+-
+-    rda5981_del_scan_all_result();
+-    if(rda5981_check_scan_result_name(_ssid) != 0) {
+-        for (i = 0; i< 5; i++) {
+-            rda5981_scan(NULL, 0, 0);
+-            if(rda5981_check_scan_result_name(_ssid) == 0) {
+-                find = true;
+-                break;
+-            }
+-        }
+-    } else {
+-        find = true;
+-    }
+-
+-    if (find == false) {
+-        LWIP_DEBUGF(NETIF_DEBUG,"can not find the ap.\r\n");
+-        return NSAPI_ERROR_CONNECTION_TIMEOUT;
+-    }
+-    bss.channel = 15;
+-    rda5981_get_scan_result_name(&bss, _ssid);
+-    if ((_channel !=0) && (bss.channel != _channel)) {
+-        LWIP_DEBUGF(NETIF_DEBUG, "invalid channel\r\n");
+-        return NSAPI_ERROR_CONNECTION_TIMEOUT;
+-    }
+-
+-    memcpy(gssid, _ssid, strlen(_ssid));
+-    if (_pass[0] != 0) {
+-        memcpy(gpass, _pass, strlen(_pass));
+-    }
+-    memset(gbssid, 0, NSAPI_MAC_BYTES);
+-    gssid[strlen(_ssid)] = gpass[strlen(_pass)] = '\0';
+-
+-    msg.type = WLAND_CONNECT;
+-    rda_mail_put(wland_msgQ, (void*)&msg, osWaitForever);
+-    ret = rda_sem_wait(wifi_auth_sem, 10000);
+-    if (ret) {
+-        return NSAPI_ERROR_CONNECTION_TIMEOUT;
+-    }
+-
+-    if(_dhcp) {
+-        memset(_ip_address, 0, sizeof(_ip_address));
+-        memset(_netmask, 0, sizeof(_netmask));
+-        memset(_gateway, 0, sizeof(_gateway));
+-    }
+-
+-    ret = _interface->bringup(_dhcp,
+-          _ip_address[0] ? _ip_address : 0,
+-          _netmask[0] ? _netmask : 0,
+-          _gateway[0] ? _gateway : 0,
+-          DEFAULT_STACK,
+-          _blocking);
+-    LWIP_DEBUGF(NETIF_DEBUG,("Interface bringup up status:%d\r\n",ret));
+-
+-    if( ret == NSAPI_ERROR_OK || ret == NSAPI_ERROR_IS_CONNECTED ) {
+-        ret = NSAPI_ERROR_OK;
+-		wifi_state = WIFI_CONNECTED;
+-    }
+-    else if( ret == NSAPI_ERROR_DHCP_FAILURE) {
+-        disconnect();
+-    }
+-    return ret;
+-}
+-
+-
+-nsapi_size_or_error_t RDAWiFiInterface::scan(WiFiAccessPoint *res, nsapi_size_t count)
+-{
+-    int bss_num = 0, i;
+-    rda5981_scan_result *bss;
+-    nsapi_wifi_ap_t ap;
+-
+-    init();
+-
+-    rda5981_scan(NULL, 0, 0);
+-    bss_num = rda5981_get_scan_num();
+-    if (count != 0) {
+-        bss_num = (bss_num < count) ? bss_num : count;
+-    }
+-    if (res) {
+-        bss = (rda5981_scan_result *)malloc(bss_num * sizeof(rda5981_scan_result));
+-        rda5981_get_scan_result(bss, bss_num);
+-        for (i=0; i<bss_num; i++) {
+-            memset(&ap, 0, sizeof(nsapi_wifi_ap_t));
+-            memcpy(ap.bssid, bss[i].BSSID, 6);
+-            memcpy(ap.ssid, bss[i].SSID, bss[i].SSID_len);
+-            ap.channel = bss[i].channel;
+-            ap.rssi = bss[i].RSSI;
+-            if (bss[i].secure_type == ENCRYPT_NONE) {
+-                ap.security = NSAPI_SECURITY_NONE;
+-            } else if(bss[i].secure_type & ENCRYPT_WEP) {
+-                ap.security = NSAPI_SECURITY_WEP;
+-            } else if((bss[i].secure_type & (ENCRYPT_WPA_TKIP | ENCRYPT_WPA_CCMP)) && \
+-                        (bss[i].secure_type & (ENCRYPT_WPA2_TKIP | ENCRYPT_WPA2_CCMP))) {
+-                ap.security = NSAPI_SECURITY_WPA_WPA2;
+-            } else if((bss[i].secure_type & (ENCRYPT_WPA_TKIP | ENCRYPT_WPA_CCMP))) {
+-                ap.security = NSAPI_SECURITY_WPA;
+-            } else {
+-                ap.security = NSAPI_SECURITY_WPA2;
+-            }
+-            WiFiAccessPoint ap_temp(ap);
+-            memcpy(&res[i], &ap_temp, sizeof(WiFiAccessPoint));
+-        }
+-        free(bss);
+-    }
+-    return bss_num;
+- 
+-}
+-
+-WiFiInterface *WiFiInterface::get_default_instance() {
+-    static RDAWiFiInterface wifinet;
+-    return &wifinet;
+-}
+-
+-nsapi_size_or_error_t RDAWiFiInterface::set_msg_queue(void *queue)
+-{
+-    //TO_DO: No need for 1st stage since application already control the logic.
+-    //rda5981_set_main_queue(queue);
+-    return 0;
+-}
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaWiFiInterface.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaWiFiInterface.h
+deleted file mode 100644
+index 7be55d3..0000000
+--- a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/RdaWiFiInterface.h
++++ /dev/null
+@@ -1,148 +0,0 @@
+-/* LWIP implementation of NetworkInterfaceAPI
+- * Copyright (c) 2019 Unisoc Communications Inc.
+- * SPDX-License-Identifier: Apache-2.0
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-#ifndef RDA_WIFI_INTERFACE_H
+-#define RDA_WIFI_INTERFACE_H
+-
+-#include "nsapi.h"
+-#include "rtos.h"
+-#include "EMACInterface.h"
+-#include "WiFiInterface.h"
+-
+-
+-/** RDAWiFiInterface class
+- *  Implementation of the NetworkStack for an EMAC-based Ethernet driver
+- */
+-class RDAWiFiInterface : public EMACInterface, public WiFiInterface
+-{
+-    public:
+-        /** Create an EMAC-based ethernet interface.
+-         *
+-         * The default arguments obtain the default EMAC, which will be target-
+-         * dependent (and the target may have some JSON option to choose which
+-         * is the default, if there are multiple). The default stack is configured
+-         * by JSON option nsapi.default-stack.
+-         *
+-         * Due to inability to return errors from the constructor, no real
+-         * work is done until the first call to connect().
+-         *
+-         * @param emac  Reference to EMAC to use
+-         * @param stack Reference to onboard-network stack to use
+-         */
+-        RDAWiFiInterface(
+-                EMAC &emac = EMAC::get_default_instance(),
+-                OnboardNetworkStack &stack = OnboardNetworkStack::get_default_instance()) : EMACInterface(emac, stack) {
+-                _ssid[0] = '\0';
+-                _pass[0] = '\0';
+-                _channel = 0;
+-                _security = NSAPI_SECURITY_NONE;
+-        }
+-
+-        //static RDAWiFiInterface *get_target_default_instance();
+-        
+-        /** Set the WiFi network credentials
+-         *
+-         *  @param ssid      Name of the network to connect to
+-         *  @param pass      Security passphrase to connect to the network
+-         *  @param security  Type of encryption for connection
+-         *                   (defaults to NSAPI_SECURITY_NONE)
+-         *  @return          0 on success, or error code on failure
+-         */
+-        virtual nsapi_error_t set_credentials(const char *ssid, const char *pass,
+-                nsapi_security_t security = NSAPI_SECURITY_NONE);
+-
+-        /** Set the WiFi network channel
+-         *
+-         *  @param channel   Channel on which the connection is to be made, or 0 for any (Default: 0)
+-         *  @return          0 on success, or error code on failure
+-         */
+-        virtual nsapi_error_t set_channel(uint8_t channel);
+-
+-        /** Gets the current radio signal strength for active connection
+-         *
+-         *  @return         Connection strength in dBm (negative value),
+-         *                  or 0 if measurement impossible
+-         */
+-        virtual int8_t get_rssi();
+-
+-        /** Start the interface
+-         *
+-         *  Attempts to connect to a WiFi network.
+-         *
+-         *  @param ssid      Name of the network to connect to
+-         *  @param pass      Security passphrase to connect to the network
+-         *  @param security  Type of encryption for connection (Default: NSAPI_SECURITY_NONE)
+-         *  @param channel   Channel on which the connection is to be made, or 0 for any (Default: 0)
+-         *  @return          0 on success, or error code on failure
+-         */
+-        virtual nsapi_error_t connect(const char *ssid, const char *pass,
+-                nsapi_security_t security = NSAPI_SECURITY_NONE, uint8_t channel = 0);
+-
+-        /** Start the interface
+-         *
+-         *  Attempts to connect to a WiFi network. Requires ssid and passphrase to be set.
+-         *  If passphrase is invalid, NSAPI_ERROR_AUTH_ERROR is returned.
+-         *
+-         *  @return         0 on success, negative error code on failure
+-         */
+-        virtual nsapi_error_t connect();
+-
+-        /** Stop the interface
+-         *
+-         *  @return         0 on success, or error code on failure
+-         */
+-        virtual nsapi_error_t disconnect();
+-
+-        /** Restart the interface
+-        *
+-        *  Attempts to reconnect to a WiFi network. Ssid and passphrase has been stored.
+-        *
+-        *  @return         0 on success, negative error code on failure
+-        */
+-        virtual nsapi_error_t reconnect();
+-
+-        /** Scan for available networks
+-         *
+-         *  This function will block. If the @a count is 0, function will only return count of available networks, so that
+-         *  user can allocated necessary memory. If the \p count is grater than 0 and the a \p res is not NULL it'll be populated
+-         *  with discovered networks up to value of \p count.
+-         *
+-         *  @param  res      Pointer to allocated array to store discovered AP
+-         *  @param  count    Size of allocated @a res array, or 0 to only count available AP
+-         *  @return          Number of entries in \p count, or if \p count was 0 number of available networks,
+-         *                   negative on error see @a nsapi_error
+-         */
+-        virtual nsapi_size_or_error_t scan(WiFiAccessPoint *res, nsapi_size_t count);
+-
+-        virtual nsapi_size_or_error_t init();
+-
+-        virtual nsapi_size_or_error_t set_msg_queue(void *queue);
+-
+-    private:
+-        char _ssid[33];
+-        char _pass[65];
+-		uint8_t _channel;
+-        nsapi_security_t _security;    
+-            
+-
+-};
+-
+-#endif
+-
+-
+-
+-
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/inc/rda_sys_wrapper.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/inc/rda_sys_wrapper.h
+index 25b80b5..8281557 100644
+--- a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/inc/rda_sys_wrapper.h
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/inc/rda_sys_wrapper.h
+@@ -134,6 +134,14 @@ extern int rda_msg_get(void *msgQId, unsigned int *value, unsigned int millisec)
+ void* rda_mail_create(unsigned int msgcnt, unsigned int msgsize);
+ 
+ /**
++ * @brief     : delete a mail
++ * @param[in] : mail handle
++ * @param[out]:
++ * @return    : return ERR or NO_ERR
++ */
++int rda_mail_delete(void *msgq);
++
++/**
+  * @brief     : get a msg from mail
+  * @param[in] : handler name of mail/mail/wait time
+  * @param[out]:
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/src/rda5991h_wland.c b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/src/rda5991h_wland.c
+index d51064e..6bb7cda 100644
+--- a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/src/rda5991h_wland.c
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/src/rda5991h_wland.c
+@@ -514,17 +514,15 @@ static void rda_get_macaddr_from_flash(unsigned char *macaddr)
+     }
+     memcpy(macaddr, rda_mac_addr, 6);
+ }
++
+ void mbed_mac_address(char *mac)
+ {
+-    mac[0] = 0xD6;
+-    mac[1] = 0x71;
+-    mac[2] = 0x36;
+-    mac[3] = 0x60;
+-    mac[4] = 0xD8;
+-#if !MBED_CONF_APP_ECHO_SERVER
+-    mac[5] = 0xF4;
+-#else
+-    mac[5] = 0xF3;
+-#endif
+-    return;
++	if(!mac_is_valid((char *)user_mac)) {
++		rda_get_macaddr_from_flash((unsigned char *)mac);
++		memcpy(user_mac, rda_mac_addr, ETH_ALEN);
++	}
++	else {
++		memcpy(mac, user_mac, ETH_ALEN);
++	}
+ }
++
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/src/rda_sys_wrapper.c b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/src/rda_sys_wrapper.c
+index 07781ff..27faa3a 100644
+--- a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/src/rda_sys_wrapper.c
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/lwip-wifi/arch/TARGET_RDA/TARGET_UNO_91H/src/rda_sys_wrapper.c
+@@ -332,6 +332,14 @@ void* rda_mail_create(unsigned int msgcnt, unsigned int msgsize)
+     return (void*)msgq;
+ }
+ 
++int rda_mail_delete(void *msgq)
++{
++    if (msgq) {
++        return (osMessageQueueDelete((osMessageQueueId_t)msgq) == osOK) ? NO_ERR : ERR;
++    }
++    return ERR;
++}
++
+ int rda_mail_get(void *msgq, void *msg, unsigned int wait)
+ {
+     int ret;
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.cpp b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.cpp
+index 9ab3557..c1bb2d8 100644
+--- a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.cpp
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.cpp
+@@ -38,8 +38,9 @@
+ 
+ extern void *packet_rx_queue;
+ 
+-RDA5981x_EMAC::RDA5981x_EMAC()
++RDA5981x_EMAC::RDA5981x_EMAC(rda_interface_role_t role) : emac_role(role)
+ {
++	rx_thread_id = NULL;
+ }
+ 
+ /**
+@@ -57,49 +58,55 @@ RDA5981x_EMAC::RDA5981x_EMAC()
+  */
+ bool RDA5981x_EMAC::link_out(emac_mem_buf_t *buf)
+ {
+-    emac_mem_buf_t *q, *p = buf;
+-
+-    u32_t actual_txlen = 0;
+-    u8_t **data = NULL;
+-    u16_t retry = 400;
+-
+-    LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output enter, p:%08x\n", p));
+-
+-    while ((data == NULL) && (retry-- > 0)) {
+-        data = (u8_t**)wland_get_databuf();
+-        osThreadYield();
+-    }
+-    if (data == NULL) {
+-        LWIP_DEBUGF(NETIF_DEBUG, ("rda91h_low_level_output, no PKT buf\r\n"));
+-        memory_manager->free(buf);
+-        return false;
++	emac_mem_buf_t *q, *p = buf;
++
++	u32_t actual_txlen = 0;
++	u8_t **data = NULL;
++	u16_t retry = 400;
++
++	LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output enter, p:%08x\n", p));
++
++	while ((data == NULL) && (retry-- > 0)) {
++		data = (u8_t**)wland_get_databuf();
++		osThreadYield();
++	}
++	
++	if (data == NULL) {
++		LWIP_DEBUGF(NETIF_DEBUG, ("rda91h_low_level_output, no PKT buf\r\n"));
++		memory_manager->free(buf);
++		return false;
++	}
++
++	for (q = p; q != NULL; q = memory_manager->get_next(q)) {
++	/* Send the data from the pbuf to the interface, one pbuf at a
++	   time. The size of the data in each pbuf is kept in the ->len
++	   variable. */
++		memcpy(&((*data)[actual_txlen+2]), memory_manager->get_ptr(q), memory_manager->get_len(q));//reserve wid header length
++		actual_txlen += memory_manager->get_len(q);
++		if (actual_txlen > 1514 || actual_txlen > memory_manager->get_total_len(p)) {
++			LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output err, actual_txlen:%d, tot_len%d\n", actual_txlen, memory_manager->get_total_len(p)));
++			memory_manager->free(buf);
++			return false;
++		}
+     }
+ 
+-    for (q = p; q != NULL; q = memory_manager->get_next(q)) {
+-        /* Send the data from the pbuf to the interface, one pbuf at a
+-           time. The size of the data in each pbuf is kept in the ->len
+-           variable. */
+-        memcpy(&((*data)[actual_txlen+2]), memory_manager->get_ptr(q), memory_manager->get_len(q));//reserve wid header length
+-        actual_txlen += memory_manager->get_len(q);
+-        if (actual_txlen > 1514 || actual_txlen > memory_manager->get_total_len(p)) {
+-            LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output err, actual_txlen:%d, tot_len%d\n", actual_txlen, memory_manager->get_total_len(p)));
+-            memory_manager->free(buf);
+-            return false;
+-        }
+-    }
++	/* Signal rda5996 that packet should be sent */
++	if (actual_txlen == memory_manager->get_total_len(p)) {
++		if (emac_role == RDA_STA_ROLE) {
++			wland_txip_data((void*)data, actual_txlen, 0);
++		} else if (emac_role == RDA_AP_ROLE) {
++			wland_txip_data((void*)data, actual_txlen, 1);
++		}
+ 
+-    /* Signal rda5996 that packet should be sent */
+-    if (actual_txlen == memory_manager->get_total_len(p)) {
+-        wland_txip_data((void*)data, actual_txlen, 0);
+-        memory_manager->free(buf);
+-        return true;
+-    }
++		memory_manager->free(buf);
++		return true;
++	}
+ 
+-    LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output pkt len mismatch, actual_txlen:%d, tot_len%d\n",
+-            actual_txlen, memory_manager->get_total_len(p)));
++	LWIP_DEBUGF(NETIF_DEBUG, ("low_level_output pkt len mismatch, actual_txlen:%d, tot_len%d\n",
++		actual_txlen, memory_manager->get_total_len(p)));
+ 
+-    memory_manager->free(buf);
+-    return false;
++	memory_manager->free(buf);
++	return false;
+ }
+ 
+ /**
+@@ -111,181 +118,218 @@ bool RDA5981x_EMAC::link_out(emac_mem_buf_t *buf)
+  * @return negative value when no more frames,
+  *         zero when frame is received
+  */
+-emac_mem_buf_t * RDA5981x_EMAC::low_level_input(u8_t *data, int len)
++emac_mem_buf_t *RDA5981x_EMAC::low_level_input(uint8_t *data, int len)
+ {
+-    emac_mem_buf_t *p, *q;
+-    u16_t index = 0;
+-
+-    LWIP_DEBUGF(NETIF_DEBUG, ("low_level_input enter, rxlen:%d\n", len));
+-
+-    /* Obtain the size of the packet and put it into the "len"
+-     variable. */
+-    if (!len) {
+-        return NULL;
+-    }
+-
+-    /* We allocate a pbuf chain of pbufs from the pool. */
+-    p = memory_manager->alloc_pool(len, 0);
+-    if (p != NULL) {
+-        /* We iterate over the pbuf chain until we have read the entire
+-         * packet into the pbuf. */
+-        for (q = p; q != NULL; q = memory_manager->get_next(q)) {
+-            /* Read enough bytes to fill this pbuf in the chain. The
+-            * available data in the pbuf is given by the q->len
+-            * variable.
+-            * This does not necessarily have to be a memcpy, you can also preallocate
+-            * pbufs for a DMA-enabled MAC and after receiving truncate it to the
+-            * actually received size. In this case, ensure the tot_len member of the
+-            * pbuf is the sum of the chained pbuf len members.
+-            */
+-            /* load rx data from 96 to local mem_pool */
+-            memcpy(memory_manager->get_ptr(q), &data[index], memory_manager->get_len(q));
+-            index += memory_manager->get_len(q);
+-
+-            if (index >= len) {
+-                break;
+-            }
+-        }
+-
+-    } else {
+-        /* Drop this packet */
+-        LWIP_DEBUGF(NETIF_DEBUG, ("low_level_input pbuf_alloc fail, rxlen:%d\n", len));
+-
+-        return NULL;
+-    }
+-    return p;
++	emac_mem_buf_t *p, *q;
++	u16_t index = 0;
++
++	LWIP_DEBUGF(NETIF_DEBUG, ("low_level_input enter, rxlen:%d\n", len));
++
++	/* Obtain the size of the packet and put it into the "len"
++	variable. */
++	if (!len) {
++		return NULL;
++	}
++
++	/* We allocate a pbuf chain of pbufs from the pool. */
++	p = memory_manager->alloc_pool(len, 0);
++	if (p != NULL) {
++		/* We iterate over the pbuf chain until we have read the entire
++		* packet into the pbuf. */
++		for (q = p; q != NULL; q = memory_manager->get_next(q)) {
++			/* Read enough bytes to fill this pbuf in the chain. The
++			* available data in the pbuf is given by the q->len
++			* variable.
++			* This does not necessarily have to be a memcpy, you can also preallocate
++			* pbufs for a DMA-enabled MAC and after receiving truncate it to the
++			* actually received size. In this case, ensure the tot_len member of the
++			* pbuf is the sum of the chained pbuf len members.
++			*/
++			/* load rx data from 96 to local mem_pool */
++			memcpy(memory_manager->get_ptr(q), &data[index], memory_manager->get_len(q));
++			index += memory_manager->get_len(q);
++
++			if (index >= len) {
++			    break;
++			}
++		}
++	} else {
++	/* Drop this packet */
++		LWIP_DEBUGF(NETIF_DEBUG, ("low_level_input pbuf_alloc fail, rxlen:%d\n", len));
++		return NULL;
++	}
++	return p;
+ }
+ 
+-
+ /** \brief  Attempt to read a packet from the EMAC interface.
+  *
+  */
+ void RDA5981x_EMAC::packet_rx()
+ {
+-    rda_msg msg;
+-    packet_rx_queue = rda_mail_create(10, sizeof(unsigned int)*4);
+-    /* move received packet into a new buf */
+-    while (1) {
+-        emac_mem_buf_t *p = NULL;
+-        rda_mail_get(packet_rx_queue, (void*)&msg, osWaitForever);
+-        switch(msg.type) {
+-            case 0:
+-                p = low_level_input((unsigned char*)msg.arg1, msg.arg2);
+-                if (p == NULL) {
+-                    break;
+-                }
+-                if (p) {
+-                    emac_link_input_cb(p);
+-                }
+-                break;
+-            case 1:
+-                emac_link_state_cb(msg.arg1);
+-                break;
+-            default:
+-                break;
+-        }
+-    }
++	rda_msg msg;
++	// Creat rx queue
++	packet_rx_queue = rda_mail_create(10, sizeof(unsigned int) * 4);
++	/* move received packet into a new buf */
++	while (1) {
++		emac_mem_buf_t *p = NULL;
++		rda_mail_get(packet_rx_queue, (void*)&msg, osWaitForever);
++		switch(msg.type) {
++			case 0:
++				p = low_level_input((unsigned char*)msg.arg1, msg.arg2);
++				if (p == NULL) {
++					break;
++				}
++				if (p) {
++					emac_link_input_cb(p);
++				}
++				break;
++			case 1:
++				emac_link_state_cb(msg.arg1);
++				break;
++			default:
++				break;
++		}
++	}
+ }
+ 
+ void RDA5981x_EMAC::thread_function(void *pvParameters)
+ {
+-    static struct RDA5981x_EMAC *rda5981x_enet = static_cast<RDA5981x_EMAC *>(pvParameters);
+-    rda5981x_enet->packet_rx();
++	struct RDA5981x_EMAC *rda5981x_enet = (RDA5981x_EMAC *)pvParameters;
++	rda5981x_enet->packet_rx();
+ }
+ 
+ bool RDA5981x_EMAC::power_up()
+ {
+-    /* Initialize the hardware */
+-    static int init_flag = 0;
+-    if (init_flag == 0) {
+-        wland_reg_func();
+-        rda_thread_new("maclib_thread", maclib_task, NULL, DEFAULT_THREAD_STACKSIZE*8, PHY_PRIORITY);
+-        rda_thread_new("wland_thread", wland_task, NULL, DEFAULT_THREAD_STACKSIZE*5, PHY_PRIORITY);
+-        rda_thread_new("packet_rx", RDA5981x_EMAC::thread_function, this, DEFAULT_THREAD_STACKSIZE*5, PHY_PRIORITY);
+-        /* Allow the PHY task to detect the initial link state and set up the proper flags */
+-        osDelay(100);
+-        wland_sta_init();
+-        init_flag = 1;
+-    }
++	/* Initialize the hardware */
++	static int init_flag = 0;
++	if (init_flag == 0) {
++		wland_reg_func();
++		rda_thread_new("maclib_thread", maclib_task, NULL, DEFAULT_THREAD_STACKSIZE * 8, PHY_PRIORITY);
++		/* Allow the PHY task to detect the initial link state and set up the proper flags */
++		osDelay(100);
++		wland_sta_init();
++		init_flag = 1;
++	}
++
++	wlan_thread_id = rda_thread_new("wland_thread", wland_task, NULL, DEFAULT_THREAD_STACKSIZE * 5, PHY_PRIORITY);
++	if (!wlan_thread_id) {
++		return false;
++	}
++	rx_thread_id = rda_thread_new("packet_rx", RDA5981x_EMAC::thread_function, this, DEFAULT_THREAD_STACKSIZE * 5, PHY_PRIORITY);
++	if (!rx_thread_id) {
++		return false;
++	}
++
++	return true;
++}
+ 
+-    return true;
++osStatus RDA5981x_EMAC::remove_rx_thread()
++{
++	osStatus ret = osOK;
++	if (wlan_thread_id) {
++		ret = rda_thread_delete(wlan_thread_id);
++		wlan_thread_id = NULL;
++	}
++
++	if (rx_thread_id) {
++		ret = rda_thread_delete(rx_thread_id);
++		rx_thread_id = NULL;
++		rda_mail_delete(packet_rx_queue);
++		packet_rx_queue = NULL;
++	}
++
++	return ret;
+ }
+ 
+ uint32_t RDA5981x_EMAC::get_mtu_size() const
+ {
+-    return RDA_ETH_MTU_SIZE;
++	return RDA_ETH_MTU_SIZE;
+ }
+ 
+ uint32_t RDA5981x_EMAC::get_align_preference() const
+ {
+-    return 0;
++	 return 0;
+ }
+ 
+ void RDA5981x_EMAC::get_ifname(char *name, uint8_t size) const
+ {
+-    memcpy(name, RDA_ETH_IF_NAME, (size < sizeof(RDA_ETH_IF_NAME)) ? size : sizeof(RDA_ETH_IF_NAME));
++	memcpy(name, RDA_ETH_IF_NAME, (size < sizeof(RDA_ETH_IF_NAME)) ? size : sizeof(RDA_ETH_IF_NAME));
+ }
+ 
+ uint8_t RDA5981x_EMAC::get_hwaddr_size() const
+ {
+-    return RDA_HWADDR_SIZE;
++	return RDA_HWADDR_SIZE;
+ }
+ 
+ bool RDA5981x_EMAC::get_hwaddr(uint8_t *addr) const
+ {
+-    mbed_mac_address((char *)addr);
+-    return true;
++	mbed_mac_address((char *)addr);
++	return true;
+ }
+ 
+ void RDA5981x_EMAC::set_hwaddr(const uint8_t *addr)
+ {
+-    /* No-op at this stage */
++	/* No-op at this stage */
+ }
+ 
+ void RDA5981x_EMAC::set_link_input_cb(emac_link_input_cb_t input_cb)
+ {
+-    emac_link_input_cb = input_cb;
++	emac_link_input_cb = input_cb;
+ }
+ 
+ void RDA5981x_EMAC::set_link_state_cb(emac_link_state_change_cb_t state_cb)
+ {
+-    emac_link_state_cb = state_cb;
++	emac_link_state_cb = state_cb;
+ }
+ 
+ void RDA5981x_EMAC::add_multicast_group(const uint8_t *addr)
+ {
+-    /* No-op at this stage */
++	/* No-op at this stage */
+ }
+ 
+ void RDA5981x_EMAC::remove_multicast_group(const uint8_t *addr)
+ {
+-    /* No-op at this stage */
++	/* No-op at this stage */
+ }
+ 
+ void RDA5981x_EMAC::set_all_multicast(bool all)
+ {
+-    /* No-op at this stage */
++	/* No-op at this stage */
+ }
+ 
+ void RDA5981x_EMAC::power_down()
+ {
+-    /* No-op at this stage */
++	/* No-op at this stage */
+ }
+ 
+ void RDA5981x_EMAC::set_memory_manager(EMACMemoryManager &mem_mngr)
+ {
+-    memory_manager = &mem_mngr;
++	memory_manager = &mem_mngr;
++}
++
++rda_interface_role_t RDA5981x_EMAC::get_interface_role()
++{
++	return emac_role;
+ }
+ 
+-RDA5981x_EMAC &RDA5981x_EMAC::get_instance()
++RDA5981x_EMAC &RDA5981x_EMAC::get_instance(rda_interface_role_t role)
+ {
+-    static RDA5981x_EMAC emac;
+-    return emac;
++	static RDA5981x_EMAC emac_sta(RDA_STA_ROLE);
++	static RDA5981x_EMAC emac_ap(RDA_AP_ROLE);
++
++    return role == RDA_AP_ROLE ? emac_ap : emac_sta;
++}
++
++void RDA5981x_EMAC::emac_wifi_link_state_changed(bool up_down)
++{
++	emac_link_state_cb(up_down);
+ }
+ 
++
++#if 0
+ // Weak so a module can override
+ MBED_WEAK EMAC &EMAC::get_default_instance()
+ {
+-    return RDA5981x_EMAC::get_instance();
++	return RDA5981x_EMAC::get_instance();
+ }
+-
++#endif
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.h
+index fa95ba4..d0921a9 100644
+--- a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.h
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac.h
+@@ -14,146 +14,167 @@
+  * limitations under the License.
+  */
+ 
+-#ifndef STM32_EMAC_H_
+-#define STM32_EMAC_H_
++#ifndef RDA5981X_EMAC_H_
++#define RDA5981X_EMAC_H_
+ 
+ #include "EMAC.h"
+ #include "rtos/Mutex.h"
+ 
++
++typedef enum
++{
++    RDA_INVALID_ROLE           = 0,
++    RDA_STA_ROLE               = 1,         /**< STA or Client Interface     */
++    RDA_AP_ROLE                = 2,         /**< softAP Interface  */
++    RDA_P2P_ROLE               = 3,         /**< P2P Interface  */
++} rda_interface_role_t;
++
++
+ class RDA5981x_EMAC : public EMAC {
+ public:
+-    RDA5981x_EMAC();
+-
+-    static RDA5981x_EMAC &get_instance();
+-
+-    /**
+-     * Return maximum transmission unit
+-     *
+-     * @return     MTU in bytes
+-     */
+-    virtual uint32_t get_mtu_size() const;
+-
+-    /**
+-     * Gets memory buffer alignment preference
+-     *
+-     * Gets preferred memory buffer alignment of the Emac device. IP stack may or may not
+-     * align link out memory buffer chains using the alignment.
+-     *
+-     * @return         Memory alignment requirement in bytes
+-     */
+-    virtual uint32_t get_align_preference() const;
+-
+-    /**
+-     * Return interface name
+-     *
+-     * @param name Pointer to where the name should be written
+-     * @param size Maximum number of character to copy
+-     */
+-    virtual void get_ifname(char *name, uint8_t size) const;
+-
+-    /**
+-     * Returns size of the underlying interface HW address size.
+-     *
+-     * @return     HW address size in bytes
+-     */
+-    virtual uint8_t get_hwaddr_size() const;
+-
+-    /**
+-     * Return interface-supplied HW address
+-     *
+-     * Copies HW address to provided memory, @param addr has to be of correct size see @a get_hwaddr_size
+-     *
+-     * HW address need not be provided if this interface does not have its own HW
+-     * address configuration; stack will choose address from central system
+-     * configuration if the function returns false and does not write to addr.
+-     *
+-     * @param addr HW address for underlying interface
+-     * @return     true if HW address is available
+-     */
+-    virtual bool get_hwaddr(uint8_t *addr) const;
+-
+-    /**
+-     * Set HW address for interface
+-     *
+-     * Provided address has to be of correct size, see @a get_hwaddr_size
+-     *
+-     * Called to set the MAC address to actually use - if @a get_hwaddr is provided
+-     * the stack would normally use that, but it could be overridden, eg for test
+-     * purposes.
+-     *
+-     * @param addr Address to be set
+-     */
+-    virtual void set_hwaddr(const uint8_t *addr);
+-
+-    /**
+-     * Sends the packet over the link
+-     *
+-     * That can not be called from an interrupt context.
+-     *
+-     * @param buf  Packet to be send
+-     * @return     True if the packet was send successfully, False otherwise
+-     */
+-    virtual bool link_out(emac_mem_buf_t *buf);
+-
+-    /**
+-     * Initializes the HW
+-     *
+-     * @return True on success, False in case of an error.
+-     */
+-    virtual bool power_up();
+-
+-    /**
+-     * Deinitializes the HW
+-     *
+-     */
+-    virtual void power_down();
+-
+-    /**
+-     * Sets a callback that needs to be called for packets received for that interface
+-     *
+-     * @param input_cb Function to be register as a callback
+-     */
+-    virtual void set_link_input_cb(emac_link_input_cb_t input_cb);
+-
+-    /**
+-     * Sets a callback that needs to be called on link status changes for given interface
+-     *
+-     * @param state_cb Function to be register as a callback
+-     */
+-    virtual void set_link_state_cb(emac_link_state_change_cb_t state_cb);
+-
+-    /** Add device to a multicast group
+-     *
+-     * @param address  A multicast group hardware address
+-     */
+-    virtual void add_multicast_group(const uint8_t *address);
+-
+-    /** Remove device from a multicast group
+-     *
+-     * @param address  A multicast group hardware address
+-     */
+-    virtual void remove_multicast_group(const uint8_t *address);
+-
+-    /** Request reception of all multicast packets
+-     *
+-     * @param all True to receive all multicasts
+-     *            False to receive only multicasts addressed to specified groups
+-     */
+-    virtual void set_all_multicast(bool all);
+-
+-    /** Sets memory manager that is used to handle memory buffers
+-     *
+-     * @param mem_mngr Pointer to memory manager
+-     */
+-    virtual void set_memory_manager(EMACMemoryManager &mem_mngr);
++	RDA5981x_EMAC(rda_interface_role_t role);
++
++	static RDA5981x_EMAC &get_instance(rda_interface_role_t role);
++
++	// Current interface role
++	rda_interface_role_t get_interface_role();
++
++	/**
++	 * Return maximum transmission unit
++	 *
++	 * @return     MTU in bytes
++	 */
++	virtual uint32_t get_mtu_size() const;
++
++	/**
++	 * Gets memory buffer alignment preference
++	 *
++	 * Gets preferred memory buffer alignment of the Emac device. IP stack may or may not
++	 * align link out memory buffer chains using the alignment.
++	 *
++	 * @return         Memory alignment requirement in bytes
++	 */
++	virtual uint32_t get_align_preference() const;
++
++	/**
++	 * Return interface name
++	 *
++	 * @param name Pointer to where the name should be written
++	 * @param size Maximum number of character to copy
++	 */
++	virtual void get_ifname(char *name, uint8_t size) const;
++
++	/**
++	 * Returns size of the underlying interface HW address size.
++	 *
++	 * @return     HW address size in bytes
++	 */
++	virtual uint8_t get_hwaddr_size() const;
++
++	/**
++	 * Return interface-supplied HW address
++	 *
++	 * Copies HW address to provided memory, @param addr has to be of correct size see @a get_hwaddr_size
++	 *
++	 * HW address need not be provided if this interface does not have its own HW
++	 * address configuration; stack will choose address from central system
++	 * configuration if the function returns false and does not write to addr.
++	 *
++	 * @param addr HW address for underlying interface
++	 * @return     true if HW address is available
++	 */
++	virtual bool get_hwaddr(uint8_t *addr) const;
++
++	/**
++	 * Set HW address for interface
++	 *
++	 * Provided address has to be of correct size, see @a get_hwaddr_size
++	 *
++	 * Called to set the MAC address to actually use - if @a get_hwaddr is provided
++	 * the stack would normally use that, but it could be overridden, eg for test
++	 * purposes.
++	 *
++	 * @param addr Address to be set
++	 */
++	virtual void set_hwaddr(const uint8_t *addr);
++
++	/**
++	 * Sends the packet over the link
++	 *
++	 * That can not be called from an interrupt context.
++	 *
++	 * @param buf  Packet to be send
++	 * @return     True if the packet was send successfully, False otherwise
++	 */
++	virtual bool link_out(emac_mem_buf_t *buf);
++
++	/**
++	 * Initializes the HW
++	 *
++	 * @return True on success, False in case of an error.
++	 */
++	virtual bool power_up();
++
++	/**
++	 * Deinitializes the HW
++	 *
++	 */
++	virtual void power_down();
++
++	/**
++	 * Sets a callback that needs to be called for packets received for that interface
++	 *
++	 * @param input_cb Function to be register as a callback
++	 */
++	virtual void set_link_input_cb(emac_link_input_cb_t input_cb);
++
++	/**
++	 * Sets a callback that needs to be called on link status changes for given interface
++	 *
++	 * @param state_cb Function to be register as a callback
++	 */
++	virtual void set_link_state_cb(emac_link_state_change_cb_t state_cb);
++
++	/** Add device to a multicast group
++	 *
++	 * @param address  A multicast group hardware address
++	 */
++	virtual void add_multicast_group(const uint8_t *address);
++
++	/** Remove device from a multicast group
++	 *
++	 * @param address  A multicast group hardware address
++	 */
++	virtual void remove_multicast_group(const uint8_t *address);
++
++	/** Request reception of all multicast packets
++	 *
++	 * @param all True to receive all multicasts
++	 *            False to receive only multicasts addressed to specified groups
++	 */
++	virtual void set_all_multicast(bool all);
++
++	/** Sets memory manager that is used to handle memory buffers
++	 *
++	 * @param mem_mngr Pointer to memory manager
++	 */
++	virtual void set_memory_manager(EMACMemoryManager &mem_mngr);
++
++    void emac_wifi_link_state_changed(bool up_down);
++
++	osStatus remove_rx_thread();
++
+ 
+ private:
+-    void packet_rx();
+-    emac_mem_buf_t * low_level_input(u8_t *data, int len);
+-    static void thread_function(void *pvParameters);
+-    emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming data */
+-    emac_link_state_change_cb_t emac_link_state_cb; /**< Link state change callback */
+-    EMACMemoryManager *memory_manager; /**< Memory manager */
++	void packet_rx();
++	emac_mem_buf_t *low_level_input(uint8_t *data, int len);
++	static void thread_function(void *pvParameters);
++	emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming data */
++	emac_link_state_change_cb_t emac_link_state_cb; /**< Link state change callback */
++	EMACMemoryManager *memory_manager; /**< Memory manager */
++	rda_interface_role_t emac_role;
++	osThreadId_t rx_thread_id;
++	osThreadId_t wlan_thread_id;
+ 
+ };
+ 
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac_config.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac_config.h
+index 717d423..0ab521a 100644
+--- a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac_config.h
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda5981x_emac_config.h
+@@ -14,9 +14,9 @@
+  * limitations under the License.
+  */
+ 
+-#ifndef STM32XX_EMAC_CONFIG_H__
+-#define STM32XX_EMAC_CONFIG_H__
++#ifndef RDA_EMAC_CONFIG_H__
++#define RDA_EMAC_CONFIG_H__
+ 
+ #define THREAD_STACKSIZE              512
+ 
+-#endif // #define STM32XX_EMAC_CONFIG_H__
++#endif
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_dhcp_server_debug.cpp b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_dhcp_server_debug.cpp
+new file mode 100644
+index 0000000..1a2aa40
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_dhcp_server_debug.cpp
+@@ -0,0 +1,405 @@
++#include "RdaDhcpServer.h"
++
++#if defined(__cplusplus)
++extern "C"
++{
++#endif
++
++typedef struct DHCP_options_table_s {
++    uint8_t     code;
++    uint32_t    length;         /* 0x80000000 means variable */
++    const char   *name;
++} dhcp_options_table_t;
++
++static dhcp_options_table_t dhcp_options_lookup_table[] = {
++    {  0,   0,  "Pad" },
++    {  1,   4,  "Subnet Mask" },
++    {  2,   4,  "Time Offset" },
++    {  3,   0,  "Router" },
++    {  4,   0,  "Time Server" },
++    {  5,   0,  "Name Server" },
++    {  6,   0,  "Domain Server" },
++    {  7,   0,  "Log Server" },
++    {  8,   0,  "Quotes Server" },
++    {  9,   0,  "LPR Server" },
++    { 10,   0,  "Impress Server" },
++    { 11,   0,  "RLP Server" },
++    { 12,   0,  "Hostname" },
++    { 13,   2,  "Boot File Size" },
++    { 14,   0,  "Merit Dump File" },
++    { 15,   0,  "Domain Name" },
++    { 16,   0,  "Swap Server" },
++    { 17,   0,  "Root Path" },
++    { 18,   0,  "Extension File" },
++    { 19,   1,  "Forward On/Off" },
++    { 20,   1,  "SrcRte On/Off" },
++    { 21,   0,  "Policy Filter" },
++    { 22,   2,  "Max DG Assembly" },
++    { 23,   1,  "Default IP TTL" },
++    { 24,   4,  "MTU Timeout" },
++    { 25,   0,  "MTU Plateau" },
++    { 26,   2,  "MTU Interface" },
++    { 27,   1,  "MTU Subnet" },
++    { 28,   4,  "Broadcast Address" },
++    { 29,   1,  "Mask Discovery" },
++    { 30,   1,  "Mask Supplier" },
++    { 31,   1,  "Router Discovery" },
++    { 32,   4,  "Router Request" },
++    { 33,   0,  "Static Route" },
++    { 34,   1,  "Trailers" },
++    { 35,   4,  "ARP Timeout" },
++    { 36,   1,  "Ethernet" },
++    { 37,   1,  "Default TCP TTL" },
++    { 38,   4,  "Keepalive Time" },
++    { 39,   1,  "Keepalive Data" },
++    { 40,   0,  "NIS Domain" },
++    { 41,   0,  "NIS Servers" },
++    { 42,   0,  "NTP Servers" },
++    { 43,   0,  "Vendor Specific" },
++    { 44,   0,  "NETBIOS Name Srv" },
++    { 45,   0,  "NETBIOS Dist Srv" },
++    { 46,   1,  "NETBIOS Node Type" },
++    { 47,   0,  "NETBIOS Scope" },
++    { 48,   0,  "X Window Font" },
++    { 49,   0,  "X Window Manager" },
++    { 50,   4,  "Address Request" },
++    { 51,   4,  "Address Time" },
++    { 52,   1,  "Overload" },
++    { 53,   1,  "DHCP Msg Type" },
++    { 54,   4,  "DHCP Server Id" },
++    { 55,   0,  "Parameter List" },
++    { 56,   0,  "DHCP Message" },
++    { 57,   2,  "DHCP Max Msg Size" },
++    { 58,   4,  "Renewal Time" },
++    { 59,   4,  "Rebinding Time" },
++    { 60,   0,  "Class Id" },
++    { 61,   0,  "Client Id" },
++    { 62,   0,  "NetWare/IP Domain" },
++    { 63,   0,  "NetWare/IP Option" },
++    { 64,   0,  "NIS-Domain-Name" },
++    { 65,   0,  "NIS-Server-Addr" },
++    { 66,   0,  "Server-Name" },
++    { 67,   0,  "Bootfile-Name" },
++    { 68,   0,  "Home-Agent-Addrs" },
++    { 69,   0,  "SMTP-Server" },
++    { 70,   0,  "POP3-Server" },
++    { 71,   0,  "NNTP-Server" },
++    { 72,   0,  "WWW-Server" },
++    { 73,   0,  "Finger-Server" },
++    { 74,   0,  "IRC-Server" },
++    { 75,   0,  "StreetTalk-Server" },
++    { 76,   0,  "STDA-Server" },
++    { 77,   0,  "User-Class" },
++    { 78,   0,  "Directory Agent" },
++    { 79,   0,  "Service Scope" },
++    { 80,   0,  "Rapid Commit" },
++    { 81,   0,  "Client FQDN" },
++    { 82,   0,  "Relay Agent Information" },
++    { 83,   0,  "iSNS" },
++    { 85,   0,  "NDS Servers" },
++    { 86,   0,  "NDS Tree Name" },
++    { 87,   0,  "NDS Context" },
++    { 88,   0x80000000, "BCMCS Controller Domain Name list" },
++    { 89,   0x80000000, "BCMCS Controller IPv4 address option" },
++    { 90,   0,  "Authentication" },
++    { 91,   0x80000000, "client-last-transaction-time option" },
++    { 92,   0x80000000, "associated-ip option" },
++    { 93,   0,  "Client System" },
++    { 94,   0,  "Client NDI" },
++    { 95,   0,  "LDAP" },
++    { 97,   0,  "UUID/GUID" },
++    { 98,   0,  "User-Auth" },
++    { 99,   0x80000000, "GEOCONF_CIVIC" },
++    {100,   0,  "PCode" },
++    {101,   0,  "TCode" },
++    {109,   16, "OPTION_DHCP4O6_S46_SADDR" },
++    {112,   0,  "Netinfo Address" },
++    {113,   0,  "Netinfo Tag" },
++    {114,   0,  "URL" },
++    {116,   0,  "Auto-Config" },
++    {117,   0,  "Name Service Search" },
++    {118,   4,  "Subnet Selection Option" },
++    {119,   0,  "Domain Search" },
++    {120,   0,  "SIP Servers DHCP Option" },
++    {121,   0,  "Classless Static Route Option" },
++    {122,   0,  "CCC" },
++    {123,   16, "GeoConf Option" },
++    {124,   0,  "V-I Vendor Class" },
++    {125,   0,  "V-I Vendor-Specific Information" },
++    {128,   0,  "Etherboot signature. 6 bytes: E4:45:74:68:00:00" },
++    {129,   4,  "Call Server IP address" },
++    {130,   0x80000000, "Ethernet interface. Variable" },
++    {131,   0,  "Remote statistics server IP address" },
++    {132,   0,  "IEEE 802.1Q VLAN ID" },
++    {133,   0,  "IEEE 802.1D/p Layer 2 Priority" },
++    {134,   0,  "Diffserv Code Point (DSCP) for" },
++    {135,   0,  "HTTP Proxy for phone-specific" },
++    {136,   0,  "OPTION_PANA_AGENT" },
++    {137,   0,  "OPTION_V4_LOST" },
++    {138,   0,  "OPTION_CAPWAP_AC_V4" },
++    {139,   0,  "OPTION-IPv4_Address-MoS" },
++    {140,   0,  "OPTION-IPv4_FQDN-MoS" },
++    {141,   0,  "SIP UA Configuration Service Domains" },
++    {142,   0,  "OPTION-IPv4_Address-ANDSF" },
++    {143,   0,  "OPTION_V4_SZTP_REDIRECT" },
++    {144,   16, "GeoLoc" },
++    {145,   1,  "FORCERENEW_NONCE_CAPABLE" },
++    {146,   0,  "RDNSS Selection" },
++    {151,   0x80000000, "N+1	status-code" },
++    {152,   4,  "base-time" },
++    {153,   4,  "start-time-of-state" },
++    {154,   4,  "query-start-time" },
++    {155,   4,  "query-end-time" },
++    {156,   1,  "dhcp-state" },
++    {157,   1,  "data-source" },
++    {158,   0x80000000, " Variable; the minimum length is 5. OPTION_V4_PCP_SERVER" },
++    {159,   4,  "OPTION_V4_PORTPARAMS" },
++    {160,   0,  "DHCP Captive-Portal" },
++    {161,   0x80000000, "(variable) OPTION_MUD_URL_V4" },
++    {208,   4,  "PXELINUX Magic" },
++    {209,   0,  "Configuration File" },
++    {210,   0,  "Path Prefix" },
++    {211,   4,  "Reboot Time" },
++    {212,   0x80000000, "18+ N	OPTION_6RD" },
++    {213,   0,  "OPTION_V4_ACCESS_DOMAIN" },
++    {220,   0,  "Subnet Allocation Option" },
++};
++
++#define isprint(c)   ((c) >= 0x20 && (c) < 0x7f)
++int hex_dump_print(const void *data_ptr, uint16_t length, int show_ascii)
++{
++    uint8_t *data = (uint8_t *)data_ptr;
++    uint8_t *char_ptr;
++    int i, count;
++    if ((data == NULL) || (length == 0)) {
++        return -1;
++    }
++    count = 0;
++    char_ptr = data;
++    while (length > 0) {
++        i = 0;
++        while ((length > 0) && (i < 16)) {
++            printf(" %02x", *data);
++            i++;
++            data++;
++            length--;
++            count++;
++        }
++
++        if (show_ascii != 0) {
++            int fill = 16 - i;
++            /* fill in for < 16 */
++            while (fill > 0) {
++                printf("   ");
++                fill--;
++            }
++            /* space between numbers and chars */
++            printf("    ");
++            while (i > 0) {
++                printf("%c", (isprint(*char_ptr) ? *char_ptr : '.'));
++                char_ptr++;
++                i--;
++            }
++        }
++        printf("\r\n");
++    }
++    return count;
++}
++
++
++void dhcp_server_print_header_info(dhcp_packet_t *header, uint32_t datalen, const char *title)
++{
++    uint8_t *ptr;
++    if (title != NULL) {
++        printf("%s: size %d\r\n", title, datalen);
++    }
++
++    printf("Opcode         :%2d    : %s\r\n", header->Opcode, (header->Opcode == 1) ? "Request" : (header->Opcode == 2) ? "Reply" : "Unknown");
++    printf("HwType         :%2d    : %s\r\n", header->HwType, (header->HwType == 1) ? "Ethernet" : "Unknown");
++    printf("HwLength       :      : %d\r\n", header->HwLen);
++    printf("Hops           :      : %d\r\n", header->Hops);
++    printf("TransactionId  :      : 0x%lx\r\n", header->TransactionId);
++    printf("Elapsed time   :      : %d\r\n", header->SecsElapsed);
++    printf("Flags          :      : 0x%08x\r\n", header->Flags);
++    uint8_t *ip_ptr = (uint8_t *)&header->ClientIpAddr;
++    printf("from client IP :      : %d.%d.%d.%d\r\n", ip_ptr[0], ip_ptr[1], ip_ptr[2], ip_ptr[3]);
++    ip_ptr = (uint8_t *)&header->YourIpAddr;
++    printf("from us YOUR IP:      : %d.%d.%d.%d\r\n", ip_ptr[0], ip_ptr[1], ip_ptr[2], ip_ptr[3]);
++    ip_ptr = (uint8_t *)&header->ServerIpAddr;
++    printf("DHCP server IP :      : %d.%d.%d.%d\r\n", ip_ptr[0], ip_ptr[1], ip_ptr[2], ip_ptr[3]);
++    ip_ptr = (uint8_t *)&header->GatewayIpAddr;
++    printf("gateway IP     :      : %d.%d.%d.%d\r\n", ip_ptr[0], ip_ptr[1], ip_ptr[2], ip_ptr[3]);
++
++    printf("Client MAC     :      :");
++    hex_dump_print(header->ClientHwAddr, 16, 0);
++    ip_ptr = (uint8_t *)&header->MagicCookie;
++    printf("Magic          :      : %2x %2x %2x %2x\r\n", ip_ptr[0], ip_ptr[1], ip_ptr[2], ip_ptr[3]);
++
++    printf("Options        :\r\n");
++    ptr = (uint8_t *)header->Options;
++    printf("Hex Dump:\r\n");
++    hex_dump_print(ptr, 64, 1);
++    printf("\r\n");
++
++    while ((ptr != NULL) && (*ptr != DHCP_END_OPTION_CODE) && ((uint32_t)(ptr - &header->Options[0]) < datalen)) {
++        int len;
++        switch (*ptr) {
++            case DHCP_SUBNETMASK_OPTION_CODE:           // (1)
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d  SUBNET MASK : ", DHCP_SUBNETMASK_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 1);
++                ptr += len;
++                break;
++            case DHCP_ROUTER_OPTION_CODE:               // (3)
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d  ROUTER : ", DHCP_ROUTER_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 0);
++                ptr += len;
++                break;
++            case DHCP_DNS_SERVER_OPTION_CODE:           // (6)
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d  DNS SERVER : ", DHCP_DNS_SERVER_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 0);
++                ptr += len;
++                break;
++            case DHCP_HOST_NAME_OPTION_CODE:
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d  HOST NAME : ", DHCP_HOST_NAME_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 1);
++                ptr += len;
++                break;
++            case DHCP_MTU_OPTION_CODE:                  // (26)
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d  MTU : ", DHCP_MTU_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 0);
++                ptr += len;
++                break;
++            case DHCP_REQUESTED_IP_ADDRESS_OPTION_CODE: // (50)
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d  REQUESTED IP : ", DHCP_REQUESTED_IP_ADDRESS_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 0);
++                ptr += len;
++                break;
++            case DHCP_LEASETIME_OPTION_CODE:            // (51)
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d   LEASE TIME : ", DHCP_LEASETIME_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 0);
++                ptr += len;
++                break;
++            case DHCP_MESSAGETYPE_OPTION_CODE: {        // (53)
++                ptr++;
++                len = *ptr++;
++                int code = *ptr;
++                printf(" Code:%d Length:%d  MESSAGE : ", DHCP_MESSAGETYPE_OPTION_CODE, len);
++                switch (code) {
++                    case 1:
++                        printf("  %d -- DHCP DISCOVER\r\n", code);
++                        break;
++                    case 2:
++                        printf("  %d -- DHCP OFFER\r\n", code);
++                        break;
++                    case 3:
++                        printf("  %d -- DHCP REQUEST\r\n", code);
++                        break;
++                    case 4:
++                        printf("  %d -- DHCP DECLINE\r\n", code);
++                        break;
++                    case 5:
++                        printf("  %d -- DHCP ACK\r\n", code);
++                        break;
++                    case 6:
++                        printf("  %d -- DHCP NACK\r\n", code);
++                        break;
++                    case 7:
++                        printf("  %d -- DHCP RELEASE\r\n", code);
++                        break;
++                    case 8:
++                        printf("  %d -- DHCP INFORM\r\n", code);
++                        break;
++                    default:
++                        printf("  %d -- INVALID\r\n", code);
++                        break;
++                }
++                ptr += len;
++                break;
++            }
++            case DHCP_SERVER_IDENTIFIER_OPTION_CODE:    // (54)
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d  SERVER ID : ", DHCP_SERVER_IDENTIFIER_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 0);
++                ptr += len;
++                break;
++            case DHCP_PARAM_REQUEST_LIST_OPTION_CODE:
++//          9.8. Parameter Request List
++//
++//             This option is used by a DHCP client to request values for specified
++//             configuration parameters.  The list of requested parameters is
++//             specified as n octets, where each octet is a valid DHCP option code
++//             as defined in this document.
++//
++//             The client MAY list the options in order of preference.  The DHCP
++//             server is not required to return the options in the requested order,
++//             but MUST try to insert the requested options in the order requested
++//             by the client.
++//
++//             The code for this option is 55.  Its minimum length is 1.
++//
++//              Code   Len   Option Codes
++//             +-----+-----+-----+-----+---
++//             |  55 |  n  |  c1 |  c2 | ...
++//             +-----+-----+-----+-----+---
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d    PARAM REQ : ", DHCP_PARAM_REQUEST_LIST_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 0);
++                {
++                    int i;
++                    for (i = 0; i < len; i++) {
++                        uint8_t sub_code;
++                        sub_code = *ptr++;
++
++                        uint32_t lookup_index;
++                        uint32_t max_lookup = (sizeof(dhcp_options_lookup_table) / sizeof(dhcp_options_lookup_table[0]));
++                        for (lookup_index = 0; lookup_index < max_lookup; lookup_index++) {
++                            if (dhcp_options_lookup_table[lookup_index].code == sub_code) {
++                                uint32_t length = dhcp_options_lookup_table[lookup_index].length;
++                                if (length != 0) {
++                                    /* length is variable, in the length field ? */
++                                    length = *ptr;
++                                }
++                                printf("  Code:%3d : %s\r\n", dhcp_options_lookup_table[lookup_index].code, dhcp_options_lookup_table[lookup_index].name);
++                                break;
++                            }
++                        }
++                        if (lookup_index >= max_lookup) {
++                            printf("  Code:%3d : UNKNOWN\r\n", dhcp_options_lookup_table[lookup_index].code);
++                        }
++                    }
++                }
++                break;
++            case DHCP_WPAD_OPTION_CODE:                 // (252)
++                ptr++;
++                len = *ptr++;
++                printf(" Code:%d Length:%d WPAD : ", DHCP_WPAD_OPTION_CODE, len);
++                hex_dump_print(ptr, len, 1);
++                ptr += len;
++                break;
++
++            default:
++                ptr++;
++                break;
++        }
++    }
++}
++
++#if defined(__cplusplus)
++}
++#endif
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_interface.cpp b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_interface.cpp
+new file mode 100644
+index 0000000..350e459
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_interface.cpp
+@@ -0,0 +1,34 @@
++/*
++ * Copyright (c) 2018-2019, Arm Limited and affiliates.
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "RdaStaInterface.h"
++#include "RdaSoftAPInterface.h"
++#include "rda_interface.h"
++
++rda_interface_shared_info_t rda_iface_shared;
++
++WiFiInterface *WiFiInterface::get_target_default_instance()
++{
++    static RdaStaInterface wifi;
++    return &wifi;
++}
++
++RdaSoftAPInterface *RdaSoftAPInterface::get_default_instance()
++{
++    static RdaSoftAPInterface softap;
++    return &softap;
++}
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_interface.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_interface.h
+new file mode 100644
+index 0000000..6800e84
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_interface.h
+@@ -0,0 +1,51 @@
++/* WHD implementation of NetworkInterfaceAPI
++ * Copyright (c) 2017-2019 ARM Limited
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#ifndef RDA_INTERFACE_H
++#define RDA_INTERFACE_H
++
++#include "rtos/Mutex.h"
++#include "OnboardNetworkStack.h"
++
++/** WhdSTAInterface class
++ *  Shared information 
++ */
++#define IF_STATUS_ALL_IF_DOWN   0x0
++#define IF_STATUS_STA_UP        0x1
++#define IF_STATUS_SOFT_AP_UP    0x2
++
++enum rda_default_interface_config 
++{
++    DEFAULT_IF_NOT_SET,
++    DEFAULT_IF_STA,
++    DEFAULT_IF_SOFT_AP
++};
++
++struct rda_interface_shared_info_t {
++    rtos::Mutex mutex;
++    rda_default_interface_config default_if_cfg;
++    uint32_t if_status_flags;
++    OnboardNetworkStack::Interface *iface_sta;
++    OnboardNetworkStack::Interface *iface_softap;
++    rda_interface_shared_info_t() : default_if_cfg(DEFAULT_IF_NOT_SET), if_status_flags(IF_STATUS_ALL_IF_DOWN),
++                                    iface_sta(NULL), iface_softap(NULL)
++    {}
++};
++
++extern rda_interface_shared_info_t rda_iface_shared;
++
++#endif
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_network_utils.c b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_network_utils.c
+new file mode 100644
+index 0000000..e6f508d
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_network_utils.c
+@@ -0,0 +1,88 @@
++/*
++ * Copyright (c) 2018-2019 ARM Limited
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include "rda_network_utils.h"
++
++uint8_t unsigned_to_decimal_string(uint32_t value, char *output, uint8_t min_length, uint8_t max_length)
++{
++    uint8_t digits_left;
++    char buffer[] = "0000000000";
++
++    if (output == NULL) {
++        return 0;
++    }
++
++    max_length = (uint8_t) MIN(max_length, sizeof(buffer));
++    digits_left = max_length;
++    while ((value != 0) && (digits_left != 0)) {
++        --digits_left;
++        buffer[digits_left] = (char)((value % 10) + '0');
++        value = value / 10;
++    }
++
++    digits_left = (uint8_t) MIN((max_length - min_length), digits_left);
++    memcpy(output, &buffer[digits_left], (size_t)(max_length - digits_left));
++
++    /* Add terminating null */
++    output[(max_length - digits_left)] = '\x00';
++
++    return (uint8_t)(max_length - digits_left);
++}
++
++void ipv4_to_string(char buffer[16], uint32_t ipv4_address)
++{
++    uint8_t *ip = (uint8_t *)&ipv4_address;
++
++    /* unsigned_to_decimal_string() null-terminates the string
++     * Save the original last character and replace it */
++    char last_char = buffer[16];
++    unsigned_to_decimal_string(ip[0], &buffer[0], 3, 3);
++    buffer[3] = '.';
++    unsigned_to_decimal_string(ip[1], &buffer[4], 3, 3);
++    buffer[7] = '.';
++    unsigned_to_decimal_string(ip[2], &buffer[8], 3, 3);
++    buffer[11] = '.';
++    unsigned_to_decimal_string(ip[3], &buffer[12], 3, 3);
++    buffer[16] = last_char;
++}
++
++uint32_t string_to_ipv4(const char *buffer)
++{
++    uint32_t temp = 0;
++    int char_count = 0;
++    const char *ptr = buffer;
++
++    while ((ptr != NULL)  && (*ptr != 0) && (char_count++ < 16)) {
++        uint8_t byte = 0;
++        while ((*ptr != 0) && (*ptr != '.') && (char_count++ < 16)) {
++            byte *= 10;
++            if ((*ptr >= '0') && (*ptr <= '9')) {
++                byte += (*ptr - '0');
++            } else {
++                break;
++            }
++            ptr++;
++        }
++        temp <<= 8;
++        temp |= byte;
++        if (*ptr == '.') {
++            ptr++;  /* skip '.' */
++        }
++    }
++    return temp;
++}
++
+diff --git a/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_network_utils.h b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_network_utils.h
+new file mode 100644
+index 0000000..c51d340
+--- /dev/null
++++ b/features/netsocket/emac-drivers/TARGET_RDA_EMAC/rda_network_utils.h
+@@ -0,0 +1,97 @@
++/*
++ * Copyright (c) 2018-2019 ARM Limited
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#pragma once
++
++#include <stdint.h>
++#include <stdlib.h>
++#include <string.h>
++
++#if defined(__cplusplus)
++extern "C" {
++#endif
++
++#ifndef MIN
++extern int MIN(/*@sef@*/ int x, /*@sef@*/ int y);  /* LINT : This tells lint that  the parameter must be side-effect free. i.e. evaluation does not change any values (since it is being evaulated more than once */
++#define MIN(x,y) ((x) < (y) ? (x) : (y))
++#endif /* ifndef MIN */
++
++#define FX_IPTYPE_IPV4                  (0)
++#define FX_IPTYPE_IPV6                  (1)
++
++typedef union {
++    uint32_t addr;
++    uint8_t addrs[4];
++} rda_ip_addr_v4_t;
++
++typedef struct {
++    uint32_t addr[4];
++} rda_ip_addr_v6_t;
++
++typedef struct {
++    uint8_t type;
++    union {
++        rda_ip_addr_v4_t addrv4;
++        rda_ip_addr_v6_t addrv6;
++    };
++} rda_ip_addr_t;
++
++/**
++ * Structure for storing a MAC address (Wi-Fi Media Access Control address).
++ */
++typedef struct {
++    uint8_t octet[6]; /**< Unique 6-byte MAC address */
++} rda_mac_addr_t;
++
++/**
++ * Converts a unsigned long int to a decimal string
++ *
++ * @param value[in]      : The unsigned long to be converted
++ * @param output[out]    : The buffer which will receive the decimal string
++ * @param min_length[in] : the minimum number of characters to output (zero padding will apply if required).
++ * @param max_length[in] : the maximum number of characters to output (up to 10 ). There must be space for terminating NULL.
++ *
++ * @note: A terminating NULL is added. Wnsure that there is space in the buffer for this.
++ *
++ * @return the number of characters returned (excluding terminating null)
++ *
++ */
++uint8_t unsigned_to_decimal_string(uint32_t value, char *output, uint8_t min_length, uint8_t max_length);
++
++/**
++ *  Convert a IPv4 address to a string
++ *
++ *  @note: String is 16 bytes including terminating null
++ *
++ * @param[out] buffer       : Buffer which will recieve the IPv4 string
++ * @param[in]  ipv4_address : IPv4 address to convert
++ */
++void ipv4_to_string(char buffer[16], uint32_t ipv4_address);
++
++/**
++ *  Convert a IPv4 address to a string
++ *
++ *  @note: String is 16 bytes including terminating null
++ *
++ * @param[in] buffer         : Buffer which has the IPv4 string
++ * @return  ipv4_address (0 on failure)
++ */
++uint32_t string_to_ipv4(const char *buffer);
++
++#if defined(__cplusplus)
++}
++#endif
+diff --git a/platform/mbed_lib.json b/platform/mbed_lib.json
+index befcfdd..df7e140 100644
+--- a/platform/mbed_lib.json
++++ b/platform/mbed_lib.json
+@@ -110,7 +110,7 @@
+         "heap-stats-enabled": {
+             "macro_name": "MBED_HEAP_STATS_ENABLED",
+             "help": "Set to 1 to enable heap stats. When enabled the function mbed_stats_heap_get returns non-zero data. See mbed_stats.h for more information",
+-            "value": null
++            "value": 1
+         },
+ 
+         "thread-stats-enabled": {
+diff --git a/platform/mbed_retarget.h b/platform/mbed_retarget.h
+index 56c2d8b..ee3a51e 100644
+--- a/platform/mbed_retarget.h
++++ b/platform/mbed_retarget.h
+@@ -550,11 +550,14 @@ enum {
+ #define F_GETFL 3
+ #define F_SETFL 4
+ 
++#ifndef POLL_FD_LWIP_SOCKET
++#define POLL_FD_LWIP_SOCKET
+ struct pollfd {
+     int fd;
+     short events;
+     short revents;
+ };
++#endif /* POLL_FD_LWIP_SOCKET */
+ 
+ /* POSIX-compatible I/O functions */
+ #if __cplusplus
+diff --git a/platform/source/mbed_rtc_time.cpp b/platform/source/mbed_rtc_time.cpp
+index 2465ae2..69bf9fe 100644
+--- a/platform/source/mbed_rtc_time.cpp
++++ b/platform/source/mbed_rtc_time.cpp
+@@ -41,24 +41,24 @@ static bool _rtc_enabled;
+ 
+ static void _rtc_lpticker_init(void)
+ {
+-    _rtc_lp_timer->start();
+-    _rtc_enabled = true;
++	_rtc_lp_timer->start();
++	_rtc_enabled = true;
+ }
+ 
+ static int _rtc_lpticker_isenabled(void)
+ {
+-    return (_rtc_enabled == true);
++	return (_rtc_enabled == true);
+ }
+ 
+ static time_t _rtc_lpticker_read(void)
+ {
+-    return _rtc_lp_timer->read_high_resolution_us() / US_PER_SEC + _rtc_lp_base;
++	return _rtc_lp_timer->read_high_resolution_us() / US_PER_SEC + _rtc_lp_base;
+ }
+ 
+ static void _rtc_lpticker_write(time_t t)
+ {
+-    _rtc_lp_timer->reset();
+-    _rtc_lp_base = t;
++	_rtc_lp_timer->reset();
++	_rtc_lp_base = t;
+ }
+ 
+ static void (*_rtc_init)(void) = _rtc_lpticker_init;
+@@ -80,38 +80,46 @@ extern "C" {
+ 
+ int settimeofday(const struct timeval *tv, MBED_UNUSED const struct timezone *tz)
+ {
+-    _mutex->lock();
+-    if (_rtc_init != NULL) {
+-        _rtc_init();
+-    }
+-    if (_rtc_write != NULL) {
+-        _rtc_write(tv->tv_sec);
+-    }
+-    _mutex->unlock();
+-
+-    return 0;
++	_mutex->lock();
++	if (_rtc_init != NULL) {
++		_rtc_init();
++	}
++	if (_rtc_write != NULL) {
++		_rtc_write(tv->tv_sec);
++	}
++	_mutex->unlock();
++
++	return 0;
+ }
+ 
+ int gettimeofday(struct timeval *tv, MBED_UNUSED void *tz)
+ {
+-    _mutex->lock();
+-    if (_rtc_isenabled != NULL) {
+-        if (!(_rtc_isenabled())) {
+-            set_time(0);
+-        }
+-    }
+-
+-    time_t t = (time_t) - 1;
+-    if (_rtc_read != NULL) {
+-        t = _rtc_read();
+-    }
+-
+-    tv->tv_sec  = t;
+-    tv->tv_usec = 0;
+-
+-    _mutex->unlock();
+-
+-    return 0;
++	int i;
++	const int retry_count = 5;
++
++	_mutex->lock();
++	if (_rtc_isenabled != NULL) {
++		if (!(_rtc_isenabled())) {
++			set_time(0);
++		}
++	}
++	/*cast to long type for toolchain compatibility issue
++	  Because time_t is broken with 2017-q4 release and the later release
++	  of gcc tool chain. 
++	*/
++	long t = (long)(-1);
++	if (_rtc_read != NULL) {
++		for (i = 0; i < retry_count; i++) {
++			t = (long)_rtc_read();
++		}
++	}
++
++	tv->tv_sec  = t;
++	tv->tv_usec = 0;
++
++	_mutex->unlock();
++
++	return 0;
+ }
+ 
+ #if defined (__ICCARM__)
+@@ -120,31 +128,31 @@ time_t __time32(time_t *timer)
+ time_t time(time_t *timer)
+ #endif
+ {
+-    struct timeval tv;
+-    gettimeofday(&tv, NULL);
++	struct timeval tv;
++	gettimeofday(&tv, NULL);
+ 
+-    if (timer != NULL) {
+-        *timer = tv.tv_sec;
+-    }
++	if (timer != NULL) {
++		*timer = tv.tv_sec;
++	}
+ 
+-    return tv.tv_sec;
++	return tv.tv_sec;
+ }
+ 
+ 
+ void set_time(time_t t)
+ {
+-    const struct timeval tv = { t, 0 };
+-    settimeofday(&tv, NULL);
++	const struct timeval tv = { t, 0 };
++	settimeofday(&tv, NULL);
+ }
+ 
+ void attach_rtc(time_t (*read_rtc)(void), void (*write_rtc)(time_t), void (*init_rtc)(void), int (*isenabled_rtc)(void))
+ {
+-    _mutex->lock();
+-    _rtc_read = read_rtc;
+-    _rtc_write = write_rtc;
+-    _rtc_init = init_rtc;
+-    _rtc_isenabled = isenabled_rtc;
+-    _mutex->unlock();
++	_mutex->lock();
++	_rtc_read = read_rtc;
++	_rtc_write = write_rtc;
++	_rtc_init = init_rtc;
++	_rtc_isenabled = isenabled_rtc;
++	_mutex->unlock();
+ }
+ 
+ 
+diff --git a/targets/TARGET_RDA/TARGET_UNO_91H/PinNames.h b/targets/TARGET_RDA/TARGET_UNO_91H/PinNames.h
+index c50fd4f..e3d1df3 100644
+--- a/targets/TARGET_RDA/TARGET_UNO_91H/PinNames.h
++++ b/targets/TARGET_RDA/TARGET_UNO_91H/PinNames.h
+@@ -126,9 +126,10 @@ typedef enum {
+     ADC_PIN1A = PB_8, // Another pin name for ADC 1
+     ADC_PIN2  = PD_9,
+ 
+-    LED1    = GPIO_PIN21,
+-    LED2    = GPIO_PIN1,
++    LED1    = PB_1,
++    LED2    = PB_2,
+ 
++    USER_BUTTON = PB_3,
+     // Arduino Pin Names
+     // Analog Ports (A0-A1)
+     A0 = PB_6,
+diff --git a/targets/TARGET_RDA/TARGET_UNO_91H/rtc_api.c b/targets/TARGET_RDA/TARGET_UNO_91H/rtc_api.c
+new file mode 100644
+index 0000000..068099c
+--- /dev/null
++++ b/targets/TARGET_RDA/TARGET_UNO_91H/rtc_api.c
+@@ -0,0 +1,92 @@
++/* mbed Microcontroller Library
++ * Copyright (c) 2006-2013 ARM Limited
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++#include "rtc_api.h"
++
++#if DEVICE_RTC
++
++#include "us_ticker_api.h"
++
++#define RTC_TIMER_INITVAL_REG       (RDA_SCU->FTMRINITVAL)
++#define RTC_TIMER_TIMESTAMP_REG     (RDA_SCU->FTMRTS)
++
++#define RTC_TIMER_CLOCK_SOURCE      (32768)
++
++static time_t sw_timebase = 0U;
++static time_t sw_timeofst = 0U;
++static uint32_t round_ticks = 0U;
++static uint32_t remain_ticks = 0U;
++static int is_rtc_enabled = 0;
++
++void rtc_init(void) {
++    uint32_t start_time;
++    /* Make sure us_ticker is running */
++    start_time = us_ticker_read();
++    /* To fix compiling warning */
++    start_time = start_time;
++    /* Record the ticks */
++    round_ticks = RTC_TIMER_INITVAL_REG;
++    is_rtc_enabled = 1;
++}
++
++void rtc_free(void) {
++    is_rtc_enabled = 0;
++}
++
++int rtc_isenabled(void) {
++    return is_rtc_enabled;
++}
++
++time_t rtc_read(void) {
++    /* Get hw timestamp in seconds, ">>15" equals "/RTC_TIMER_CLOCK_SOURCE" (="/32768") */
++    time_t hw_ts = (time_t)((RTC_TIMER_TIMESTAMP_REG + remain_ticks) >> 15);
++    /* Calculate current timestamp */
++    time_t t = sw_timebase + hw_ts - sw_timeofst;
++    return t;
++}
++
++void rtc_write(time_t t) {
++    /* Get hw timestamp in seconds */
++    uint32_t rtc_cur_ticks = RTC_TIMER_TIMESTAMP_REG;
++    uint32_t rtc_rpl_ticks = (rtc_cur_ticks + remain_ticks) & 0x00007FFFUL;
++    uint32_t sw_rpl = 0U;
++    time_t hw_ts = (time_t)((rtc_cur_ticks + remain_ticks) >> 15);
++    /* Set remaining ticks */
++    remain_ticks += rtc_rpl_ticks;
++    sw_rpl = remain_ticks >> 15;
++    remain_ticks &= 0x00007FFFUL;
++    /* Set sw timestamp in seconds */
++
++    if(t < hw_ts) {
++        sw_timebase = (time_t)sw_rpl;
++        sw_timeofst = (time_t)(hw_ts - t);
++    } else {
++        sw_timebase = (time_t)(sw_rpl + t - hw_ts);
++        sw_timeofst = (time_t)0U;
++    }
++}
++
++void rtc_base_update(void)
++{
++    if(is_rtc_enabled) {
++        uint32_t sw_rpl = 0U;
++        remain_ticks += round_ticks & 0x00007FFFUL;
++        sw_rpl = remain_ticks >> 15;
++        remain_ticks &= 0x00007FFFUL;
++        sw_timebase += (time_t)((round_ticks >> 15) + sw_rpl);
++    }
++}
++#endif
++
+diff --git a/targets/targets.json b/targets/targets.json
+index 32617db..aa7d931 100644
+--- a/targets/targets.json
++++ b/targets/targets.json
+@@ -9525,6 +9525,7 @@
+             "SLEEP",
+             "ANALOGIN",
+             "FLASH",
++            "RTC",
+             "TRNG"
+         ],
+         "release_versions": ["2", "5"]
+-- 
+2.7.4
+
