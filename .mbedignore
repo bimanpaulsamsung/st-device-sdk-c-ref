@@ -15,9 +15,24 @@ iot-core/src/port/net/openssl/
 #iot-core/src/port/net/mbedtls/
 
 #Block Linux specific files
-iot-core/src/crypto/ss/
 iot-core/src/easysetup/http/lwip_httpd/fsdata_custom.c
 iot-core/src/easysetup/posix_testing/iot_easysetup_posix_testing.c
+
+#Block unwanted security files
+#iot-core/src/security/iot_security_ecdh.c
+#iot-core/src/security/iot_security_manager.c
+#iot-core/src/security/iot_security_common.c
+#iot-core/src/security/helper/libsodium/iot_security_helper_libsodium.c
+#iot-core/src/security/helper/mbedtls/iot_security_helper_mbedtls.c
+#iot-core/src/security/backend/software/iot_security_be_software.c
+#iot-core/src/security/backend/software/iot_security_be_bsp.c
+iot-core/src/security/backend/software/lib
+iot-core/src/security/backend/software/lib/esp
+iot-core/src/security/backend/software/lib/esp/libiot_security_ss.a
+iot-core/src/security/backend/hardware/virtual/iot_security_be_virtual.c
+#iot-core/src/security/iot_security_crypto.c
+#iot-core/src/security/iot_security_storage.c
+
 
 #Block HTTP or HTTPS
 iot-core/src/easysetup/http/tls/
@@ -57,6 +72,8 @@ iot-core/src/port/bsp/rtl8195/
 iot-core/src/port/bsp/rtl8720c/
 iot-core/src/port/bsp/rtl8721c/
 iot-core/src/port/bsp/tizenrt/
+iot-core/src/port/bsp/pic32mz/
+iot-core/src/port/bsp/rda5981c/
 
 #Block the Apps not required
 apps/cc3220sf/
@@ -64,9 +81,13 @@ apps/cc3220sf/
 apps/emw3080/
 apps/emw3166/
 apps/esp32/
+apps/esp32_v3.3/
+apps/esp32_v4.x/
 apps/esp8266/
 apps/lpc54018/
 apps/mt7682_ss/
+apps/pic32mz/
+apps/rda5981c/
 apps/rtl8195/
 apps/rtl8720c/
 apps/rtl8721c/
