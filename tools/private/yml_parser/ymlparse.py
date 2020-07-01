@@ -469,11 +469,15 @@ def make_helper_c_header_output(caps):
         output.write(        "    const struct "+caps.id+"_attr_"+attr.name+" {\n")
         output.write(        "        const char *name;\n")
         output.write(        "        const unsigned char property;\n")
-        output.write(        "        const unsigned char value_type;\n")
+        output.write(        "        const unsigned char valueType;\n")
         if (attr.jsonSchema.enum_list):
             output.write(    "        const char *values[" + (ENUM_PREFIX + caps.id + "_" + attr.name + "_VALUE_MAX").upper() + "];\n")
+            for enum_value in attr.jsonSchema.enum_list:
+                output.write("        const char *value_" + enum_value.replace(' ', '_') + ";\n")
         if (attr.unit_enum_list):
             output.write(    "        const char *units[" + (ENUM_PREFIX + caps.id + "_" + attr.name + "_UNIT_MAX").upper() + "];\n")
+            for enum_unit in attr.unit_enum_list:
+                output.write("        const char *unit_" + get_unit_string(enum_unit.encode('utf8'), attr.name) + ";\n")
 
         value_type_string = get_c_type_from_jsonSchema_type(attr.jsonSchema.type)
         if (attr.jsonSchema.min):
@@ -502,15 +506,18 @@ def make_helper_c_header_output(caps):
         output.write(        "        .property = " + property_string + "\n")
 
         if not (attr.jsonSchema.type):
-            output.write(    "        .value_type = NULL,\n")
+            output.write(    "        .valueType = NULL,\n")
         else:
-            output.write(    "        .value_type = VALUE_TYPE_" + attr.jsonSchema.type.upper() + ",\n")
+            output.write(    "        .valueType = VALUE_TYPE_" + attr.jsonSchema.type.upper() + ",\n")
 
         if (attr.jsonSchema.enum_list):
             enum_string = ""
             for enum_value in attr.jsonSchema.enum_list:
                 enum_string = enum_string + "\""+enum_value+"\", "
             output.write(    "        .values = {" + enum_string.rstrip(" ,") + "},\n")
+            for enum_value in attr.jsonSchema.enum_list:
+                output.write("        .value_" + enum_value.replace(' ', '_') + " = \"" + enum_value + "\",\n")
+
 
         if (attr.unit_enum_list):
             enum_string = ""
@@ -518,6 +525,8 @@ def make_helper_c_header_output(caps):
                 enum_unit = enum_unit.encode('utf8')
                 enum_string = enum_string + "\""+enum_unit+"\", "
             output.write(    "        .units = {" + enum_string.rstrip(" ,") + "},\n")
+            for enum_unit in attr.unit_enum_list:
+                output.write("        .unit_" + get_unit_string(enum_unit.encode('utf8'), attr.name) + " = \"" + enum_unit.encode('utf8') + "\",\n")
 
         if (attr.jsonSchema.min):
             output.write(    "        .min = " + attr.jsonSchema.min + ",\n")
