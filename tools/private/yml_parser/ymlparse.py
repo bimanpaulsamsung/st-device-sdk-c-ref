@@ -149,7 +149,7 @@ def get_unit_string(enum_unit, attr_name):
     enum_unit = enum_unit.replace('^', "")
     enum_unit = enum_unit.replace('μg', "ug")
     enum_unit = enum_unit.replace('斤', "catty")
-    return enum_unit.replace(' ', '_').upper()
+    return enum_unit.replace(' ', '_')
 
 def update_related_cmds_info(yaml_attr, attr, caps):
     if ("setter" in yaml_attr):
