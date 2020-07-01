@@ -44,33 +44,39 @@ static float calculate_rgb(float v1, float v2, float vh)
 	return v1;
 }
 
-/* SmartThings manage color by using Hue-Saturation format,
-   If you use LED by using RGB color format, you need to change color format */
-void update_rgb_from_hsl(double hue, double saturation, int level,
-		int *red, int *green, int *blue)
+void update_rgb_from_color_temp(int color_temp, int *red, int *green, int *blue)
 {
-	if (saturation == 0)
-	{
-		*red = *green = *blue = 255;
-		return;
-	}
+    int ct_table[10][3] = {
+            {160, 0, 0}, //0
+            {220, 20, 0}, //1000
+            {255, 50, 0}, //2000
+            {255, 160, 0}, //3000
+            {255, 230, 130}, //4000
+            {255, 255, 255}, //5000
+            {120, 150, 255}, //6000
+            {60, 80, 240}, //7000
+            {30, 70, 200}, //8000
+            {10, 50, 130}, //9000
+    };
 
-	float v1, v2;
-	float h = ((float) hue) / 100;
-	float s = ((float) saturation) / 100;
-	float l = ((float) level) / 100;
+    if (color_temp < 0) {
+        *red = ct_table[0][0];
+        *green = ct_table[0][1];
+        *blue = ct_table[0][2];
+        return;
+    }
+    if (color_temp >= 9000) {
+        *red = ct_table[9][0];
+        *green = ct_table[9][1];
+        *blue = ct_table[9][2];
+        return;
+    }
 
-	if (l < 0.5) {
-		v2 = l * (1 + s);
-	} else {
-		v2 = l + s - l * s;
-	}
-
-	v1 = 2 * l - v2;
-
-	*red   = (int)(255 * calculate_rgb(v1, v2, h + (1.0f / 3)));
-	*green = (int)(255 * calculate_rgb(v1, v2, h));
-	*blue  = (int)(255 * calculate_rgb(v1, v2, h - (1.0f / 3)));
+    int idx = color_temp / 1000;
+    int remain = color_temp % 1000;
+    *red = ct_table[idx][0] + (ct_table[idx+1][0]-ct_table[idx][0])*remain/1000;
+    *green = ct_table[idx][1] + (ct_table[idx+1][1]-ct_table[idx][1])*remain/1000;
+    *blue = ct_table[idx][2] + (ct_table[idx+1][2]-ct_table[idx][2])*remain/1000;
 }
 
 int get_button_event(int* button_event_type, int* button_event_count)

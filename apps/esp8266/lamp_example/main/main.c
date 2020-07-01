@@ -32,7 +32,8 @@
 
 #include "caps_switch.h"
 #include "caps_switchLevel.h"
-#include "caps_colorControl.h"
+#include "caps_colorTemperature.h"
+#include "caps_activityLightingMode.h"
 
 // onboarding_config_start is null-terminated string
 extern const uint8_t onboarding_config_start[]    asm("_binary_onboarding_config_json_start");
@@ -44,9 +45,9 @@ extern const uint8_t device_info_end[]        asm("_binary_device_info_json_end"
 
 static caps_switch_data_t *cap_switch_data;
 static caps_switchLevel_data_t *cap_switchLevel_data;
-static caps_colorControl_data_t *cap_colorControl_data;
+static caps_colorTemperature_data_t *cap_colorTemp_data;
+static caps_activityLightingMode_data_t *cap_lightMode_data;
 
-static int hsl_color_lightness = 50;
 static int rgb_color_red = 255;
 static int rgb_color_green = 255;
 static int rgb_color_blue = 255;
@@ -88,11 +89,9 @@ static void noti_led_onoff(int onoff)
 
 static void update_color_info(void)
 {
-    double hue = cap_colorControl_data->get_hue_value(cap_colorControl_data);
-    double saturation = cap_colorControl_data->get_saturation_value(cap_colorControl_data);
-
-    update_rgb_from_hsl(hue, saturation, hsl_color_lightness,
-                        &rgb_color_red, &rgb_color_green, &rgb_color_blue);
+    int colorTemp_value = cap_colorTemp_data->get_colorTemperature_value(cap_colorTemp_data);
+    update_rgb_from_color_temp(colorTemp_value,
+     &rgb_color_red, &rgb_color_green, &rgb_color_blue);
 }
 
 static void color_led_onoff(int onoff)
@@ -137,10 +136,38 @@ void cap_switchLevel_cmd_cb(struct caps_switchLevel_data *caps_data)
     change_switch_level(switch_level);
 }
 
-void cap_colorControl_cmd_cb(struct caps_colorControl_data *caps_data)
+void cap_colorTemp_cmd_cb(struct caps_colorTemperature_data *caps_data)
 {
-    int switch_state = get_switch_state();
-    color_led_onoff(switch_state);
+    update_color_info();
+    color_led_onoff(get_switch_state());
+}
+
+void cap_lightMode_cmd_cb(struct caps_activityLightingMode_data *caps_data)
+{
+    const char* lightMode = cap_lightMode_data->get_lightingMode_value(cap_lightMode_data);
+
+    int colorTemp = 0;
+    if(!strcmp(lightMode, caps_helper_activityLightingMode.attr_lightingMode.value_reading)) {
+        colorTemp = 4000;
+    } else if(!strcmp(lightMode, caps_helper_activityLightingMode.attr_lightingMode.value_writing)) {
+        colorTemp = 5000;
+    } else if(!strcmp(lightMode, caps_helper_activityLightingMode.attr_lightingMode.value_computer)) {
+        colorTemp = 6000;
+    } else if(!strcmp(lightMode, caps_helper_activityLightingMode.attr_lightingMode.value_day)) {
+        colorTemp = 5500;
+    } else if(!strcmp(lightMode, caps_helper_activityLightingMode.attr_lightingMode.value_night)) {
+        colorTemp = 6500;
+    } else if(!strcmp(lightMode, caps_helper_activityLightingMode.attr_lightingMode.value_sleepPreparation)) {
+        colorTemp = 3000;
+    } else if(!strcmp(lightMode, caps_helper_activityLightingMode.attr_lightingMode.value_cozy)) {
+        colorTemp = 2000;
+    } else if(!strcmp(lightMode, caps_helper_activityLightingMode.attr_lightingMode.value_soft)) {
+        colorTemp = 2500;
+    }
+    cap_colorTemp_data->set_colorTemperature_value(cap_colorTemp_data, colorTemp);
+    update_color_info();
+    color_led_onoff(get_switch_state());
+    cap_colorTemp_data->attr_colorTemperature_send(cap_colorTemp_data);
 }
 
 static void capability_init()
@@ -165,18 +192,23 @@ static void capability_init()
         cap_switchLevel_data->set_level_unit(cap_switchLevel_data, caps_helper_switchLevel.attr_level.units[CAP_ENUM_SWITCHLEVEL_LEVEL_UNIT_PERCENT]);
     }
 
+    cap_colorTemp_data = caps_colorTemperature_initialize(ctx, "main", NULL, NULL);
+    if (cap_colorTemp_data) {
+        int colorTemp_init_value = 2000;
 
-    cap_colorControl_data = caps_colorControl_initialize(ctx, "main", NULL, NULL);
-    if (cap_colorControl_data) {
-        int hue_init_value = 0;
-        int saturation_init_value = 100;
+        cap_colorTemp_data->cmd_setColorTemperature_usr_cb = cap_colorTemp_cmd_cb;
 
-        cap_colorControl_data->cmd_setColor_usr_cb = cap_colorControl_cmd_cb;
-        cap_colorControl_data->cmd_setHue_usr_cb = cap_colorControl_cmd_cb;
-        cap_colorControl_data->cmd_setSaturation_usr_cb = cap_colorControl_cmd_cb;
-
-        cap_colorControl_data->set_color_value(cap_colorControl_data, hue_init_value, saturation_init_value);
+        cap_colorTemp_data->set_colorTemperature_value(cap_colorTemp_data, colorTemp_init_value);
     }
+
+    cap_lightMode_data = caps_activityLightingMode_initialize(ctx, "main", NULL, NULL);
+    if (cap_lightMode_data) {
+        const char *init_lightMode = caps_helper_activityLightingMode.attr_lightingMode.value_cozy;
+        cap_lightMode_data->set_lightingMode_value(cap_lightMode_data, init_lightMode);
+
+        cap_lightMode_data->cmd_setLightingMode_usr_cb = cap_lightMode_cmd_cb;
+    }
+
 }
 
 static void iot_status_cb(iot_status_t status,
