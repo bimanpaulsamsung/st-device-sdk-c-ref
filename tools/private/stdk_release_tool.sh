@@ -133,7 +133,9 @@ TARGET_MINOR_VER=`sed -n '/#define VER_MINOR/p' $VERSION_HEADER | sed 's/[^0-9]*
 TARGET_PATCH_VER=`sed -n '/#define VER_PATCH/p' $VERSION_HEADER | sed 's/[^0-9]*//g'`
 ((TARGET_PATCH_VER=TARGET_PATCH_VER+1))
 fi
-sed -i '/#define VER_PATCH/c\#define VER_PATCH\t('${TARGET_PATCH_VER}')' $VERSION_HEADER
+sed -i '/#define VER_MAJOR/c\#define VER_MAJOR\t'${TARGET_MAJOR_VER}'' $VERSION_HEADER
+sed -i '/#define VER_MINOR/c\#define VER_MINOR\t'${TARGET_MINOR_VER}'' $VERSION_HEADER
+sed -i '/#define VER_PATCH/c\#define VER_PATCH\t'${TARGET_PATCH_VER}'' $VERSION_HEADER
 git add $VERSION_HEADER
 git commit -s -m "Update core version to $TARGET_MAJOR_VER.$TARGET_MINOR_VER.$TARGET_PATCH_VER"
 git checkout -B develop_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
