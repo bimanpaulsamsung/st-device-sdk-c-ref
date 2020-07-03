@@ -322,8 +322,9 @@ if [ $? == 0 ]; then
 fi
 git add iot-core
 git diff --diff-filter=U --quiet
-if [ $? != 0]; then
-	while [ $? != 0 ];
+DIFF_RESULT=$?
+if [ $DIFF_RESULT != 0 ]; then
+	while [ $DIFF_RESULT != 0 ];
 	do
 		echo
 		echo "               MERGE CONFLICT(sdk-ref)                   "
@@ -338,6 +339,7 @@ if [ $? != 0]; then
 		then
 			bash --rcfile ${WORK_SPACE}/tmpbashrc
 			git merge --continue
+			DIFF_RESULT=$?
 		else
 			exit 1
 		fi
