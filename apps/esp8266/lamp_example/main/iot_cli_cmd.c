@@ -25,42 +25,43 @@
 
 #include "st_dev.h"
 
-extern IOT_CTX *ctx;
+#include "iot_debug.h" //private
 
+extern IOT_CTX *ctx;
 
 static int _cli_copy_nth_arg(char* dest, char* src, int size, int n)
 {
-	int start = 0, end = -1;
-	int i = 0, word_index = 0;
-	int len;
+    int start = 0, end = -1;
+    int i = 0, word_index = 0;
+    int len;
 
-	for (i = 0; src[i] != '\0'; i++) {
-		if ((src[i] == ' ') && (src[i+1]!=' ') && (src[i+1]!='\0')) { //start check
-			word_index++;
-			if (word_index == n) {
-				start = i+1;
-			}
-		} else if ((src[i] != ' ') && ((src[i+1]==' ')||(src[i+1]=='\0'))) { //end check
-			if (word_index == n) {
-				end = i;
-				break;
-			}
-		}
-	}
+    for (i = 0; src[i] != '\0'; i++) {
+        if ((src[i] == ' ') && (src[i+1]!=' ') && (src[i+1]!='\0')) { //start check
+            word_index++;
+            if (word_index == n) {
+                start = i+1;
+            }
+        } else if ((src[i] != ' ') && ((src[i+1]==' ')||(src[i+1]=='\0'))) { //end check
+            if (word_index == n) {
+                end = i;
+                break;
+            }
+        }
+    }
 
-	if (end == -1) {
-		//printf("Fail to find %dth arg\n", n);
-		return -1;
-	}
+    if (end == -1) {
+        //printf("Fail to find %dth arg\n", n);
+        return -1;
+    }
 
-	len = end - start + 1;
-	if ( len > size - 1) {
-		len = size - 1;
-	}
+    len = end - start + 1;
+    if ( len > size - 1) {
+        len = size - 1;
+    }
 
-	strncpy(dest, &src[start], len);
-	dest[len] = '\0';
-	return 0;
+    strncpy(dest, &src[start], len);
+    dest[len] = '\0';
+    return 0;
 
 }
 
@@ -104,13 +105,36 @@ static void _cli_cmd_dummy_cmd(char *string)
     }
 }
 
+static void _cli_cmd_get_log_dump(char *string)
+{
+    char buf[MAX_UART_LINE_SIZE];
+    char* log;
+    size_t size = 2048;
+    size_t written_size = 0;
+    int ret;
+    int mode = IOT_DUMP_MODE_NEED_BASE64 | IOT_DUMP_MODE_NEED_DUMP_STATE;
+
+    if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+        size = strtol(buf, NULL, 10);
+    }
+    ret = iot_dump_create_all_log_dump((struct iot_context *)ctx, &log, size, &written_size, mode);
+    if (ret < 0) {
+        printf("Fail to get log dump!\n");
+        return;
+    }
+    printf("all_log_dump - size: %d / %d\n", written_size, size);
+    printf("%s\n", log);
+    free(log);
+}
+
+
 static struct cli_command cmd_list[] = {
     {"cleanup", "clean-up data with reboot option", _cli_cmd_cleanup},
     {"button", "button {count} {type} : ex) button 5 / button 1 long", _cli_cmd_butten_event},
-	{"dummy", "dummy cmd", _cli_cmd_dummy_cmd},
+    {"get_log_dump", "[private] get_log_dump [size(default 2048)] ",  _cli_cmd_get_log_dump},
 };
 
 void register_iot_cli_cmd(void) {
-	for (int i = 0; i < ARRAY_SIZE(cmd_list); i++)
-		cli_register_command(&cmd_list[i]);
+    for (int i = 0; i < ARRAY_SIZE(cmd_list); i++)
+        cli_register_command(&cmd_list[i]);
 }
