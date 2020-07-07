@@ -58,8 +58,8 @@ static iot_status_t g_iot_status = IOT_STATUS_IDLE;
 static iot_stat_lv_t g_iot_stat_lv;
 
 static int noti_led_mode = LED_ANIMATION_MODE_IDLE;
-static int sensor_update_enable = false;
-static int sensor_update_period_ms = 30000;
+int monitor_enable = false;
+int monitor_period_ms = 30000;
 
 IOT_CTX* ctx = NULL;
 
@@ -322,8 +322,8 @@ void button_event(IOT_CAP_HANDLE *handle, int type, int count)
                 }
                 break;
             case 2:
-                sensor_update_enable = !sensor_update_enable;
-                printf("change sensor update mode to %d\n", sensor_update_enable);
+                monitor_enable = !monitor_enable;
+                printf("change monitor mode to %d\n", monitor_enable);
                 break;
             case 5:
                 /* clean-up provisioning & registered data with reboot option*/
@@ -351,10 +351,10 @@ static void app_main_task(void *arg)
 
     int dustLevel_value = 0;
     int fineDustLevel_value = 0;
-    TimeOut_t sensor_update_timeout;
-    TickType_t sensor_update_period_tick = pdMS_TO_TICKS(sensor_update_period_ms);
+    TimeOut_t monitor_timeout;
+    TickType_t monitor_period_tick = pdMS_TO_TICKS(monitor_period_ms);
 
-    vTaskSetTimeOutState(&sensor_update_timeout);
+    vTaskSetTimeOutState(&monitor_timeout);
 
     for (;;) {
         if (get_button_event(&button_event_type, &button_event_count)) {
@@ -364,9 +364,9 @@ static void app_main_task(void *arg)
             change_led_state(noti_led_mode);
         }
 
-        if (sensor_update_enable && (xTaskCheckForTimeOut(&sensor_update_timeout, &sensor_update_period_tick) != pdFALSE)) {
-            vTaskSetTimeOutState(&sensor_update_timeout);
-            sensor_update_period_tick = pdMS_TO_TICKS(sensor_update_period_ms);
+        if (monitor_enable && (xTaskCheckForTimeOut(&monitor_timeout, &monitor_period_tick) != pdFALSE)) {
+            vTaskSetTimeOutState(&monitor_timeout);
+            monitor_period_tick = pdMS_TO_TICKS(monitor_period_ms);
             /* emulate sensor value for example */
             dustLevel_value = (dustLevel_value + 1) % 300;
             fineDustLevel_value = dustLevel_value;

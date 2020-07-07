@@ -91,19 +91,29 @@ static void _cli_cmd_butten_event(char *string)
     button_event(ctx, type, count);
 }
 
-static void _cli_cmd_dummy_cmd(char *string)
+extern int monitor_enable;
+static void _cli_cmd_monitor_enable(char *string)
 {
-    char buf[10];
-    int i = 0;
-    printf("input string : %s\n", string);
+    char buf[MAX_UART_LINE_SIZE];
 
-    while (true) {
-        if (_cli_copy_nth_arg(buf, string, sizeof(buf), i) < 0) {
-            break;
-        }
-        printf("%dth arg : %s\n", i++, buf);
+    if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+        monitor_enable = strtol(buf, NULL, 10);
+        printf("change monitor mode to %d\n", monitor_enable);
     }
 }
+
+extern int monitor_period_ms;
+static void _cli_cmd_monitor_period(char *string)
+{
+    char buf[MAX_UART_LINE_SIZE];
+
+    if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+        monitor_period_ms = strtol(buf, NULL, 10);
+        printf("change monitor period to %d ms\n", monitor_period_ms);
+    }
+}
+
+// PRIVATE
 
 static void _cli_cmd_get_log_dump(char *string)
 {
@@ -127,10 +137,12 @@ static void _cli_cmd_get_log_dump(char *string)
     free(log);
 }
 
-
 static struct cli_command cmd_list[] = {
     {"cleanup", "clean-up data with reboot option", _cli_cmd_cleanup},
     {"button", "button {count} {type} : ex) button 5 / button 1 long", _cli_cmd_butten_event},
+    {"monitor_enable", "monitor_enable {0/1}", _cli_cmd_monitor_enable},
+    {"monitor_period", "monitor_period {period_ms}", _cli_cmd_monitor_period},
+    //private
     {"get_log_dump", "[private] get_log_dump [size(default 2048)] ",  _cli_cmd_get_log_dump},
 };
 
