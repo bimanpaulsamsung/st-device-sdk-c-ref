@@ -25,7 +25,16 @@
 
 #include "st_dev.h"
 
-#include "iot_debug.h" //private
+//private
+#include <sys/time.h>help
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_libc.h"
+#include "esp_heap_trace.h"
+#include "esp_system.h"
+#include "iot_main.h"
+#include "iot_debug.h"
+
 
 extern IOT_CTX *ctx;
 
@@ -115,6 +124,135 @@ static void _cli_cmd_monitor_period(char *string)
 
 // PRIVATE
 
+extern heap_region_t g_heap_region[HEAP_REGIONS_MAX];
+static void _cli_cmd_heap_info(char *string)
+{
+    size_t total_size = 0;
+
+    for (int i = 0; i <	HEAP_REGIONS_MAX; i++) {
+        printf("Region[%d] : %p ~ %p (%u), %08x\n", i,
+               g_heap_region[i].start_addr, g_heap_region[i].start_addr + g_heap_region[i].total_size,
+               g_heap_region[i].total_size, g_heap_region[i].caps);
+        total_size += g_heap_region[i].total_size;
+    }
+
+    printf("heap_info : CU:%d, CR:%d, PU:%d, PR:%d\n",
+           total_size - heap_caps_get_free_size(MALLOC_CAP_32BIT),
+           heap_caps_get_free_size(MALLOC_CAP_32BIT),
+           total_size - heap_caps_get_minimum_free_size(MALLOC_CAP_32BIT),
+           heap_caps_get_minimum_free_size(MALLOC_CAP_32BIT));
+}
+
+static void _cli_cmd_time_info(char *string)
+{
+    char buf[20];
+    struct timeval tv_now;
+    struct timeval tv_set = {1559347200, 0}; /* default time is 2019-06-01 00:00:00 UTC */
+
+    if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+        if (strncmp(buf, "get", 3) == 0) {
+            gettimeofday(&tv_now, NULL);
+            printf("current wall time is %ld\n", tv_now.tv_sec);
+        } else if (strncmp(buf, "set", 3) == 0) {
+            if (_cli_copy_nth_arg(buf, string, sizeof(buf), 2) >= 0) {
+                sscanf(buf, "%ld", &tv_set.tv_sec);
+
+                if (tv_set.tv_sec < 1546300800) {
+                    printf("settime target is too old. Need to be greater than 1546300800(2019-01-01 00:00:00 UTC)\n");
+                    return;
+                }
+            }
+
+            /* Set time to tv_set */
+            settimeofday(&tv_set, NULL);
+
+            /* Wait 100ms and check current time */
+            vTaskDelay(100 / portTICK_RATE_MS);
+            gettimeofday(&tv_now, NULL);
+            printf("current wall time is %ld\n", tv_now.tv_sec);
+
+        } else {
+            printf("Invalid parameter.\n");
+            return;
+        }
+    } else {
+        printf("Invalid parameter.\n");
+        return;
+    }
+}
+
+static void _cli_cmd_reboot(char *string)
+{
+    printf("reboot the system\n");
+    esp_restart();
+}
+
+static void _cli_cmd_device_info(char *string)
+{
+    printf("\n");
+
+    const char* buf = esp_get_idf_version();
+    printf("ESP_IDF VERSION : %s\n", buf);
+
+    esp_chip_info_t chip_info;
+    esp_chip_info(&chip_info);
+
+    if (chip_info.model == CHIP_ESP8266) {
+        printf("MODEL NAME : ESP8266\n");
+    }
+
+    /*
+     * Todo : Support ESP32 Feature
+     * #define CHIP_FEATURE_EMB_FLASH      BIT(0)      //!< Chip has embedded flash memory
+     * #define CHIP_FEATURE_WIFI_BGN       BIT(1)      //!< Chip has 2.4GHz WiFi
+     * #define CHIP_FEATURE_BLE            BIT(4)      //!< Chip has Bluetooth LE
+     * #define CHIP_FEATURE_BT             BIT(5)      //!< Chip has Bluetooth Classic
+     *
+     */
+    if (chip_info.features == CHIP_FEATURE_WIFI_BGN) {
+        printf("CHIP FEATURE : WIFI_BGN\n");
+    }
+
+    printf("NUMBER OF CPU CORES : %d\n", chip_info.cores);
+    printf("REVISION : %d\n", chip_info.revision);
+
+    uint8_t mac_addr[6];
+    esp_err_t ret = esp_read_mac(mac_addr, ESP_MAC_WIFI_STA);
+    if (ret == ESP_OK) {
+        printf("MAC ADDRESS (STATION) : %02x:%02x:%02x:%02x:%02x:%02x\n", mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+    }
+
+    ret = esp_read_mac(mac_addr, ESP_MAC_WIFI_SOFTAP);
+    if (ret == ESP_OK) {
+        printf("MAC ADDRESS (SOFTAP) : %02x:%02x:%02x:%02x:%02x:%02x\n", mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+    }
+
+    printf("\n");
+
+    return;
+}
+
+#ifdef CONFIG_SAMSUNG_BUILD_ENG
+static void _cli_cmd_pub_event(char *string)
+{
+    char buf[MAX_UART_LINE_SIZE];
+
+    if (ctx == NULL) {
+        printf("ctx is NULL\n");
+        return;
+    }
+
+    if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+        printf("event payload %s\n", buf);
+        st_publish_event_raw(ctx, buf);
+    }
+}
+#else
+static void _cli_cmd_pub_event(char *string)
+{
+    printf("pub_event is disabled : enable CONFIG_SAMSUNG_BUILD_ENG\n");
+}
+#endif
 static void _cli_cmd_get_log_dump(char *string)
 {
     char buf[MAX_UART_LINE_SIZE];
@@ -140,9 +278,14 @@ static void _cli_cmd_get_log_dump(char *string)
 static struct cli_command cmd_list[] = {
     {"cleanup", "clean-up data with reboot option", _cli_cmd_cleanup},
     {"button", "button {count} {type} : ex) button 5 / button 1 long", _cli_cmd_butten_event},
-    {"monitor_enable", "monitor_enable {0/1}", _cli_cmd_monitor_enable},
+    {"monitor_enable", "monitor_enable {0|1}", _cli_cmd_monitor_enable},
     {"monitor_period", "monitor_period {period_ms}", _cli_cmd_monitor_period},
     //private
+    {"heap_info", "[private] print heap free size and minimum size", _cli_cmd_heap_info},
+    {"time", "[private] time get or time set {since_epoch}", _cli_cmd_time_info},
+    {"reboot", "[private] reboot the system", _cli_cmd_reboot},
+    {"pub_event", "[private] pub_event [event payload]", _cli_cmd_pub_event},
+    {"device_info", "[private] show device info", _cli_cmd_device_info},
     {"get_log_dump", "[private] get_log_dump [size(default 2048)] ",  _cli_cmd_get_log_dump},
 };
 
