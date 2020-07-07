@@ -34,6 +34,7 @@
 #include "caps_switchLevel.h"
 #include "caps_colorTemperature.h"
 #include "caps_activityLightingMode.h"
+#include "caps_dustSensor.h"
 
 // onboarding_config_start is null-terminated string
 extern const uint8_t onboarding_config_start[]    asm("_binary_onboarding_config_json_start");
@@ -47,6 +48,7 @@ static caps_switch_data_t *cap_switch_data;
 static caps_switchLevel_data_t *cap_switchLevel_data;
 static caps_colorTemperature_data_t *cap_colorTemp_data;
 static caps_activityLightingMode_data_t *cap_lightMode_data;
+static caps_dustSensor_data_t *cap_dustSensor_data;
 
 static int rgb_color_red = 255;
 static int rgb_color_green = 255;
@@ -56,6 +58,8 @@ static iot_status_t g_iot_status = IOT_STATUS_IDLE;
 static iot_stat_lv_t g_iot_stat_lv;
 
 static int noti_led_mode = LED_ANIMATION_MODE_IDLE;
+static int sensor_update_enable = false;
+static int sensor_update_period_ms = 30000;
 
 IOT_CTX* ctx = NULL;
 
@@ -209,6 +213,14 @@ static void capability_init()
         cap_lightMode_data->cmd_setLightingMode_usr_cb = cap_lightMode_cmd_cb;
     }
 
+    cap_dustSensor_data = caps_dustSensor_initialize(ctx, "main", NULL, NULL);
+    if (cap_dustSensor_data) {
+        cap_dustSensor_data->set_dustLevel_value(cap_dustSensor_data, 0);
+        cap_dustSensor_data->set_fineDustLevel_value(cap_dustSensor_data, 0);
+
+        cap_dustSensor_data->set_dustLevel_unit(cap_dustSensor_data, caps_helper_dustSensor.attr_dustLevel.unit_ug_per_m3);
+        cap_dustSensor_data->set_fineDustLevel_unit(cap_dustSensor_data, caps_helper_dustSensor.attr_fineDustLevel.unit_ug_per_m3);
+    }
 }
 
 static void iot_status_cb(iot_status_t status,
@@ -309,6 +321,10 @@ void button_event(IOT_CAP_HANDLE *handle, int type, int count)
                     }
                 }
                 break;
+            case 2:
+                sensor_update_enable = !sensor_update_enable;
+                printf("change sensor update mode to %d\n", sensor_update_enable);
+                break;
             case 5:
                 /* clean-up provisioning & registered data with reboot option*/
                 st_conn_cleanup(ctx, true);
@@ -333,12 +349,33 @@ static void app_main_task(void *arg)
     int button_event_type;
     int button_event_count;
 
+    int dustLevel_value = 0;
+    int fineDustLevel_value = 0;
+    TimeOut_t sensor_update_timeout;
+    TickType_t sensor_update_period_tick = pdMS_TO_TICKS(sensor_update_period_ms);
+
+    vTaskSetTimeOutState(&sensor_update_timeout);
+
     for (;;) {
         if (get_button_event(&button_event_type, &button_event_count)) {
             button_event(handle, button_event_type, button_event_count);
         }
         if (noti_led_mode != LED_ANIMATION_MODE_IDLE) {
             change_led_state(noti_led_mode);
+        }
+
+        if (sensor_update_enable && (xTaskCheckForTimeOut(&sensor_update_timeout, &sensor_update_period_tick) != pdFALSE)) {
+            vTaskSetTimeOutState(&sensor_update_timeout);
+            sensor_update_period_tick = pdMS_TO_TICKS(sensor_update_period_ms);
+            /* emulate sensor value for example */
+            dustLevel_value = (dustLevel_value + 1) % 300;
+            fineDustLevel_value = dustLevel_value;
+
+            cap_dustSensor_data->set_dustLevel_value(cap_dustSensor_data, dustLevel_value);
+            cap_dustSensor_data->attr_dustLevel_send(cap_dustSensor_data);
+
+            cap_dustSensor_data->set_fineDustLevel_value(cap_dustSensor_data, fineDustLevel_value);
+            cap_dustSensor_data->attr_fineDustLevel_send(cap_dustSensor_data);
         }
 
 
