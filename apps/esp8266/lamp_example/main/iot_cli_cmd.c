@@ -26,7 +26,7 @@
 #include "st_dev.h"
 
 //private
-#include <sys/time.h>help
+#include <sys/time.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_libc.h"
@@ -147,7 +147,7 @@ static void _cli_cmd_time_info(char *string)
 {
     char buf[20];
     struct timeval tv_now;
-    struct timeval tv_set = {1559347200, 0}; /* default time is 2019-06-01 00:00:00 UTC */
+    struct timeval tv_set = {1577836800, 0}; /* default time is 2020-01-01 00:00:00 UTC */
 
     if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
         if (strncmp(buf, "get", 3) == 0) {
@@ -157,8 +157,8 @@ static void _cli_cmd_time_info(char *string)
             if (_cli_copy_nth_arg(buf, string, sizeof(buf), 2) >= 0) {
                 sscanf(buf, "%ld", &tv_set.tv_sec);
 
-                if (tv_set.tv_sec < 1546300800) {
-                    printf("settime target is too old. Need to be greater than 1546300800(2019-01-01 00:00:00 UTC)\n");
+                if (tv_set.tv_sec < 1577836800) {
+                    printf("settime target is too old. Need to be greater than 1577836800(2020-01-01 00:00:00 UTC)\n");
                     return;
                 }
             }
