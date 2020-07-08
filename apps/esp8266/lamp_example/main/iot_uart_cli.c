@@ -127,7 +127,7 @@ static void cli_cmd_help(char *cmd) {
 		if (!now->cmd)
 			continue;
 
-		printf("%10s : %s\n", now->cmd->command, now->cmd->help_string);
+		printf("%15s : %s\n", now->cmd->command, now->cmd->help_string);
 		now = now->next;
 	}
 }

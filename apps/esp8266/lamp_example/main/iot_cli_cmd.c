@@ -199,6 +199,8 @@ static void _cli_cmd_device_info(char *string)
 
     if (chip_info.model == CHIP_ESP8266) {
         printf("MODEL NAME : ESP8266\n");
+    } else if (chip_info.model == CHIP_ESP32) {
+        printf("MODEL NAME : ESP32\n");
     }
 
     /*
