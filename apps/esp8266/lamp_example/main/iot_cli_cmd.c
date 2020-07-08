@@ -129,7 +129,7 @@ static void _cli_cmd_heap_info(char *string)
 {
     size_t total_size = 0;
 
-    for (int i = 0; i <	HEAP_REGIONS_MAX; i++) {
+    for (int i = 0; i < HEAP_REGIONS_MAX; i++) {
         printf("Region[%d] : %p ~ %p (%u), %08x\n", i,
                g_heap_region[i].start_addr, g_heap_region[i].start_addr + g_heap_region[i].total_size,
                g_heap_region[i].total_size, g_heap_region[i].caps);
