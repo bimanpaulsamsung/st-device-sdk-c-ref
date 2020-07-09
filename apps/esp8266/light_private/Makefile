@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := smart_lamp_demo
+PROJECT_NAME := light_example
 
 EXTRA_COMPONENT_DIRS := ${IDF_PATH}/../../iot-core
 

@@ -27,23 +27,6 @@
 
 static xQueueHandle button_event_queue = NULL;
 
-static float calculate_rgb(float v1, float v2, float vh)
-{
-	if (vh < 0) vh += 1;
-	if (vh > 1) vh -= 1;
-
-	if ((6 * vh) < 1)
-		return (v1 + (v2 - v1) * 6 * vh);
-
-	if ((2 * vh) < 1)
-		return v2;
-
-	if ((3 * vh) < 2)
-		return (v1 + (v2 - v1) * ((2.0f / 3) - vh) * 6);
-
-	return v1;
-}
-
 void update_rgb_from_color_temp(int color_temp, int *red, int *green, int *blue)
 {
     int ct_table[10][3] = {
