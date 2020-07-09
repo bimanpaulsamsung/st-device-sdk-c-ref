@@ -29,6 +29,7 @@
 #include <sys/time.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
 #include "esp_libc.h"
 #include "esp_heap_trace.h"
 #include "esp_system.h"
@@ -235,6 +236,7 @@ static void _cli_cmd_device_info(char *string)
 }
 
 #ifdef CONFIG_SAMSUNG_BUILD_ENG
+extern int st_publish_event_raw(IOT_CTX *iot_ctx, char *event_payload);
 static void _cli_cmd_pub_event(char *string)
 {
     char buf[MAX_UART_LINE_SIZE];

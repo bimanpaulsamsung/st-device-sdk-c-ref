@@ -1,5 +1,10 @@
 menu "Example Configuration"
 
+config SAMSUNG_BUILD_ENG
+    bool "Samsung build ENG"
+    default y
+    help
+        SAMSUNG BUILD ENG
 config WIFI_SSID
     string "WiFi SSID"
     default "myssid"
