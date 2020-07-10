@@ -434,7 +434,7 @@ void app_main(void)
     uart_cli_main();
 
     // needed when it is necessary to keep monitoring the device status
-    xTaskCreate(app_main_task, "app_main_task", 2048, NULL, 10, NULL);
+    xTaskCreate(app_main_task, "app_main_task", 4096, NULL, 10, NULL);
 
     connection_start();
 }
