@@ -58,6 +58,12 @@ Basically, this release builds on the environments of chipset vendor's SDKs.
       >
       > You have to proceed the above steps at Windows PC for downloading a binary. But you have to build the source code on the cygwin or linux for this chipset.
 
+  - Example for Cypress cy8cproto_062_4343w (Ubuntu/Debian quickstart)
+
+    - Install [mbed cli](doc/mbed_cli_setup.md) on linux.
+    - Install [arm toolchain](doc/mbed_cli_setup.md) and configure with `mbed cli`.
+
+
 ### Build
 
 1. Download the STDK Reference source code. Basically, this STDK Reference will download the ported original chipset vendor's SDKs as submodules in the `bsp` directory through the `setup.sh` script. If a chipset vendor's SDK does not exist as git format, you can manually copy it under the `bsp` directory.
@@ -76,6 +82,7 @@ Basically, this release builds on the environments of chipset vendor's SDKs.
          ex) ./setup.sh rtl8195
          ex) ./setup.sh rtl8720c
          ex) ./setup.sh rtl8721c
+         ex) ./setup.sh cy8cproto_062_4343w
 
      $ ./setup.sh esp8266
      ```
@@ -107,6 +114,14 @@ Serial port needs to be matched to the computer environment for serial port flas
   - These data are described in the build configuration file(e.g.  sdkconfig)
 - Example for RTL8195
   - Baud rate 115200, Data bit 8, Parity None, Stop bits 1
+- Example for Cypress cy8cproto_062_4343w
+  - Baud rate 9600, Data bit 8, Parity None, Stop bits 1
+
+  You can open a serial terminal to the tty port of a connected Mbed target (usually board) using the mbed sterm command. If no tty port is specified, Mbed CLI detects the connected Mbed targets and their tty ports.
+
+  `$ mbed sterm`
+
+  > Note: If port is not opening, you may need to use `sudo mbed sterm`
 
 Flashing can be done according to the method supported by chipset SDK.
 
@@ -125,6 +140,17 @@ Flashing can be done according to the method supported by chipset SDK.
       ```sh
       # ./build.sh {chip_name} {app_name} {options}
       $ ./build.sh esp8266 st_switch flash monitor
+      ```
+
+- Example for Cypress cy8cproto_062_4343w
+
+  You can flash the executables into a target device via `build.sh` with additional option. Actually, you don't need to run `./build.sh cy8cproto_062_4343w st_switch` before running `./build.sh cy8cproto_062_4343w st_switch flash`, this will automatically rebuild anything which needs it.
+
+  - options
+    - flash : download executable binaries to the device
+      ```sh
+      # ./build.sh {chip_name} {app_name} {options}
+      $ ./build.sh cy8cproto_062_4343w st_switch flash
       ```
 
 - Example for RTL8195
