@@ -16,62 +16,33 @@
  *
  ****************************************************************************/
 
-//#define CONFIG_TARGET_WITTY_CLOUD
-//#define CONFIG_TARGET_ESP8266_DEVKITC_V1
-#if defined(CONFIG_TARGET_WITTY_CLOUD)
+
+//#define CONFIG_TARGET_WEMOS_D1_R32
+#ifdef CONFIG_TARGET_WEMOS_D1_R32
 
 #define GPIO_OUTPUT_NOTIFICATION_LED 2
-#define GPIO_INPUT_BUTTON 4
+#define GPIO_INPUT_BUTTON 18
 
-#define GPIO_OUTPUT_COLORLED_R 15
-#define GPIO_OUTPUT_COLORLED_G 12
-#define GPIO_OUTPUT_COLORLED_B 13
-#define GPIO_OUTPUT_COLORLED_0 16
+#define GPIO_OUTPUT_COLORLED_R 16
+#define GPIO_OUTPUT_COLORLED_G 26
+#define GPIO_OUTPUT_COLORLED_B 17
+#define GPIO_OUTPUT_COLORLED_0 25
 
-enum notification_led_gpio_state {
-	NOTIFICATION_LED_GPIO_ON = 0,
-	NOTIFICATION_LED_GPIO_OFF = 1,
-};
-
-#elif defined(CONFIG_TARGET_ESP8266_DEVKITC_V1)
+#else // ESP32_DEVKITC_V4
 
 #define GPIO_OUTPUT_NOTIFICATION_LED 2
 #define GPIO_INPUT_BUTTON 0
 
-#define GPIO_OUTPUT_COLORLED_R 14
-#define GPIO_OUTPUT_COLORLED_G 12
-#define GPIO_OUTPUT_COLORLED_B 13
-#define GPIO_OUTPUT_COLORLED_0 15
+#define GPIO_OUTPUT_COLORLED_R 12
+#define GPIO_OUTPUT_COLORLED_G 14
+#define GPIO_OUTPUT_COLORLED_B 27
+#define GPIO_OUTPUT_COLORLED_0 26
+
+#endif
 
 enum notification_led_gpio_state {
 	NOTIFICATION_LED_GPIO_ON = 1,
 	NOTIFICATION_LED_GPIO_OFF = 0,
-};
-
-#else //default
-
-#define GPIO_OUTPUT_NOTIFICATION_LED 2
-#define GPIO_INPUT_BUTTON 5
-
-#define GPIO_OUTPUT_COLORLED_R 16
-#define GPIO_OUTPUT_COLORLED_G 14
-#define GPIO_OUTPUT_COLORLED_B 12
-#define GPIO_OUTPUT_COLORLED_0 13
-enum notification_led_gpio_state {
-	NOTIFICATION_LED_GPIO_ON = 0,
-	NOTIFICATION_LED_GPIO_OFF = 1,
-};
-
-#endif
-
-enum switch_onoff_state {
-    SWITCH_OFF = 0,
-    SWITCH_ON = 1,
-};
-
-enum color_led_gpio_state {
-	COLOR_LED_OFF = 0,
-	COLOR_LED_ON = 1,
 };
 
 #define LED_BLINK_TIME 50
@@ -96,7 +67,8 @@ enum button_event_type {
 	BUTTON_SHORT_PRESS = 1,
 };
 
-void update_rgb_from_color_temp(int color_temp, int *red, int *green, int *blue);
+void update_rgb_from_hsl(double hue, double saturation, int level,
+				int *red, int *green, int *blue);
 void button_isr_handler(void *arg);
 int get_button_event(int* button_event_type, int* button_event_count);
 void led_blink(int gpio, int delay, int count);

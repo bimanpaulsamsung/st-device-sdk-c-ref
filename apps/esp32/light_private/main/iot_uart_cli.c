@@ -31,7 +31,7 @@
 #include "iot_os_util.h"
 
 #define UART_BUF_SIZE (20)
-#define UART_LINE_SIZE (MAX_UART_LINE_SIZE)
+#define UART_LINE_SIZE (128)
 
 #define PROMPT_STRING "STDK # "
 
@@ -43,6 +43,8 @@
 
 */
 int g_StopMainTask = 0;
+
+static portMUX_TYPE spinlock = portMUX_INITIALIZER_UNLOCKED;
 
 static struct cli_command_list *cli_cmd_list;
 
@@ -127,7 +129,7 @@ static void cli_cmd_help(char *cmd) {
 		if (!now->cmd)
 			continue;
 
-		printf("%15s : %s\n", now->cmd->command, now->cmd->help_string);
+		printf("%10s : %s\n", now->cmd->command, now->cmd->help_string);
 		now = now->next;
 	}
 }
@@ -141,30 +143,30 @@ static void _cli_util_wait_for_user_input(unsigned int timeout_ms)
 	TickType_t cur = xTaskGetTickCount();
 	TickType_t end = cur + pdMS_TO_TICKS(timeout_ms);
 	while (xTaskGetTickCount() < end) {
-		taskENTER_CRITICAL();
+		portENTER_CRITICAL(&spinlock);
 		if (g_StopMainTask != 1) {
-			taskEXIT_CRITICAL();
+			portEXIT_CRITICAL(&spinlock);
 			break;
 		}
-		taskEXIT_CRITICAL();
+		portEXIT_CRITICAL(&spinlock);
 		IOT_DELAY(100);
 	}
 
-	taskENTER_CRITICAL();
+	portENTER_CRITICAL(&spinlock);
 	if (g_StopMainTask == 1) {
 		// When there is no input("\n") for a set time, main task will be executed...
 		g_StopMainTask = 0;
 	}
-	taskEXIT_CRITICAL();
+	portEXIT_CRITICAL(&spinlock);
 
 	if (g_StopMainTask != 0) {
 		while (1) {
-			taskENTER_CRITICAL();
+			portENTER_CRITICAL(&spinlock);
 			if (g_StopMainTask == 0) {
-				taskEXIT_CRITICAL();
+				portEXIT_CRITICAL(&spinlock);
 				break;
 			}
-			taskEXIT_CRITICAL();
+			portEXIT_CRITICAL(&spinlock);
 			IOT_DELAY(100);
 		}
 	}
@@ -185,14 +187,14 @@ static void esp_uart_init() {
 	// Configure parameters of an UART driver,
     // communication pins and install the driver
     uart_config_t uart_config = {
-        .baud_rate = 74880,
+        .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,
         .parity    = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
     };
     uart_param_config(UART_NUM_0, &uart_config);
-    uart_driver_install(UART_NUM_0, UART_LINE_SIZE * 2, 0, 0, NULL);
+    uart_driver_install(UART_NUM_0, UART_LINE_SIZE * 2, 0, 0, NULL, ESP_INTR_FLAG_LOWMED);
 }
 
 static void esp_uart_cli_task()
@@ -218,13 +220,13 @@ static void esp_uart_cli_task()
 			{
 				case '\r':
 				case '\n':
-					taskENTER_CRITICAL();
+					portENTER_CRITICAL(&spinlock);
 					if (g_StopMainTask == 1) {
 						// when there is a user input("\n") within a given timeout, this value will be chaned into 2.
 						// but, if there is no user input within a given timeout, this value will be changed into 0 in order to run the main function
 						g_StopMainTask = 2;
 					}
-					taskEXIT_CRITICAL();
+					portEXIT_CRITICAL(&spinlock);
 
 					uart_write_bytes(UART_NUM_0, "\r\n", 2);
 					if (line_len) {
