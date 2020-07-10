@@ -213,7 +213,7 @@ static void capability_init()
         cap_lightMode_data->cmd_setLightingMode_usr_cb = cap_lightMode_cmd_cb;
     }
 
-    cap_dustSensor_data = caps_dustSensor_initialize(ctx, "main", NULL, NULL);
+    cap_dustSensor_data = caps_dustSensor_initialize(ctx, "monitor", NULL, NULL);
     if (cap_dustSensor_data) {
         cap_dustSensor_data->set_dustLevel_value(cap_dustSensor_data, 0);
         cap_dustSensor_data->set_fineDustLevel_value(cap_dustSensor_data, 0);
