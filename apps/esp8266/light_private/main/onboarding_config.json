@@ -1,16 +1,18 @@
 {
   "onboardingConfig": {
-    "deviceOnboardingId": "NAME",
-    "mnId": "MNID",
-    "setupId": "999",
-    "vid": "VID",
-    "deviceTypeId": "TYPE",
+    "deviceOnboardingId": "Light_example",
+    "mnId": "0ADv",
+    "setupId": "007",
+    "vid": "SSHLE100",
+    "deviceTypeId": "Light",
     "ownershipValidationTypes": [
-      "JUSTWORKS",
-      "BUTTON",
-      "PIN",
-      "QR"
+      "BUTTON"
     ],
-    "identityType": "ED25519_or_CERIFICATE"
+    "identityType": "ED25519",
+    "deviceIntegrationProfileKey": {
+      "id": "a98e056a-d06d-4bec-9eb8-fb91f272fe0c",
+      "majorVersion": 0,
+      "minorVersion": 1
+    }
   }
 }
