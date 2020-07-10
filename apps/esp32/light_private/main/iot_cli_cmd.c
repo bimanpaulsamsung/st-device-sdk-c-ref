@@ -30,12 +30,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "esp_libc.h"
-#include "esp_heap_trace.h"
+#include "esp_heap_caps.h"
 #include "esp_system.h"
 #include "iot_main.h"
 #include "iot_debug.h"
-
 
 extern IOT_CTX *ctx;
 
@@ -125,17 +123,13 @@ static void _cli_cmd_monitor_period(char *string)
 
 // PRIVATE
 
-extern heap_region_t g_heap_region[HEAP_REGIONS_MAX];
 static void _cli_cmd_heap_info(char *string)
 {
-    size_t total_size = 0;
+    multi_heap_info_t info;
+    size_t total_size;
+    heap_caps_get_info(&info, MALLOC_CAP_32BIT);
 
-    for (int i = 0; i < HEAP_REGIONS_MAX; i++) {
-        printf("Region[%d] : %p ~ %p (%u), %08x\n", i,
-               g_heap_region[i].start_addr, g_heap_region[i].start_addr + g_heap_region[i].total_size,
-               g_heap_region[i].total_size, g_heap_region[i].caps);
-        total_size += g_heap_region[i].total_size;
-    }
+    total_size = info.total_free_bytes + info.total_allocated_bytes;
 
     printf("heap_info : CU:%d, CR:%d, PU:%d, PR:%d\n",
            total_size - heap_caps_get_free_size(MALLOC_CAP_32BIT),
@@ -198,9 +192,7 @@ static void _cli_cmd_device_info(char *string)
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
 
-    if (chip_info.model == CHIP_ESP8266) {
-        printf("MODEL NAME : ESP8266\n");
-    } else if (chip_info.model == CHIP_ESP32) {
+    if (chip_info.model == CHIP_ESP32) {
         printf("MODEL NAME : ESP32\n");
     }
 

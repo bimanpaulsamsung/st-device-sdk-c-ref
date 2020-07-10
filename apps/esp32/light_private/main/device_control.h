@@ -44,6 +44,15 @@ enum notification_led_gpio_state {
 	NOTIFICATION_LED_GPIO_ON = 1,
 	NOTIFICATION_LED_GPIO_OFF = 0,
 };
+enum switch_onoff_state {
+    SWITCH_OFF = 0,
+    SWITCH_ON = 1,
+};
+
+enum color_led_gpio_state {
+	COLOR_LED_OFF = 0,
+	COLOR_LED_ON = 1,
+};
 
 #define LED_BLINK_TIME 50
 
@@ -67,8 +76,7 @@ enum button_event_type {
 	BUTTON_SHORT_PRESS = 1,
 };
 
-void update_rgb_from_hsl(double hue, double saturation, int level,
-				int *red, int *green, int *blue);
+void update_rgb_from_color_temp(int color_temp, int *red, int *green, int *blue);
 void button_isr_handler(void *arg);
 int get_button_event(int* button_event_type, int* button_event_count);
 void led_blink(int gpio, int delay, int count);
