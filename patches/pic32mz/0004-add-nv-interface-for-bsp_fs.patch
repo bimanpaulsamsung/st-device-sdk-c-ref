@@ -1,0 +1,118 @@
+From f0e2978bafa376a89dd9631dd16e63e9a3e32396 Mon Sep 17 00:00:00 2001
+From: "qin.li" <qin.li@samsung.com>
+Date: Tue, 14 Jul 2020 12:01:29 +0800
+Subject: [PATCH] add nv interface for bsp_fs
+
+---
+ .../wireless_driver/include/wdrv_mrf24wn_main.h    |  6 ++
+ .../wireless_driver/wdrv_mrf24wn_config_data.c     | 72 ++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
+
+diff --git a/src/system_config/pic32mz_ef_curiosity/framework/driver/wifi/mrf24wn/wireless_driver/include/wdrv_mrf24wn_main.h b/src/system_config/pic32mz_ef_curiosity/framework/driver/wifi/mrf24wn/wireless_driver/include/wdrv_mrf24wn_main.h
+index b04c676..95698bf 100644
+--- a/src/system_config/pic32mz_ef_curiosity/framework/driver/wifi/mrf24wn/wireless_driver/include/wdrv_mrf24wn_main.h
++++ b/src/system_config/pic32mz_ef_curiosity/framework/driver/wifi/mrf24wn/wireless_driver/include/wdrv_mrf24wn_main.h
+@@ -274,6 +274,12 @@ TCPIP_MAC_RES WDRV_Connect(void);
+ WDRV_CONNECTION_STATES WDRV_ConnectStatus_Get(void);
+ void WPSDoneCB(void);
+ 
++//reuse WDRV nv to support STDK bsp_fs, provide API to read/write
++int IOT_DataRead(char *buff, int length, int offset);
++int IOT_DataWrite(char *buff, int length, int scIdx);
++/*Erase the whole page!!!*/
++int IOT_DataErase(void);
++
+ extern WDRV_SCAN_STATUS g_scanStatus;
+ extern WDRV_SCAN_RESULT g_scanResults[];
+ 
+diff --git a/src/system_config/pic32mz_ef_curiosity/framework/driver/wifi/mrf24wn/wireless_driver/wdrv_mrf24wn_config_data.c b/src/system_config/pic32mz_ef_curiosity/framework/driver/wifi/mrf24wn/wireless_driver/wdrv_mrf24wn_config_data.c
+index ddad683..468f41f 100644
+--- a/src/system_config/pic32mz_ef_curiosity/framework/driver/wifi/mrf24wn/wireless_driver/wdrv_mrf24wn_config_data.c
++++ b/src/system_config/pic32mz_ef_curiosity/framework/driver/wifi/mrf24wn/wireless_driver/wdrv_mrf24wn_config_data.c
+@@ -132,6 +132,46 @@ static bool WDRV_NVM_PageEraseConfigWrite(uint8_t *buf, size_t size, uint32_t st
+     return true;
+ }
+ 
++static bool WDRV_NVM_Write(uint8_t *buf, size_t size, uint32_t startAddr)
++{
++    SYS_FS_MEDIA_GEOMETRY *nvmMediaGeometry;
++    DRV_NVM_COMMAND_HANDLE nvmCommandHandle;
++
++    if (startAddr > DRV_NVM_MEDIA_SIZE * 1024)
++        return false;
++
++    s_nvmHandle = DRV_NVM_Open(0, DRV_IO_INTENT_WRITE);
++    if (s_nvmHandle == DRV_HANDLE_INVALID) {
++        DRV_NVM_Close(s_nvmHandle);
++        s_nvmHandle = NULL;
++        return false;
++    }
++
++    nvmMediaGeometry = DRV_NVM_GeometryGet(s_nvmHandle);
++    if (nvmMediaGeometry == NULL) {
++        DRV_NVM_Close(s_nvmHandle);
++        s_nvmHandle = NULL;
++        return false;
++    }
++
++    DRV_NVM_EraseWrite(s_nvmHandle,
++            &nvmCommandHandle,
++            buf,
++            nvmMediaGeometry->geometryTable[1].numBlocks * startAddr / (DRV_NVM_MEDIA_SIZE * 1024),
++            1);
++
++    if (nvmCommandHandle == DRV_NVM_COMMAND_HANDLE_INVALID) {
++        DRV_NVM_Close(s_nvmHandle);
++        s_nvmHandle = NULL;
++        return false;
++    }
++
++    DRV_NVM_Close(s_nvmHandle);
++    s_nvmHandle = NULL;
++
++    return true;
++}
++
+ static bool WDRV_NVM_PageErase(uint32_t startAddr)
+ {
+     SYS_FS_MEDIA_GEOMETRY *nvmMediaGeometry;
+@@ -313,4 +353,36 @@ void WDRV_CONFIG_DataDelete(void)
+     DeleteConfigInMemory();
+ }
+ 
++//read by byte, write by sector(2K), erase by page(16K)
++#define IOT_NV_SPACE_ADDR (36 * 1024)
++int IOT_DataRead(char *buff, int length, int offset)
++{
++    if (s_nvmHandle) {
++        SYS_CONSOLE_MESSAGE("Last NVM operation is not finished, please wait\r\n");
++        return -1;
++    }
++
++    return WDRV_NVM_Read(buff, length, IOT_NV_SPACE_ADDR + offset) ? 0 : -1;
++}
++
++int IOT_DataWrite(char *buff, int length, int scIdx)
++{
++    if (s_nvmHandle) {
++        SYS_CONSOLE_MESSAGE("Last NVM operation is not finished, please wait\r\n");
++        return -1;
++    }
++
++    return WDRV_NVM_Write(buff, length, (IOT_NV_SPACE_ADDR + scIdx * DRV_NVM_ROW_SIZE)) ? 0 : -1;
++}
++
++int IOT_DataErase(void)
++{
++    if (s_nvmHandle) {
++        SYS_CONSOLE_MESSAGE("Last NVM operation is not finished, please wait\r\n");
++        return -1;
++    }
++
++    WDRV_NVM_PageErase(IOT_NV_SPACE_ADDR);
++}
++
+ // DOM-IGNORE-END
+-- 
+2.7.4
+

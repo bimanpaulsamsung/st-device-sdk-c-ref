@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CHIP_LIST=("esp8266" "esp32" "rtl8195" "rtl8720c" "rtl8721c" "mt7682_ss" "emw3166" "emw3080" "cc3220sf" "lpc54018" "cy8cproto_062_4343w" "rda5981c")
+CHIP_LIST=("esp8266" "esp32" "rtl8195" "rtl8720c" "rtl8721c" "mt7682_ss" "emw3166" "emw3080" "cc3220sf" "lpc54018" "cy8cproto_062_4343w" "rda5981c" "pic32mz")
 
 CORE_PATH="iot-core"
 CHIP_NAME=${1}
@@ -21,6 +21,7 @@ print_usage () {
 	echo "    ex) ./setup.sh lpc54018"
 	echo "    ex) ./setup.sh cy8cproto_062_4343w"
 	echo "    ex) ./setup.sh rda5981c"
+	echo "    ex) ./setup.sh pic32mz"
 	echo
 }
 

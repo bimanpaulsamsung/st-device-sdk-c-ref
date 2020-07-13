@@ -37,3 +37,6 @@
 [submodule "bsp/lpc54018"]
 	path = bsp/lpc54018
 	url = git@github.sec.samsung.net:STDK/nxp-lpc54018-sdk.git
+[submodule "bsp/pic32mz"]
+	path = bsp/pic32mz
+	url = git@github.sec.samsung.net:STDK/microchip-pic32mz.git
