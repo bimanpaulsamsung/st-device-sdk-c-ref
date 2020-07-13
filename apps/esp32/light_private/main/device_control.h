@@ -44,19 +44,19 @@ enum switch_onoff_state {
 };
 
 enum color_led_gpio_state {
-	COLOR_LED_OFF = 0,
-	COLOR_LED_ON = 1,
+    COLOR_LED_OFF = 0,
+    COLOR_LED_ON = 1,
 };
 
 enum led_animation_mode_list {
-	LED_ANIMATION_MODE_IDLE = 0,
-	LED_ANIMATION_MODE_FAST,
-	LED_ANIMATION_MODE_SLOW,
+    LED_ANIMATION_MODE_IDLE = 0,
+    LED_ANIMATION_MODE_FAST,
+    LED_ANIMATION_MODE_SLOW,
 };
 
 enum button_gpio_state {
-	BUTTON_GPIO_RELEASED = 1,
-	BUTTON_GPIO_PRESSED = 0,
+    BUTTON_GPIO_RELEASED = 1,
+    BUTTON_GPIO_PRESSED = 0,
 };
 
 #define BUTTON_DEBOUNCE_TIME_MS 20
@@ -64,8 +64,8 @@ enum button_gpio_state {
 #define BUTTON_DELAY_MS 300
 
 enum button_event_type {
-	BUTTON_LONG_PRESS = 0,
-	BUTTON_SHORT_PRESS = 1,
+    BUTTON_LONG_PRESS = 0,
+    BUTTON_SHORT_PRESS = 1,
 };
 
 void change_switch_state(int switch_state);
