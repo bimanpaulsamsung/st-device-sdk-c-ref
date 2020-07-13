@@ -24,10 +24,13 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
+static int rgb_color_red = 255;
+static int rgb_color_green = 0;
+static int rgb_color_blue = 0;
 
 static xQueueHandle button_event_queue = NULL;
 
-void update_rgb_from_color_temp(int color_temp, int *red, int *green, int *blue)
+static void update_rgb_from_color_temp(int color_temp, int *red, int *green, int *blue)
 {
     int ct_table[10][3] = {
             {160, 0, 0}, //0
@@ -60,6 +63,31 @@ void update_rgb_from_color_temp(int color_temp, int *red, int *green, int *blue)
     *red = ct_table[idx][0] + (ct_table[idx+1][0]-ct_table[idx][0])*remain/1000;
     *green = ct_table[idx][1] + (ct_table[idx+1][1]-ct_table[idx][1])*remain/1000;
     *blue = ct_table[idx][2] + (ct_table[idx+1][2]-ct_table[idx][2])*remain/1000;
+}
+
+void change_switch_state(int switch_state)
+{
+    if (switch_state == SWITCH_OFF) {
+        gpio_set_level(GPIO_OUTPUT_COLORLED_R, COLOR_LED_OFF);
+        gpio_set_level(GPIO_OUTPUT_COLORLED_G, COLOR_LED_OFF);
+        gpio_set_level(GPIO_OUTPUT_COLORLED_B, COLOR_LED_OFF);
+    } else {
+        gpio_set_level(GPIO_OUTPUT_COLORLED_R, (rgb_color_red > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
+        gpio_set_level(GPIO_OUTPUT_COLORLED_G, (rgb_color_green > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
+        gpio_set_level(GPIO_OUTPUT_COLORLED_B, (rgb_color_blue > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
+    }
+}
+
+void update_color_info(int color_temp)
+{
+    update_rgb_from_color_temp(color_temp,
+                               &rgb_color_red, &rgb_color_green, &rgb_color_blue);
+}
+
+void change_switch_level(int level)
+{
+    printf("switch level is changed to %d", level);
+    return;
 }
 
 int get_button_event(int* button_event_type, int* button_event_count)
@@ -106,26 +134,22 @@ int get_button_event(int* button_event_type, int* button_event_count)
 	return false;
 }
 
-void led_blink(int gpio, int delay, int count)
+void led_blink(int switch_state, int delay, int count)
 {
-	uint32_t gpio_level;
-
-	gpio_level =  gpio_get_level(gpio);
 	for (int i = 0; i < count; i++) {
-		gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, 1 - gpio_level);
 		vTaskDelay(delay / portTICK_PERIOD_MS);
-		gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, gpio_level);
+        change_switch_state(1 - switch_state);
 		vTaskDelay(delay / portTICK_PERIOD_MS);
+        change_switch_state(switch_state);
 	}
 }
 
-void change_led_state(int noti_led_mode)
+void change_led_mode(int noti_led_mode)
 {
 	static TimeOut_t led_timeout;
 	static TickType_t led_tick = -1;
 	static int last_led_mode = -1;
-
-	uint32_t gpio_level = 0;
+	static int led_state = SWITCH_OFF;
 
 	if (last_led_mode != noti_led_mode) {
 		last_led_mode = noti_led_mode;
@@ -138,34 +162,24 @@ void change_led_state(int noti_led_mode)
 		case LED_ANIMATION_MODE_IDLE:
 			break;
 		case LED_ANIMATION_MODE_SLOW:
-			gpio_level =  gpio_get_level(GPIO_OUTPUT_NOTIFICATION_LED);
-			if ((gpio_level == NOTIFICATION_LED_GPIO_ON) &&
-					(xTaskCheckForTimeOut(&led_timeout, &led_tick ) != pdFALSE)) {
-				gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_OFF);
+			if (xTaskCheckForTimeOut(&led_timeout, &led_tick ) != pdFALSE) {
+			    led_state = 1 - led_state;
+                change_switch_state(led_state);
 				vTaskSetTimeOutState(&led_timeout);
-				led_tick = pdMS_TO_TICKS(1000);
-			}
-			if ((gpio_level == NOTIFICATION_LED_GPIO_OFF) &&
-					(xTaskCheckForTimeOut(&led_timeout, &led_tick ) != pdFALSE)) {
-				gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
-				vTaskSetTimeOutState(&led_timeout);
-				led_tick = pdMS_TO_TICKS(200);
+				if (led_state == SWITCH_ON) {
+                    led_tick = pdMS_TO_TICKS(200);
+                } else {
+                    led_tick = pdMS_TO_TICKS(800);
+                }
 			}
 			break;
 		case LED_ANIMATION_MODE_FAST:
-			gpio_level =  gpio_get_level(GPIO_OUTPUT_NOTIFICATION_LED);
-			if ((gpio_level == NOTIFICATION_LED_GPIO_ON) &&
-					(xTaskCheckForTimeOut(&led_timeout, &led_tick ) != pdFALSE)) {
-				gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_OFF);
-				vTaskSetTimeOutState(&led_timeout);
-				led_tick = pdMS_TO_TICKS(100);
-			}
-			if ((gpio_level == NOTIFICATION_LED_GPIO_OFF) &&
-					(xTaskCheckForTimeOut(&led_timeout, &led_tick ) != pdFALSE)) {
-				gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
-				vTaskSetTimeOutState(&led_timeout);
-				led_tick = pdMS_TO_TICKS(100);
-			}
+            if (xTaskCheckForTimeOut(&led_timeout, &led_tick ) != pdFALSE) {
+                led_state = 1 - led_state;
+                change_switch_state(led_state);
+                vTaskSetTimeOutState(&led_timeout);
+                led_tick = pdMS_TO_TICKS(100);
+            }
 			break;
 		default:
 			break;
@@ -178,10 +192,8 @@ void gpio_init(void)
 
 	io_conf.intr_type = GPIO_INTR_DISABLE;
 	io_conf.mode = GPIO_MODE_OUTPUT;
-	io_conf.pin_bit_mask = 1 << GPIO_OUTPUT_NOTIFICATION_LED;
 	io_conf.pull_down_en = 1;
 	io_conf.pull_up_en = 0;
-	gpio_config(&io_conf);
 
 	io_conf.pin_bit_mask = 1 << GPIO_OUTPUT_COLORLED_R;
 	gpio_config(&io_conf);
@@ -204,9 +216,6 @@ void gpio_init(void)
 	button_event_queue = xQueueCreate(10, sizeof(uint32_t));
 
 	gpio_install_isr_service(0);
-
-
-	gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
 
 	gpio_set_level(GPIO_OUTPUT_COLORLED_R, 1);
 	gpio_set_level(GPIO_OUTPUT_COLORLED_G, 0);

@@ -20,7 +20,6 @@
 //#define CONFIG_TARGET_WEMOS_D1_R32
 #ifdef CONFIG_TARGET_WEMOS_D1_R32
 
-#define GPIO_OUTPUT_NOTIFICATION_LED 2
 #define GPIO_INPUT_BUTTON 18
 
 #define GPIO_OUTPUT_COLORLED_R 16
@@ -30,7 +29,6 @@
 
 #else // ESP32_DEVKITC_V4
 
-#define GPIO_OUTPUT_NOTIFICATION_LED 2
 #define GPIO_INPUT_BUTTON 0
 
 #define GPIO_OUTPUT_COLORLED_R 12
@@ -40,10 +38,6 @@
 
 #endif
 
-enum notification_led_gpio_state {
-	NOTIFICATION_LED_GPIO_ON = 1,
-	NOTIFICATION_LED_GPIO_OFF = 0,
-};
 enum switch_onoff_state {
     SWITCH_OFF = 0,
     SWITCH_ON = 1,
@@ -53,8 +47,6 @@ enum color_led_gpio_state {
 	COLOR_LED_OFF = 0,
 	COLOR_LED_ON = 1,
 };
-
-#define LED_BLINK_TIME 50
 
 enum led_animation_mode_list {
 	LED_ANIMATION_MODE_IDLE = 0,
@@ -76,9 +68,11 @@ enum button_event_type {
 	BUTTON_SHORT_PRESS = 1,
 };
 
-void update_rgb_from_color_temp(int color_temp, int *red, int *green, int *blue);
+void change_switch_state(int switch_state);
+void update_color_info(int color_temp);
+void change_switch_level(int level);
 void button_isr_handler(void *arg);
 int get_button_event(int* button_event_type, int* button_event_count);
-void led_blink(int gpio, int delay, int count);
-void change_led_state(int noti_led_mode);
+void led_blink(int switch_state, int delay, int count);
+void change_led_mode(int noti_led_mode);
 void gpio_init(void);

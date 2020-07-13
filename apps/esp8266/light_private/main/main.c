@@ -50,10 +50,6 @@ static caps_colorTemperature_data_t *cap_colorTemp_data;
 static caps_activityLightingMode_data_t *cap_lightMode_data;
 static caps_dustSensor_data_t *cap_dustSensor_data;
 
-static int rgb_color_red = 255;
-static int rgb_color_green = 255;
-static int rgb_color_blue = 255;
-
 static iot_status_t g_iot_status = IOT_STATUS_IDLE;
 static iot_stat_lv_t g_iot_stat_lv;
 
@@ -74,58 +70,12 @@ static int get_switch_state(void)
         return -1;
     }
 
-    if(!strcmp(switch_value, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_ON])) {
+    if(!strcmp(switch_value, caps_helper_switch.attr_switch.value_on)) {
         switch_state = SWITCH_ON;
-    } else if(!strcmp(switch_value, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_OFF])) {
+    } else if(!strcmp(switch_value, caps_helper_switch.attr_switch.value_off)) {
         switch_state = SWITCH_OFF;
     }
     return switch_state;
-}
-
-static void noti_led_onoff(int onoff)
-{
-    if (onoff == SWITCH_OFF) {
-        gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_OFF);
-    } else {
-        gpio_set_level(GPIO_OUTPUT_NOTIFICATION_LED, NOTIFICATION_LED_GPIO_ON);
-    }
-}
-
-static void update_color_info(void)
-{
-    int colorTemp_value = cap_colorTemp_data->get_colorTemperature_value(cap_colorTemp_data);
-    update_rgb_from_color_temp(colorTemp_value,
-     &rgb_color_red, &rgb_color_green, &rgb_color_blue);
-}
-
-static void color_led_onoff(int onoff)
-{
-    if (onoff == SWITCH_OFF) {
-        gpio_set_level(GPIO_OUTPUT_COLORLED_R, COLOR_LED_OFF);
-        gpio_set_level(GPIO_OUTPUT_COLORLED_G, COLOR_LED_OFF);
-        gpio_set_level(GPIO_OUTPUT_COLORLED_B, COLOR_LED_OFF);
-    } else {
-        update_color_info();
-        gpio_set_level(GPIO_OUTPUT_COLORLED_R, (rgb_color_red > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
-        gpio_set_level(GPIO_OUTPUT_COLORLED_G, (rgb_color_green > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
-        gpio_set_level(GPIO_OUTPUT_COLORLED_B, (rgb_color_blue > 127) ? COLOR_LED_ON : COLOR_LED_OFF);
-    }
-}
-
-static void change_switch_state(int state)
-{
-    noti_led_onoff(state);
-    color_led_onoff(state);
-}
-
-static void change_switch_level(int level)
-{
-    /*
-     * YOUR CODE:
-     * implement a ability to set switch level
-     */
-    printf("switch level is changed to %d", level);
-    return;
 }
 
 void cap_switch_cmd_cb(struct caps_switch_data *caps_data)
@@ -142,8 +92,8 @@ void cap_switchLevel_cmd_cb(struct caps_switchLevel_data *caps_data)
 
 void cap_colorTemp_cmd_cb(struct caps_colorTemperature_data *caps_data)
 {
-    update_color_info();
-    color_led_onoff(get_switch_state());
+    update_color_info(cap_colorTemp_data->get_colorTemperature_value(cap_colorTemp_data));
+    change_switch_state(get_switch_state());
 }
 
 void cap_lightMode_cmd_cb(struct caps_activityLightingMode_data *caps_data)
@@ -169,8 +119,8 @@ void cap_lightMode_cmd_cb(struct caps_activityLightingMode_data *caps_data)
         colorTemp = 2500;
     }
     cap_colorTemp_data->set_colorTemperature_value(cap_colorTemp_data, colorTemp);
-    update_color_info();
-    color_led_onoff(get_switch_state());
+    update_color_info(cap_colorTemp_data->get_colorTemperature_value(cap_colorTemp_data));
+    change_switch_state(get_switch_state());
     cap_colorTemp_data->attr_colorTemperature_send(cap_colorTemp_data);
 }
 
@@ -178,12 +128,12 @@ static void capability_init()
 {
     cap_switch_data = caps_switch_initialize(ctx, "main", NULL, NULL);
     if (cap_switch_data) {
-        int switch_init_state = CAP_ENUM_SWITCH_SWITCH_VALUE_ON;
+        const char *switch_init_value = caps_helper_switch.attr_switch.value_on;
 
         cap_switch_data->cmd_on_usr_cb = cap_switch_cmd_cb;
         cap_switch_data->cmd_off_usr_cb = cap_switch_cmd_cb;
 
-        cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[switch_init_state]);
+        cap_switch_data->set_switch_value(cap_switch_data, switch_init_value);
     }
 
     cap_switchLevel_data = caps_switchLevel_initialize(ctx, "main", NULL, NULL);
@@ -193,7 +143,7 @@ static void capability_init()
         cap_switchLevel_data->cmd_setLevel_usr_cb = cap_switchLevel_cmd_cb;
 
         cap_switchLevel_data->set_level_value(cap_switchLevel_data, switch_init_level);
-        cap_switchLevel_data->set_level_unit(cap_switchLevel_data, caps_helper_switchLevel.attr_level.units[CAP_ENUM_SWITCHLEVEL_LEVEL_UNIT_PERCENT]);
+        cap_switchLevel_data->set_level_unit(cap_switchLevel_data, caps_helper_switchLevel.attr_level.unit_percent);
     }
 
     cap_colorTemp_data = caps_colorTemperature_initialize(ctx, "main", NULL, NULL);
@@ -239,7 +189,7 @@ static void iot_status_cb(iot_status_t status,
         case IOT_STATUS_IDLE:
         case IOT_STATUS_CONNECTING:
             noti_led_mode = LED_ANIMATION_MODE_IDLE;
-            noti_led_onoff(get_switch_state());
+            change_switch_state(get_switch_state());
             break;
         default:
             break;
@@ -307,16 +257,16 @@ void button_event(IOT_CAP_HANDLE *handle, int type, int count)
             case 1:
                 if (g_iot_status == IOT_STATUS_NEED_INTERACT) {
                     st_conn_ownership_confirm(ctx, true);
-                    noti_led_onoff(SWITCH_OFF);
                     noti_led_mode = LED_ANIMATION_MODE_IDLE;
+                    change_switch_state(get_switch_state());
                 } else {
                     if (get_switch_state() == SWITCH_ON) {
                         change_switch_state(SWITCH_OFF);
-                        cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_OFF]);
+                        cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.value_off);
                         cap_switch_data->attr_switch_send(cap_switch_data);
                     } else {
                         change_switch_state(SWITCH_ON);
-                        cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.values[CAP_ENUM_SWITCH_SWITCH_VALUE_ON]);
+                        cap_switch_data->set_switch_value(cap_switch_data, caps_helper_switch.attr_switch.value_on);
                         cap_switch_data->attr_switch_send(cap_switch_data);
                     }
                 }
@@ -331,12 +281,12 @@ void button_event(IOT_CAP_HANDLE *handle, int type, int count)
 
                 break;
             default:
-                led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, count);
+                led_blink(get_switch_state(), 100, count);
                 break;
         }
     } else if (type == BUTTON_LONG_PRESS) {
         printf("Button long press, iot_status: %d\n", g_iot_status);
-        led_blink(GPIO_OUTPUT_NOTIFICATION_LED, 100, 3);
+        led_blink(get_switch_state(), 100, 3);
         st_conn_cleanup(ctx, false);
         xTaskCreate(connection_start_task, "connection_task", 2048, NULL, 10, NULL);
     }
@@ -361,7 +311,7 @@ static void app_main_task(void *arg)
             button_event(handle, button_event_type, button_event_count);
         }
         if (noti_led_mode != LED_ANIMATION_MODE_IDLE) {
-            change_led_state(noti_led_mode);
+            change_led_mode(noti_led_mode);
         }
 
         if (monitor_enable && (xTaskCheckForTimeOut(&monitor_timeout, &monitor_period_tick) != pdFALSE)) {
@@ -377,7 +327,6 @@ static void app_main_task(void *arg)
             cap_dustSensor_data->set_fineDustLevel_value(cap_dustSensor_data, fineDustLevel_value);
             cap_dustSensor_data->attr_fineDustLevel_send(cap_dustSensor_data);
         }
-
 
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
