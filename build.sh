@@ -41,6 +41,7 @@ print_path() {
         ls apps/${CHIP_NAME}
     fi
     echo
+
 }
 
 if [ "${CHIP_NAME}" == "" ]; then
