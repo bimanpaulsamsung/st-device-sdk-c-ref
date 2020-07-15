@@ -1,7 +1,7 @@
-From e2ae0b9f16df71ec3fc3fea0124fbe5a4b5b25e0 Mon Sep 17 00:00:00 2001
+From 3154e09d72a2e8264fc37dba729bf1d366339da7 Mon Sep 17 00:00:00 2001
 From: "qiang3.zhang" <28670379+xiarihf@users.noreply.github.com>
 Date: Thu, 2 Apr 2020 14:10:01 +0800
-Subject: [PATCH 4/5] Add cjson component
+Subject: [PATCH 4/6] Add cjson component
 
 Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
 ---
@@ -19,7 +19,7 @@ Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
 
 diff --git a/source/third_party/cjson/cJSON.c b/source/third_party/cjson/cJSON.c
 new file mode 100644
-index 00000000..aab31b4a
+index 0000000..aab31b4
 --- /dev/null
 +++ b/source/third_party/cjson/cJSON.c
 @@ -0,0 +1,2993 @@
@@ -3018,7 +3018,7 @@ index 00000000..aab31b4a
 +}
 diff --git a/source/third_party/cjson/cJSON.h b/source/third_party/cjson/cJSON.h
 new file mode 100644
-index 00000000..15eda75f
+index 0000000..15eda75
 --- /dev/null
 +++ b/source/third_party/cjson/cJSON.h
 @@ -0,0 +1,277 @@
@@ -3301,7 +3301,7 @@ index 00000000..15eda75f
 +#endif
 diff --git a/source/third_party/cjson/cJSON_Utils.c b/source/third_party/cjson/cJSON_Utils.c
 new file mode 100644
-index 00000000..0c1ebd43
+index 0000000..0c1ebd4
 --- /dev/null
 +++ b/source/third_party/cjson/cJSON_Utils.c
 @@ -0,0 +1,1450 @@
@@ -4757,7 +4757,7 @@ index 00000000..0c1ebd43
 +}
 diff --git a/source/third_party/cjson/cJSON_Utils.h b/source/third_party/cjson/cJSON_Utils.h
 new file mode 100644
-index 00000000..a970c650
+index 0000000..a970c65
 --- /dev/null
 +++ b/source/third_party/cjson/cJSON_Utils.h
 @@ -0,0 +1,88 @@
@@ -4851,7 +4851,7 @@ index 00000000..a970c650
 +#endif
 diff --git a/source/third_party/cjson/component.mk b/source/third_party/cjson/component.mk
 new file mode 100644
-index 00000000..a359c0d7
+index 0000000..a359c0d
 --- /dev/null
 +++ b/source/third_party/cjson/component.mk
 @@ -0,0 +1,4 @@

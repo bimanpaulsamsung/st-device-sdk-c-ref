@@ -1,7 +1,7 @@
-From d51275bb63867cd6edb8cbfe81ecd5d0d6b20a11 Mon Sep 17 00:00:00 2001
+From 5d2aad43bb68c2474f85e57df00d3756fc7eae70 Mon Sep 17 00:00:00 2001
 From: "qiang3.zhang" <28670379+xiarihf@users.noreply.github.com>
 Date: Thu, 2 Apr 2020 14:01:17 +0800
-Subject: [PATCH 1/5] Add SSL components
+Subject: [PATCH 1/6] Add SSL components
 
 Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
 ---
@@ -25,7 +25,7 @@ Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
  .../include/mbedtls/compat-1.3.h              | 2525 +++++
  .../mbedtls-2.4.0/include/mbedtls/config.h    | 2989 ++++++
  .../mbedtls-2.4.0/include/mbedtls/ctr_drbg.h  |  322 +
- .../ssl/mbedtls-2.4.0/include/mbedtls/debug.h |  229 +
+ .../ssl/mbedtls-2.4.0/include/mbedtls/debug.h |  228 +
  .../ssl/mbedtls-2.4.0/include/mbedtls/des.h   |  357 +
  .../ssl/mbedtls-2.4.0/include/mbedtls/dhm.h   | 1061 +++
  .../ssl/mbedtls-2.4.0/include/mbedtls/ecdh.h  |  277 +
@@ -152,7 +152,7 @@ Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
  .../ssl/mbedtls-2.4.0/library/xtea.c          |  281 +
  .../ssl/mbedtls-2.4.0/port/cc3220sf/net.c     |  545 ++
  .../port/cc3220sf/rtl_hardware.c              |   49 +
- 147 files changed, 93937 insertions(+)
+ 147 files changed, 93936 insertions(+)
  create mode 100644 source/third_party/ssl/mbedtls-2.4.0/component.mk
  create mode 100644 source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/aes.h
  create mode 100644 source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/aesni.h
@@ -303,7 +303,7 @@ Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
 
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/component.mk b/source/third_party/ssl/mbedtls-2.4.0/component.mk
 new file mode 100644
-index 00000000..efb8cc20
+index 0000000..efb8cc2
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/component.mk
 @@ -0,0 +1,53 @@
@@ -362,7 +362,7 @@ index 00000000..efb8cc20
 +CFLAGS += -I$(MBEDTLS_PATH)/include/mbedtls
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/aes.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/aes.h
 new file mode 100644
-index 00000000..46016dcb
+index 0000000..46016dc
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/aes.h
 @@ -0,0 +1,417 @@
@@ -785,7 +785,7 @@ index 00000000..46016dcb
 +#endif /* aes.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/aesni.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/aesni.h
 new file mode 100644
-index 00000000..746baa0e
+index 0000000..746baa0
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/aesni.h
 @@ -0,0 +1,112 @@
@@ -903,7 +903,7 @@ index 00000000..746baa0e
 +#endif /* MBEDTLS_AESNI_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/arc4.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/arc4.h
 new file mode 100644
-index 00000000..f9d93f82
+index 0000000..f9d93f8
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/arc4.h
 @@ -0,0 +1,149 @@
@@ -1058,7 +1058,7 @@ index 00000000..f9d93f82
 +#endif /* arc4.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/asn1.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/asn1.h
 new file mode 100644
-index 00000000..96c1c9a8
+index 0000000..96c1c9a
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/asn1.h
 @@ -0,0 +1,358 @@
@@ -1422,7 +1422,7 @@ index 00000000..96c1c9a8
 +#endif /* asn1.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/asn1write.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/asn1write.h
 new file mode 100644
-index 00000000..f76fc807
+index 0000000..f76fc80
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/asn1write.h
 @@ -0,0 +1,240 @@
@@ -1668,7 +1668,7 @@ index 00000000..f76fc807
 +#endif /* MBEDTLS_ASN1_WRITE_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/base64.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/base64.h
 new file mode 100644
-index 00000000..7a64f521
+index 0000000..7a64f52
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/base64.h
 @@ -0,0 +1,89 @@
@@ -1763,7 +1763,7 @@ index 00000000..7a64f521
 +#endif /* base64.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/bignum.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/bignum.h
 new file mode 100644
-index 00000000..3bf02a7e
+index 0000000..3bf02a7
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/bignum.h
 @@ -0,0 +1,766 @@
@@ -2535,7 +2535,7 @@ index 00000000..3bf02a7e
 +#endif /* bignum.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/blowfish.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/blowfish.h
 new file mode 100644
-index 00000000..c0ef5a04
+index 0000000..c0ef5a0
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/blowfish.h
 @@ -0,0 +1,205 @@
@@ -2746,7 +2746,7 @@ index 00000000..c0ef5a04
 +#endif /* blowfish.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/bn_mul.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/bn_mul.h
 new file mode 100644
-index 00000000..354c1cc1
+index 0000000..354c1cc
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/bn_mul.h
 @@ -0,0 +1,886 @@
@@ -3638,7 +3638,7 @@ index 00000000..354c1cc1
 +#endif /* bn_mul.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/camellia.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/camellia.h
 new file mode 100644
-index 00000000..cf07629d
+index 0000000..cf07629
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/camellia.h
 @@ -0,0 +1,237 @@
@@ -3881,7 +3881,7 @@ index 00000000..cf07629d
 +#endif /* camellia.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ccm.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ccm.h
 new file mode 100644
-index 00000000..630b7fdf
+index 0000000..630b7fd
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ccm.h
 @@ -0,0 +1,176 @@
@@ -4063,7 +4063,7 @@ index 00000000..630b7fdf
 +#endif /* MBEDTLS_CCM_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/certs.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/certs.h
 new file mode 100644
-index 00000000..8dab7b5c
+index 0000000..8dab7b5
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/certs.h
 @@ -0,0 +1,100 @@
@@ -4169,7 +4169,7 @@ index 00000000..8dab7b5c
 +#endif /* certs.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/check_config.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/check_config.h
 new file mode 100644
-index 00000000..be803329
+index 0000000..be80332
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/check_config.h
 @@ -0,0 +1,674 @@
@@ -4849,7 +4849,7 @@ index 00000000..be803329
 +#endif /* MBEDTLS_CHECK_CONFIG_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cipher.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cipher.h
 new file mode 100644
-index 00000000..d1f4efef
+index 0000000..d1f4efe
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cipher.h
 @@ -0,0 +1,752 @@
@@ -5607,7 +5607,7 @@ index 00000000..d1f4efef
 +#endif /* MBEDTLS_CIPHER_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cipher_internal.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cipher_internal.h
 new file mode 100644
-index 00000000..969ff9cc
+index 0000000..969ff9c
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cipher_internal.h
 @@ -0,0 +1,110 @@
@@ -5723,7 +5723,7 @@ index 00000000..969ff9cc
 +#endif /* MBEDTLS_CIPHER_WRAP_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cmac.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cmac.h
 new file mode 100644
-index 00000000..628c9dab
+index 0000000..628c9da
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/cmac.h
 @@ -0,0 +1,208 @@
@@ -5937,7 +5937,7 @@ index 00000000..628c9dab
 +#endif /* MBEDTLS_CMAC_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/compat-1.3.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/compat-1.3.h
 new file mode 100644
-index 00000000..213b6914
+index 0000000..213b691
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/compat-1.3.h
 @@ -0,0 +1,2525 @@
@@ -8468,7 +8468,7 @@ index 00000000..213b6914
 +#endif /* MBEDTLS_DEPRECATED_REMOVED */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/config.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/config.h
 new file mode 100644
-index 00000000..fd3c6ede
+index 0000000..fd3c6ed
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/config.h
 @@ -0,0 +1,2989 @@
@@ -11463,7 +11463,7 @@ index 00000000..fd3c6ede
 +#endif /* MBEDTLS_CONFIG_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ctr_drbg.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ctr_drbg.h
 new file mode 100644
-index 00000000..121575a5
+index 0000000..121575a
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ctr_drbg.h
 @@ -0,0 +1,322 @@
@@ -11791,10 +11791,10 @@ index 00000000..121575a5
 +#endif /* ctr_drbg.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/debug.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/debug.h
 new file mode 100644
-index 00000000..ef8db67f
+index 0000000..73eea0b
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/debug.h
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,228 @@
 +/**
 + * \file debug.h
 + *
@@ -12023,10 +12023,9 @@ index 00000000..ef8db67f
 +#endif
 +
 +#endif /* debug.h */
-+
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/des.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/des.h
 new file mode 100644
-index 00000000..5a1a6365
+index 0000000..5a1a636
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/des.h
 @@ -0,0 +1,357 @@
@@ -12389,7 +12388,7 @@ index 00000000..5a1a6365
 +#endif /* des.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/dhm.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/dhm.h
 new file mode 100644
-index 00000000..00fafd8d
+index 0000000..00fafd8
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/dhm.h
 @@ -0,0 +1,1061 @@
@@ -13456,7 +13455,7 @@ index 00000000..00fafd8d
 +#endif /* dhm.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecdh.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecdh.h
 new file mode 100644
-index 00000000..99cfde00
+index 0000000..99cfde0
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecdh.h
 @@ -0,0 +1,277 @@
@@ -13739,7 +13738,7 @@ index 00000000..99cfde00
 +#endif /* ecdh.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecdsa.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecdsa.h
 new file mode 100644
-index 00000000..aa23d67f
+index 0000000..aa23d67
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecdsa.h
 @@ -0,0 +1,334 @@
@@ -14079,7 +14078,7 @@ index 00000000..aa23d67f
 +#endif /* ecdsa.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecjpake.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecjpake.h
 new file mode 100644
-index 00000000..d86e8207
+index 0000000..d86e820
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecjpake.h
 @@ -0,0 +1,255 @@
@@ -14340,7 +14339,7 @@ index 00000000..d86e8207
 +#endif /* ecjpake.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecp.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecp.h
 new file mode 100644
-index 00000000..b00ba4da
+index 0000000..b00ba4d
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecp.h
 @@ -0,0 +1,686 @@
@@ -15032,7 +15031,7 @@ index 00000000..b00ba4da
 +#endif /* ecp.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecp_internal.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecp_internal.h
 new file mode 100644
-index 00000000..254e1d3c
+index 0000000..254e1d3
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ecp_internal.h
 @@ -0,0 +1,292 @@
@@ -15330,7 +15329,7 @@ index 00000000..254e1d3c
 +#endif /* ecp_internal.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/entropy.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/entropy.h
 new file mode 100644
-index 00000000..fcb4d025
+index 0000000..fcb4d02
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/entropy.h
 @@ -0,0 +1,289 @@
@@ -15625,7 +15624,7 @@ index 00000000..fcb4d025
 +#endif /* entropy.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/entropy_poll.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/entropy_poll.h
 new file mode 100644
-index 00000000..94dd657e
+index 0000000..94dd657
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/entropy_poll.h
 @@ -0,0 +1,110 @@
@@ -15741,7 +15740,7 @@ index 00000000..94dd657e
 +#endif /* entropy_poll.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/error.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/error.h
 new file mode 100644
-index 00000000..8b4d3a87
+index 0000000..8b4d3a8
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/error.h
 @@ -0,0 +1,117 @@
@@ -15864,7 +15863,7 @@ index 00000000..8b4d3a87
 +#endif /* error.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/gcm.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/gcm.h
 new file mode 100644
-index 00000000..1e5a507a
+index 0000000..1e5a507
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/gcm.h
 @@ -0,0 +1,263 @@
@@ -16133,7 +16132,7 @@ index 00000000..1e5a507a
 +#endif /* gcm.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/havege.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/havege.h
 new file mode 100644
-index 00000000..d4cb3ed3
+index 0000000..d4cb3ed
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/havege.h
 @@ -0,0 +1,75 @@
@@ -16214,7 +16213,7 @@ index 00000000..d4cb3ed3
 +#endif /* havege.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/hmac_drbg.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/hmac_drbg.h
 new file mode 100644
-index 00000000..e0821cf7
+index 0000000..e0821cf
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/hmac_drbg.h
 @@ -0,0 +1,300 @@
@@ -16520,7 +16519,7 @@ index 00000000..e0821cf7
 +#endif /* hmac_drbg.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md.h
 new file mode 100644
-index 00000000..06538c38
+index 0000000..06538c3
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md.h
 @@ -0,0 +1,453 @@
@@ -16979,7 +16978,7 @@ index 00000000..06538c38
 +#endif /* MBEDTLS_MD_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md2.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md2.h
 new file mode 100644
-index 00000000..0fd8b5af
+index 0000000..0fd8b5a
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md2.h
 @@ -0,0 +1,309 @@
@@ -17294,7 +17293,7 @@ index 00000000..0fd8b5af
 +#endif /* mbedtls_md2.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md4.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md4.h
 new file mode 100644
-index 00000000..23fa95e4
+index 0000000..23fa95e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md4.h
 @@ -0,0 +1,314 @@
@@ -17614,7 +17613,7 @@ index 00000000..23fa95e4
 +#endif /* mbedtls_md4.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md5.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md5.h
 new file mode 100644
-index 00000000..06ea4c5d
+index 0000000..06ea4c5
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md5.h
 @@ -0,0 +1,314 @@
@@ -17934,7 +17933,7 @@ index 00000000..06ea4c5d
 +#endif /* mbedtls_md5.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md_internal.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md_internal.h
 new file mode 100644
-index 00000000..04de4829
+index 0000000..04de482
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/md_internal.h
 @@ -0,0 +1,115 @@
@@ -18055,7 +18054,7 @@ index 00000000..04de4829
 +#endif /* MBEDTLS_MD_WRAP_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/memory_buffer_alloc.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/memory_buffer_alloc.h
 new file mode 100644
-index 00000000..705f9a63
+index 0000000..705f9a6
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/memory_buffer_alloc.h
 @@ -0,0 +1,151 @@
@@ -18212,7 +18211,7 @@ index 00000000..705f9a63
 +#endif /* memory_buffer_alloc.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/net.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/net.h
 new file mode 100644
-index 00000000..28ae8217
+index 0000000..28ae821
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/net.h
 @@ -0,0 +1,32 @@
@@ -18250,7 +18249,7 @@ index 00000000..28ae8217
 +#endif /* !MBEDTLS_DEPRECATED_REMOVED */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/net_sockets.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/net_sockets.h
 new file mode 100644
-index 00000000..54e612cc
+index 0000000..54e612c
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/net_sockets.h
 @@ -0,0 +1,226 @@
@@ -18482,7 +18481,7 @@ index 00000000..54e612cc
 +#endif /* net_sockets.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/oid.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/oid.h
 new file mode 100644
-index 00000000..408645ec
+index 0000000..408645e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/oid.h
 @@ -0,0 +1,589 @@
@@ -19077,7 +19076,7 @@ index 00000000..408645ec
 +#endif /* oid.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/padlock.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/padlock.h
 new file mode 100644
-index 00000000..677936eb
+index 0000000..677936e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/padlock.h
 @@ -0,0 +1,108 @@
@@ -19191,7 +19190,7 @@ index 00000000..677936eb
 +#endif /* padlock.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pem.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pem.h
 new file mode 100644
-index 00000000..2cf4c0a7
+index 0000000..2cf4c0a
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pem.h
 @@ -0,0 +1,130 @@
@@ -19327,7 +19326,7 @@ index 00000000..2cf4c0a7
 +#endif /* pem.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pk.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pk.h
 new file mode 100644
-index 00000000..1059bdaa
+index 0000000..1059bda
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pk.h
 @@ -0,0 +1,618 @@
@@ -19951,7 +19950,7 @@ index 00000000..1059bdaa
 +#endif /* MBEDTLS_PK_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pk_internal.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pk_internal.h
 new file mode 100644
-index 00000000..3dae0fc5
+index 0000000..3dae0fc
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pk_internal.h
 @@ -0,0 +1,115 @@
@@ -20072,7 +20071,7 @@ index 00000000..3dae0fc5
 +#endif /* MBEDTLS_PK_WRAP_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs11.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs11.h
 new file mode 100644
-index 00000000..bf65c55a
+index 0000000..bf65c55
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs11.h
 @@ -0,0 +1,174 @@
@@ -20252,7 +20251,7 @@ index 00000000..bf65c55a
 +#endif /* MBEDTLS_PKCS11_H */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs12.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs12.h
 new file mode 100644
-index 00000000..a621ef5b
+index 0000000..a621ef5
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs12.h
 @@ -0,0 +1,120 @@
@@ -20378,7 +20377,7 @@ index 00000000..a621ef5b
 +#endif /* pkcs12.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs5.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs5.h
 new file mode 100644
-index 00000000..9a3c9fdd
+index 0000000..9a3c9fd
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/pkcs5.h
 @@ -0,0 +1,95 @@
@@ -20479,7 +20478,7 @@ index 00000000..9a3c9fdd
 +#endif /* pkcs5.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/platform.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/platform.h
 new file mode 100644
-index 00000000..79e62b0d
+index 0000000..79e62b0
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/platform.h
 @@ -0,0 +1,349 @@
@@ -20834,7 +20833,7 @@ index 00000000..79e62b0d
 +#endif /* platform.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/platform_time.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/platform_time.h
 new file mode 100644
-index 00000000..2ed36f56
+index 0000000..2ed36f5
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/platform_time.h
 @@ -0,0 +1,82 @@
@@ -20922,7 +20921,7 @@ index 00000000..2ed36f56
 +#endif /* platform_time.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ripemd160.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ripemd160.h
 new file mode 100644
-index 00000000..3a8b50a6
+index 0000000..3a8b50a
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ripemd160.h
 @@ -0,0 +1,239 @@
@@ -21167,7 +21166,7 @@ index 00000000..3a8b50a6
 +#endif /* mbedtls_ripemd160.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/rsa.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/rsa.h
 new file mode 100644
-index 00000000..5548f3c1
+index 0000000..5548f3c
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/rsa.h
 @@ -0,0 +1,1138 @@
@@ -22311,7 +22310,7 @@ index 00000000..5548f3c1
 +#endif /* rsa.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/rsa_internal.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/rsa_internal.h
 new file mode 100644
-index 00000000..bcb3c940
+index 0000000..bcb3c94
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/rsa_internal.h
 @@ -0,0 +1,216 @@
@@ -22533,7 +22532,7 @@ index 00000000..bcb3c940
 +#endif /* rsa_internal.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha1.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha1.h
 new file mode 100644
-index 00000000..05540cde
+index 0000000..05540cd
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha1.h
 @@ -0,0 +1,322 @@
@@ -22861,7 +22860,7 @@ index 00000000..05540cde
 +#endif /* mbedtls_sha1.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha256.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha256.h
 new file mode 100644
-index 00000000..ffb16c27
+index 0000000..ffb16c2
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha256.h
 @@ -0,0 +1,278 @@
@@ -23145,7 +23144,7 @@ index 00000000..ffb16c27
 +#endif /* mbedtls_sha256.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha512.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha512.h
 new file mode 100644
-index 00000000..8404a2d5
+index 0000000..8404a2d
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/sha512.h
 @@ -0,0 +1,280 @@
@@ -23431,7 +23430,7 @@ index 00000000..8404a2d5
 +#endif /* mbedtls_sha512.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl.h
 new file mode 100644
-index 00000000..c6f31744
+index 0000000..c6f3174
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl.h
 @@ -0,0 +1,2646 @@
@@ -26083,7 +26082,7 @@ index 00000000..c6f31744
 +#endif /* ssl.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_cache.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_cache.h
 new file mode 100644
-index 00000000..ec081e6d
+index 0000000..ec081e6
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_cache.h
 @@ -0,0 +1,144 @@
@@ -26233,7 +26232,7 @@ index 00000000..ec081e6d
 +#endif /* ssl_cache.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_ciphersuites.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_ciphersuites.h
 new file mode 100644
-index 00000000..1d2aabc3
+index 0000000..1d2aabc
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_ciphersuites.h
 @@ -0,0 +1,486 @@
@@ -26725,7 +26724,7 @@ index 00000000..1d2aabc3
 +#endif /* ssl_ciphersuites.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_cookie.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_cookie.h
 new file mode 100644
-index 00000000..80b65bbb
+index 0000000..80b65bb
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_cookie.h
 @@ -0,0 +1,109 @@
@@ -26840,7 +26839,7 @@ index 00000000..80b65bbb
 +#endif /* ssl_cookie.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_internal.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_internal.h
 new file mode 100644
-index 00000000..3fdf9142
+index 0000000..3fdf914
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_internal.h
 @@ -0,0 +1,695 @@
@@ -27541,7 +27540,7 @@ index 00000000..3fdf9142
 +#endif /* ssl_internal.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_ticket.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_ticket.h
 new file mode 100644
-index 00000000..93ad46ac
+index 0000000..93ad46a
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/ssl_ticket.h
 @@ -0,0 +1,136 @@
@@ -27683,7 +27682,7 @@ index 00000000..93ad46ac
 +#endif /* ssl_ticket.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/threading.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/threading.h
 new file mode 100644
-index 00000000..58e6db2f
+index 0000000..58e6db2
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/threading.h
 @@ -0,0 +1,107 @@
@@ -27796,7 +27795,7 @@ index 00000000..58e6db2f
 +#endif /* threading.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/timing.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/timing.h
 new file mode 100644
-index 00000000..2c497bf4
+index 0000000..2c497bf
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/timing.h
 @@ -0,0 +1,161 @@
@@ -27963,7 +27962,7 @@ index 00000000..2c497bf4
 +#endif /* timing.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/timing_alt.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/timing_alt.h
 new file mode 100644
-index 00000000..1b2e5110
+index 0000000..1b2e511
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/timing_alt.h
 @@ -0,0 +1,80 @@
@@ -28049,7 +28048,7 @@ index 00000000..1b2e5110
 +#endif /* timing_alt.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/version.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/version.h
 new file mode 100644
-index 00000000..c3ee649f
+index 0000000..c3ee649
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/version.h
 @@ -0,0 +1,112 @@
@@ -28167,7 +28166,7 @@ index 00000000..c3ee649f
 +#endif /* version.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509.h
 new file mode 100644
-index 00000000..d6db9c6e
+index 0000000..d6db9c6
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509.h
 @@ -0,0 +1,333 @@
@@ -28506,7 +28505,7 @@ index 00000000..d6db9c6e
 +#endif /* x509.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_crl.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_crl.h
 new file mode 100644
-index 00000000..08a4283a
+index 0000000..08a4283
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_crl.h
 @@ -0,0 +1,174 @@
@@ -28686,7 +28685,7 @@ index 00000000..08a4283a
 +#endif /* mbedtls_x509_crl.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_crt.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_crt.h
 new file mode 100644
-index 00000000..2dbb7ec9
+index 0000000..2dbb7ec
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_crt.h
 @@ -0,0 +1,663 @@
@@ -29355,7 +29354,7 @@ index 00000000..2dbb7ec9
 +#endif /* mbedtls_x509_crt.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_csr.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_csr.h
 new file mode 100644
-index 00000000..0c6ccad7
+index 0000000..0c6ccad
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/x509_csr.h
 @@ -0,0 +1,299 @@
@@ -29660,7 +29659,7 @@ index 00000000..0c6ccad7
 +#endif /* mbedtls_x509_csr.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/xtea.h b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/xtea.h
 new file mode 100644
-index 00000000..34ccee3c
+index 0000000..34ccee3
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/include/mbedtls/xtea.h
 @@ -0,0 +1,141 @@
@@ -29807,7 +29806,7 @@ index 00000000..34ccee3c
 +#endif /* xtea.h */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/aes.c b/source/third_party/ssl/mbedtls-2.4.0/library/aes.c
 new file mode 100644
-index 00000000..3d2eac82
+index 0000000..3d2eac8
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/aes.c
 @@ -0,0 +1,1530 @@
@@ -31343,7 +31342,7 @@ index 00000000..3d2eac82
 +#endif /* MBEDTLS_AES_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/aesni.c b/source/third_party/ssl/mbedtls-2.4.0/library/aesni.c
 new file mode 100644
-index 00000000..1ca3c3ef
+index 0000000..1ca3c3e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/aesni.c
 @@ -0,0 +1,464 @@
@@ -31813,7 +31812,7 @@ index 00000000..1ca3c3ef
 +#endif /* MBEDTLS_AESNI_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/arc4.c b/source/third_party/ssl/mbedtls-2.4.0/library/arc4.c
 new file mode 100644
-index 00000000..05b33d3f
+index 0000000..05b33d3
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/arc4.c
 @@ -0,0 +1,205 @@
@@ -32024,7 +32023,7 @@ index 00000000..05b33d3f
 +#endif /* MBEDTLS_ARC4_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/asn1parse.c b/source/third_party/ssl/mbedtls-2.4.0/library/asn1parse.c
 new file mode 100644
-index 00000000..4dd65c03
+index 0000000..4dd65c0
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/asn1parse.c
 @@ -0,0 +1,393 @@
@@ -32423,7 +32422,7 @@ index 00000000..4dd65c03
 +#endif /* MBEDTLS_ASN1_PARSE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/asn1write.c b/source/third_party/ssl/mbedtls-2.4.0/library/asn1write.c
 new file mode 100644
-index 00000000..69b61b20
+index 0000000..69b61b2
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/asn1write.c
 @@ -0,0 +1,390 @@
@@ -32819,7 +32818,7 @@ index 00000000..69b61b20
 +#endif /* MBEDTLS_ASN1_WRITE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/base64.c b/source/third_party/ssl/mbedtls-2.4.0/library/base64.c
 new file mode 100644
-index 00000000..f06b57b3
+index 0000000..f06b57b
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/base64.c
 @@ -0,0 +1,293 @@
@@ -33118,7 +33117,7 @@ index 00000000..f06b57b3
 +#endif /* MBEDTLS_BASE64_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/bignum.c b/source/third_party/ssl/mbedtls-2.4.0/library/bignum.c
 new file mode 100644
-index 00000000..9f13da44
+index 0000000..9f13da4
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/bignum.c
 @@ -0,0 +1,2457 @@
@@ -35581,7 +35580,7 @@ index 00000000..9f13da44
 +#endif /* MBEDTLS_BIGNUM_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/blowfish.c b/source/third_party/ssl/mbedtls-2.4.0/library/blowfish.c
 new file mode 100644
-index 00000000..9003f0df
+index 0000000..9003f0d
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/blowfish.c
 @@ -0,0 +1,656 @@
@@ -36243,7 +36242,7 @@ index 00000000..9003f0df
 +#endif /* MBEDTLS_BLOWFISH_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/camellia.c b/source/third_party/ssl/mbedtls-2.4.0/library/camellia.c
 new file mode 100644
-index 00000000..ac6f96a8
+index 0000000..ac6f96a
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/camellia.c
 @@ -0,0 +1,1072 @@
@@ -37321,7 +37320,7 @@ index 00000000..ac6f96a8
 +#endif /* MBEDTLS_CAMELLIA_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ccm.c b/source/third_party/ssl/mbedtls-2.4.0/library/ccm.c
 new file mode 100644
-index 00000000..9101e5f7
+index 0000000..9101e5f
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ccm.c
 @@ -0,0 +1,467 @@
@@ -37794,7 +37793,7 @@ index 00000000..9101e5f7
 +#endif /* MBEDTLS_CCM_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/certs.c b/source/third_party/ssl/mbedtls-2.4.0/library/certs.c
 new file mode 100644
-index 00000000..f1379b8c
+index 0000000..f1379b8
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/certs.c
 @@ -0,0 +1,403 @@
@@ -38203,7 +38202,7 @@ index 00000000..f1379b8c
 +#endif /* MBEDTLS_CERTS_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/cipher.c b/source/third_party/ssl/mbedtls-2.4.0/library/cipher.c
 new file mode 100644
-index 00000000..ff032738
+index 0000000..ff03273
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/cipher.c
 @@ -0,0 +1,917 @@
@@ -39126,7 +39125,7 @@ index 00000000..ff032738
 +#endif /* MBEDTLS_CIPHER_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/cipher_wrap.c b/source/third_party/ssl/mbedtls-2.4.0/library/cipher_wrap.c
 new file mode 100644
-index 00000000..dc76af8f
+index 0000000..dc76af8
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/cipher_wrap.c
 @@ -0,0 +1,1451 @@
@@ -40583,7 +40582,7 @@ index 00000000..dc76af8f
 +#endif /* MBEDTLS_CIPHER_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/cmac.c b/source/third_party/ssl/mbedtls-2.4.0/library/cmac.c
 new file mode 100644
-index 00000000..9dbff903
+index 0000000..9dbff90
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/cmac.c
 @@ -0,0 +1,1080 @@
@@ -41669,7 +41668,7 @@ index 00000000..9dbff903
 +#endif /* MBEDTLS_CMAC_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ctr_drbg.c b/source/third_party/ssl/mbedtls-2.4.0/library/ctr_drbg.c
 new file mode 100644
-index 00000000..ff532a01
+index 0000000..ff532a0
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ctr_drbg.c
 @@ -0,0 +1,654 @@
@@ -42329,7 +42328,7 @@ index 00000000..ff532a01
 +#endif /* MBEDTLS_CTR_DRBG_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/debug.c b/source/third_party/ssl/mbedtls-2.4.0/library/debug.c
 new file mode 100644
-index 00000000..db3924ac
+index 0000000..db3924a
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/debug.c
 @@ -0,0 +1,368 @@
@@ -42703,7 +42702,7 @@ index 00000000..db3924ac
 +#endif /* MBEDTLS_DEBUG_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/des.c b/source/third_party/ssl/mbedtls-2.4.0/library/des.c
 new file mode 100644
-index 00000000..09f95cfc
+index 0000000..09f95cf
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/des.c
 @@ -0,0 +1,1061 @@
@@ -43770,7 +43769,7 @@ index 00000000..09f95cfc
 +#endif /* MBEDTLS_DES_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/dhm.c b/source/third_party/ssl/mbedtls-2.4.0/library/dhm.c
 new file mode 100644
-index 00000000..28ac3100
+index 0000000..28ac310
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/dhm.c
 @@ -0,0 +1,663 @@
@@ -44439,7 +44438,7 @@ index 00000000..28ac3100
 +#endif /* MBEDTLS_DHM_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ecdh.c b/source/third_party/ssl/mbedtls-2.4.0/library/ecdh.c
 new file mode 100644
-index 00000000..61380b69
+index 0000000..61380b6
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ecdh.c
 @@ -0,0 +1,268 @@
@@ -44713,7 +44712,7 @@ index 00000000..61380b69
 +#endif /* MBEDTLS_ECDH_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ecdsa.c b/source/third_party/ssl/mbedtls-2.4.0/library/ecdsa.c
 new file mode 100644
-index 00000000..826fefe5
+index 0000000..826fefe
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ecdsa.c
 @@ -0,0 +1,458 @@
@@ -45177,7 +45176,7 @@ index 00000000..826fefe5
 +#endif /* MBEDTLS_ECDSA_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ecjpake.c b/source/third_party/ssl/mbedtls-2.4.0/library/ecjpake.c
 new file mode 100644
-index 00000000..e8f40862
+index 0000000..ec5a400
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ecjpake.c
 @@ -0,0 +1,1106 @@
@@ -45484,7 +45483,7 @@ index 00000000..e8f40862
 + */
 +static int ecjpake_zkp_write( const mbedtls_md_info_t *md_info,
 +                              const mbedtls_ecp_group *grp,
-+                              const int pf, 
++                              const int pf,
 +                              const mbedtls_ecp_point *G,
 +                              const mbedtls_mpi *x,
 +                              const mbedtls_ecp_point *X,
@@ -46289,7 +46288,7 @@ index 00000000..e8f40862
 +#endif /* MBEDTLS_ECJPAKE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ecp.c b/source/third_party/ssl/mbedtls-2.4.0/library/ecp.c
 new file mode 100644
-index 00000000..b41baef2
+index 0000000..b41baef
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ecp.c
 @@ -0,0 +1,2195 @@
@@ -48490,7 +48489,7 @@ index 00000000..b41baef2
 +#endif /* MBEDTLS_ECP_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ecp_curves.c b/source/third_party/ssl/mbedtls-2.4.0/library/ecp_curves.c
 new file mode 100644
-index 00000000..df5ac3ee
+index 0000000..df5ac3e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ecp_curves.c
 @@ -0,0 +1,1329 @@
@@ -49825,7 +49824,7 @@ index 00000000..df5ac3ee
 +#endif /* MBEDTLS_ECP_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/entropy.c b/source/third_party/ssl/mbedtls-2.4.0/library/entropy.c
 new file mode 100644
-index 00000000..e17512e7
+index 0000000..e17512e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/entropy.c
 @@ -0,0 +1,725 @@
@@ -50556,7 +50555,7 @@ index 00000000..e17512e7
 +#endif /* MBEDTLS_ENTROPY_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/entropy_poll.c b/source/third_party/ssl/mbedtls-2.4.0/library/entropy_poll.c
 new file mode 100644
-index 00000000..a116e605
+index 0000000..a116e60
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/entropy_poll.c
 @@ -0,0 +1,268 @@
@@ -50830,7 +50829,7 @@ index 00000000..a116e605
 +#endif /* MBEDTLS_ENTROPY_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/error.c b/source/third_party/ssl/mbedtls-2.4.0/library/error.c
 new file mode 100644
-index 00000000..0292480a
+index 0000000..0292480
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/error.c
 @@ -0,0 +1,822 @@
@@ -51658,7 +51657,7 @@ index 00000000..0292480a
 +#endif /* MBEDTLS_ERROR_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/gcm.c b/source/third_party/ssl/mbedtls-2.4.0/library/gcm.c
 new file mode 100644
-index 00000000..294a86d3
+index 0000000..294a86d
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/gcm.c
 @@ -0,0 +1,958 @@
@@ -52622,7 +52621,7 @@ index 00000000..294a86d3
 +#endif /* MBEDTLS_GCM_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/havege.c b/source/third_party/ssl/mbedtls-2.4.0/library/havege.c
 new file mode 100644
-index 00000000..2b75ef7b
+index 0000000..2b75ef7
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/havege.c
 @@ -0,0 +1,245 @@
@@ -52873,7 +52872,7 @@ index 00000000..2b75ef7b
 +#endif /* MBEDTLS_HAVEGE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/hmac_drbg.c b/source/third_party/ssl/mbedtls-2.4.0/library/hmac_drbg.c
 new file mode 100644
-index 00000000..24c609e9
+index 0000000..24c609e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/hmac_drbg.c
 @@ -0,0 +1,534 @@
@@ -53413,7 +53412,7 @@ index 00000000..24c609e9
 +#endif /* MBEDTLS_HMAC_DRBG_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/md.c b/source/third_party/ssl/mbedtls-2.4.0/library/md.c
 new file mode 100644
-index 00000000..00249af7
+index 0000000..00249af
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/md.c
 @@ -0,0 +1,478 @@
@@ -53897,7 +53896,7 @@ index 00000000..00249af7
 +#endif /* MBEDTLS_MD_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/md2.c b/source/third_party/ssl/mbedtls-2.4.0/library/md2.c
 new file mode 100644
-index 00000000..b88aa406
+index 0000000..b88aa40
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/md2.c
 @@ -0,0 +1,367 @@
@@ -54270,7 +54269,7 @@ index 00000000..b88aa406
 +#endif /* MBEDTLS_MD2_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/md4.c b/source/third_party/ssl/mbedtls-2.4.0/library/md4.c
 new file mode 100644
-index 00000000..ba704f58
+index 0000000..ba704f5
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/md4.c
 @@ -0,0 +1,472 @@
@@ -54748,7 +54747,7 @@ index 00000000..ba704f58
 +#endif /* MBEDTLS_MD4_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/md5.c b/source/third_party/ssl/mbedtls-2.4.0/library/md5.c
 new file mode 100644
-index 00000000..8440ebff
+index 0000000..8440ebf
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/md5.c
 @@ -0,0 +1,485 @@
@@ -55239,7 +55238,7 @@ index 00000000..8440ebff
 +#endif /* MBEDTLS_MD5_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/md_wrap.c b/source/third_party/ssl/mbedtls-2.4.0/library/md_wrap.c
 new file mode 100644
-index 00000000..32f08719
+index 0000000..32f0871
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/md_wrap.c
 @@ -0,0 +1,586 @@
@@ -55831,7 +55830,7 @@ index 00000000..32f08719
 +#endif /* MBEDTLS_MD_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/memory_buffer_alloc.c b/source/third_party/ssl/mbedtls-2.4.0/library/memory_buffer_alloc.c
 new file mode 100644
-index 00000000..821ae2c7
+index 0000000..821ae2c
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/memory_buffer_alloc.c
 @@ -0,0 +1,752 @@
@@ -56589,7 +56588,7 @@ index 00000000..821ae2c7
 +#endif /* MBEDTLS_MEMORY_BUFFER_ALLOC_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/net_sockets.c b/source/third_party/ssl/mbedtls-2.4.0/library/net_sockets.c
 new file mode 100644
-index 00000000..35af1838
+index 0000000..35af183
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/net_sockets.c
 @@ -0,0 +1,591 @@
@@ -57186,7 +57185,7 @@ index 00000000..35af1838
 +#endif /* MBEDTLS_NET_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/oid.c b/source/third_party/ssl/mbedtls-2.4.0/library/oid.c
 new file mode 100644
-index 00000000..edea950f
+index 0000000..edea950
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/oid.c
 @@ -0,0 +1,755 @@
@@ -57947,7 +57946,7 @@ index 00000000..edea950f
 +#endif /* MBEDTLS_OID_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/padlock.c b/source/third_party/ssl/mbedtls-2.4.0/library/padlock.c
 new file mode 100644
-index 00000000..b85ff9cd
+index 0000000..b85ff9c
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/padlock.c
 @@ -0,0 +1,170 @@
@@ -58123,7 +58122,7 @@ index 00000000..b85ff9cd
 +#endif /* MBEDTLS_PADLOCK_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/pem.c b/source/third_party/ssl/mbedtls-2.4.0/library/pem.c
 new file mode 100644
-index 00000000..ac86d7e4
+index 0000000..ac86d7e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/pem.c
 @@ -0,0 +1,492 @@
@@ -58621,7 +58620,7 @@ index 00000000..ac86d7e4
 +#endif /* MBEDTLS_PEM_PARSE_C || MBEDTLS_PEM_WRITE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/pk.c b/source/third_party/ssl/mbedtls-2.4.0/library/pk.c
 new file mode 100644
-index 00000000..b52c73fb
+index 0000000..b52c73f
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/pk.c
 @@ -0,0 +1,382 @@
@@ -59009,7 +59008,7 @@ index 00000000..b52c73fb
 +#endif /* MBEDTLS_PK_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/pk_wrap.c b/source/third_party/ssl/mbedtls-2.4.0/library/pk_wrap.c
 new file mode 100644
-index 00000000..a4bb35fc
+index 0000000..a4bb35f
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/pk_wrap.c
 @@ -0,0 +1,521 @@
@@ -59536,7 +59535,7 @@ index 00000000..a4bb35fc
 +#endif /* MBEDTLS_PK_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/pkcs11.c b/source/third_party/ssl/mbedtls-2.4.0/library/pkcs11.c
 new file mode 100644
-index 00000000..0ea64252
+index 0000000..0ea6425
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/pkcs11.c
 @@ -0,0 +1,240 @@
@@ -59782,7 +59781,7 @@ index 00000000..0ea64252
 +#endif /* defined(MBEDTLS_PKCS11_C) */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/pkcs12.c b/source/third_party/ssl/mbedtls-2.4.0/library/pkcs12.c
 new file mode 100644
-index 00000000..c603a135
+index 0000000..c603a13
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/pkcs12.c
 @@ -0,0 +1,365 @@
@@ -60153,7 +60152,7 @@ index 00000000..c603a135
 +#endif /* MBEDTLS_PKCS12_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/pkcs5.c b/source/third_party/ssl/mbedtls-2.4.0/library/pkcs5.c
 new file mode 100644
-index 00000000..95f44fa9
+index 0000000..95f44fa
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/pkcs5.c
 @@ -0,0 +1,404 @@
@@ -60563,7 +60562,7 @@ index 00000000..95f44fa9
 +#endif /* MBEDTLS_PKCS5_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/pkparse.c b/source/third_party/ssl/mbedtls-2.4.0/library/pkparse.c
 new file mode 100644
-index 00000000..9022db2f
+index 0000000..9022db2
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/pkparse.c
 @@ -0,0 +1,1452 @@
@@ -62021,7 +62020,7 @@ index 00000000..9022db2f
 +#endif /* MBEDTLS_PK_PARSE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/pkwrite.c b/source/third_party/ssl/mbedtls-2.4.0/library/pkwrite.c
 new file mode 100644
-index 00000000..8eabd889
+index 0000000..8eabd88
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/pkwrite.c
 @@ -0,0 +1,515 @@
@@ -62542,7 +62541,7 @@ index 00000000..8eabd889
 +#endif /* MBEDTLS_PK_WRITE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/platform.c b/source/third_party/ssl/mbedtls-2.4.0/library/platform.c
 new file mode 100644
-index 00000000..a295f9b9
+index 0000000..a295f9b
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/platform.c
 @@ -0,0 +1,336 @@
@@ -62884,7 +62883,7 @@ index 00000000..a295f9b9
 +#endif /* MBEDTLS_PLATFORM_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ripemd160.c b/source/third_party/ssl/mbedtls-2.4.0/library/ripemd160.c
 new file mode 100644
-index 00000000..2ba48b7f
+index 0000000..2ba48b7
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ripemd160.c
 @@ -0,0 +1,556 @@
@@ -63446,7 +63445,7 @@ index 00000000..2ba48b7f
 +#endif /* MBEDTLS_RIPEMD160_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/rsa.c b/source/third_party/ssl/mbedtls-2.4.0/library/rsa.c
 new file mode 100644
-index 00000000..c9f7ba91
+index 0000000..c9f7ba9
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/rsa.c
 @@ -0,0 +1,2382 @@
@@ -65834,7 +65833,7 @@ index 00000000..c9f7ba91
 +#endif /* MBEDTLS_RSA_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/rsa_internal.c b/source/third_party/ssl/mbedtls-2.4.0/library/rsa_internal.c
 new file mode 100644
-index 00000000..507009f1
+index 0000000..507009f
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/rsa_internal.c
 @@ -0,0 +1,487 @@
@@ -66327,7 +66326,7 @@ index 00000000..507009f1
 +#endif /* MBEDTLS_RSA_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/sha1.c b/source/third_party/ssl/mbedtls-2.4.0/library/sha1.c
 new file mode 100644
-index 00000000..1f29a0fb
+index 0000000..1f29a0f
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/sha1.c
 @@ -0,0 +1,536 @@
@@ -66869,7 +66868,7 @@ index 00000000..1f29a0fb
 +#endif /* MBEDTLS_SHA1_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/sha256.c b/source/third_party/ssl/mbedtls-2.4.0/library/sha256.c
 new file mode 100644
-index 00000000..f39bcbab
+index 0000000..f39bcba
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/sha256.c
 @@ -0,0 +1,550 @@
@@ -67425,7 +67424,7 @@ index 00000000..f39bcbab
 +#endif /* MBEDTLS_SHA256_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/sha512.c b/source/third_party/ssl/mbedtls-2.4.0/library/sha512.c
 new file mode 100644
-index 00000000..97cee07c
+index 0000000..97cee07
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/sha512.c
 @@ -0,0 +1,604 @@
@@ -68035,7 +68034,7 @@ index 00000000..97cee07c
 +#endif /* MBEDTLS_SHA512_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cache.c b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cache.c
 new file mode 100644
-index 00000000..47867f13
+index 0000000..47867f1
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cache.c
 @@ -0,0 +1,327 @@
@@ -68368,7 +68367,7 @@ index 00000000..47867f13
 +#endif /* MBEDTLS_SSL_CACHE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ssl_ciphersuites.c b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_ciphersuites.c
 new file mode 100644
-index 00000000..95e6163c
+index 0000000..95e6163
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_ciphersuites.c
 @@ -0,0 +1,1875 @@
@@ -70249,7 +70248,7 @@ index 00000000..95e6163c
 +#endif /* MBEDTLS_SSL_TLS_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cli.c b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cli.c
 new file mode 100644
-index 00000000..36d9be7b
+index 0000000..4a1658b
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cli.c
 @@ -0,0 +1,3462 @@
@@ -70610,7 +70609,7 @@ index 00000000..36d9be7b
 +
 +    *olen = 6;
 +}
-+#endif /* MBEDTLS_ECDH_C || MBEDTLS_ECDSA_C || 
++#endif /* MBEDTLS_ECDH_C || MBEDTLS_ECDSA_C ||
 +          MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED */
 +
 +#if defined(MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED)
@@ -71516,7 +71515,7 @@ index 00000000..36d9be7b
 +                                    MBEDTLS_SSL_ALERT_MSG_HANDSHAKE_FAILURE );
 +    return( MBEDTLS_ERR_SSL_BAD_HS_SERVER_HELLO );
 +}
-+#endif /* MBEDTLS_ECDH_C || MBEDTLS_ECDSA_C || 
++#endif /* MBEDTLS_ECDH_C || MBEDTLS_ECDSA_C ||
 +          MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED */
 +
 +#if defined(MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED)
@@ -73717,7 +73716,7 @@ index 00000000..36d9be7b
 +#endif /* MBEDTLS_SSL_CLI_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cookie.c b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cookie.c
 new file mode 100644
-index 00000000..caf11999
+index 0000000..caf1199
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_cookie.c
 @@ -0,0 +1,260 @@
@@ -73983,7 +73982,7 @@ index 00000000..caf11999
 +#endif /* MBEDTLS_SSL_COOKIE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ssl_srv.c b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_srv.c
 new file mode 100644
-index 00000000..a4ad0ed9
+index 0000000..a4ad0ed
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_srv.c
 @@ -0,0 +1,4096 @@
@@ -78085,7 +78084,7 @@ index 00000000..a4ad0ed9
 +#endif /* MBEDTLS_SSL_SRV_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ssl_ticket.c b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_ticket.c
 new file mode 100644
-index 00000000..4d9116d2
+index 0000000..4d9116d
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_ticket.c
 @@ -0,0 +1,489 @@
@@ -78580,7 +78579,7 @@ index 00000000..4d9116d2
 +#endif /* MBEDTLS_SSL_TICKET_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/ssl_tls.c b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_tls.c
 new file mode 100644
-index 00000000..e21125d1
+index 0000000..e21125d
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/ssl_tls.c
 @@ -0,0 +1,8309 @@
@@ -86895,7 +86894,7 @@ index 00000000..e21125d1
 +#endif /* MBEDTLS_SSL_TLS_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/threading.c b/source/third_party/ssl/mbedtls-2.4.0/library/threading.c
 new file mode 100644
-index 00000000..07586756
+index 0000000..0758675
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/threading.c
 @@ -0,0 +1,137 @@
@@ -87038,7 +87037,7 @@ index 00000000..07586756
 +#endif /* MBEDTLS_THREADING_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/timing.c b/source/third_party/ssl/mbedtls-2.4.0/library/timing.c
 new file mode 100644
-index 00000000..35d6d89e
+index 0000000..35d6d89
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/timing.c
 @@ -0,0 +1,536 @@
@@ -87580,7 +87579,7 @@ index 00000000..35d6d89e
 +#endif /* MBEDTLS_TIMING_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/version.c b/source/third_party/ssl/mbedtls-2.4.0/library/version.c
 new file mode 100644
-index 00000000..fd967508
+index 0000000..fd96750
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/version.c
 @@ -0,0 +1,50 @@
@@ -87636,7 +87635,7 @@ index 00000000..fd967508
 +#endif /* MBEDTLS_VERSION_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/version_features.c b/source/third_party/ssl/mbedtls-2.4.0/library/version_features.c
 new file mode 100644
-index 00000000..da47e3d7
+index 0000000..da47e3d
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/version_features.c
 @@ -0,0 +1,719 @@
@@ -88361,7 +88360,7 @@ index 00000000..da47e3d7
 +#endif /* MBEDTLS_VERSION_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/x509.c b/source/third_party/ssl/mbedtls-2.4.0/library/x509.c
 new file mode 100644
-index 00000000..371d6da1
+index 0000000..371d6da
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/x509.c
 @@ -0,0 +1,1104 @@
@@ -89471,7 +89470,7 @@ index 00000000..371d6da1
 +#endif /* MBEDTLS_X509_USE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/x509_create.c b/source/third_party/ssl/mbedtls-2.4.0/library/x509_create.c
 new file mode 100644
-index 00000000..df20ec8e
+index 0000000..df20ec8
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/x509_create.c
 @@ -0,0 +1,340 @@
@@ -89817,7 +89816,7 @@ index 00000000..df20ec8e
 +#endif /* MBEDTLS_X509_CREATE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/x509_crl.c b/source/third_party/ssl/mbedtls-2.4.0/library/x509_crl.c
 new file mode 100644
-index 00000000..b0f39d42
+index 0000000..b0f39d4
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/x509_crl.c
 @@ -0,0 +1,776 @@
@@ -90599,7 +90598,7 @@ index 00000000..b0f39d42
 +#endif /* MBEDTLS_X509_CRL_PARSE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/x509_crt.c b/source/third_party/ssl/mbedtls-2.4.0/library/x509_crt.c
 new file mode 100644
-index 00000000..c869e8d3
+index 0000000..465752e
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/x509_crt.c
 @@ -0,0 +1,2432 @@
@@ -91325,7 +91324,7 @@ index 00000000..c869e8d3
 +
 +    memcpy( p, buf, crt->raw.len );
 +
-+    // Direct pointers to the new buffer 
++    // Direct pointers to the new buffer
 +    p += crt->raw.len - len;
 +    end = crt_end = p + len;
 +
@@ -93037,7 +93036,7 @@ index 00000000..c869e8d3
 +#endif /* MBEDTLS_X509_CRT_PARSE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/x509_csr.c b/source/third_party/ssl/mbedtls-2.4.0/library/x509_csr.c
 new file mode 100644
-index 00000000..26a06db4
+index 0000000..26a06db
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/x509_csr.c
 @@ -0,0 +1,423 @@
@@ -93466,7 +93465,7 @@ index 00000000..26a06db4
 +#endif /* MBEDTLS_X509_CSR_PARSE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/x509write_crt.c b/source/third_party/ssl/mbedtls-2.4.0/library/x509write_crt.c
 new file mode 100644
-index 00000000..41dfe87b
+index 0000000..41dfe87
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/x509write_crt.c
 @@ -0,0 +1,485 @@
@@ -93957,7 +93956,7 @@ index 00000000..41dfe87b
 +#endif /* MBEDTLS_X509_CRT_WRITE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/x509write_csr.c b/source/third_party/ssl/mbedtls-2.4.0/library/x509write_csr.c
 new file mode 100644
-index 00000000..e8005382
+index 0000000..e800538
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/x509write_csr.c
 @@ -0,0 +1,266 @@
@@ -94229,7 +94228,7 @@ index 00000000..e8005382
 +#endif /* MBEDTLS_X509_CSR_WRITE_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/library/xtea.c b/source/third_party/ssl/mbedtls-2.4.0/library/xtea.c
 new file mode 100644
-index 00000000..fe0a3509
+index 0000000..fe0a350
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/library/xtea.c
 @@ -0,0 +1,281 @@
@@ -94516,7 +94515,7 @@ index 00000000..fe0a3509
 +#endif /* MBEDTLS_XTEA_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/port/cc3220sf/net.c b/source/third_party/ssl/mbedtls-2.4.0/port/cc3220sf/net.c
 new file mode 100644
-index 00000000..52c6efd5
+index 0000000..52c6efd
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/port/cc3220sf/net.c
 @@ -0,0 +1,545 @@
@@ -95067,7 +95066,7 @@ index 00000000..52c6efd5
 +#endif /* MBEDTLS_NET_C */
 diff --git a/source/third_party/ssl/mbedtls-2.4.0/port/cc3220sf/rtl_hardware.c b/source/third_party/ssl/mbedtls-2.4.0/port/cc3220sf/rtl_hardware.c
 new file mode 100644
-index 00000000..b63ce02b
+index 0000000..b63ce02
 --- /dev/null
 +++ b/source/third_party/ssl/mbedtls-2.4.0/port/cc3220sf/rtl_hardware.c
 @@ -0,0 +1,49 @@

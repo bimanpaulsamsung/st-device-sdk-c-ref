@@ -1,7 +1,7 @@
-From 9523b4ac11186895e41f59c7a5bad282421e39b3 Mon Sep 17 00:00:00 2001
+From eab01f37e2493462bd2bbb20f0ac6d02ad411182 Mon Sep 17 00:00:00 2001
 From: "qiang3.zhang" <28670379+xiarihf@users.noreply.github.com>
 Date: Thu, 2 Apr 2020 14:09:23 +0800
-Subject: [PATCH 3/5] Add libsodium component
+Subject: [PATCH 3/6] Add libsodium component
 
 Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
 ---
@@ -499,7 +499,7 @@ Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
 
 diff --git a/source/third_party/libsodium/component.mk b/source/third_party/libsodium/component.mk
 new file mode 100644
-index 00000000..1ac600d9
+index 0000000..1ac600d
 --- /dev/null
 +++ b/source/third_party/libsodium/component.mk
 @@ -0,0 +1,38 @@
@@ -543,7 +543,7 @@ index 00000000..1ac600d9
 +CFLAGS += -I./crypto_sign/ed25519/ref10
 diff --git a/source/third_party/libsodium/crypto_aead/aes256gcm/aesni/aead_aes256gcm_aesni.c b/source/third_party/libsodium/crypto_aead/aes256gcm/aesni/aead_aes256gcm_aesni.c
 new file mode 100644
-index 00000000..dc54bca7
+index 0000000..dc54bca
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_aead/aes256gcm/aesni/aead_aes256gcm_aesni.c
 @@ -0,0 +1,1079 @@
@@ -1628,7 +1628,7 @@ index 00000000..dc54bca7
 +}
 diff --git a/source/third_party/libsodium/crypto_aead/chacha20poly1305/sodium/aead_chacha20poly1305.c b/source/third_party/libsodium/crypto_aead/chacha20poly1305/sodium/aead_chacha20poly1305.c
 new file mode 100644
-index 00000000..c79407a1
+index 0000000..c79407a
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_aead/chacha20poly1305/sodium/aead_chacha20poly1305.c
 @@ -0,0 +1,399 @@
@@ -2033,7 +2033,7 @@ index 00000000..c79407a1
 +}
 diff --git a/source/third_party/libsodium/crypto_aead/xchacha20poly1305/sodium/aead_xchacha20poly1305.c b/source/third_party/libsodium/crypto_aead/xchacha20poly1305/sodium/aead_xchacha20poly1305.c
 new file mode 100644
-index 00000000..04971a82
+index 0000000..04971a8
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_aead/xchacha20poly1305/sodium/aead_xchacha20poly1305.c
 @@ -0,0 +1,160 @@
@@ -2199,7 +2199,7 @@ index 00000000..04971a82
 +}
 diff --git a/source/third_party/libsodium/crypto_auth/crypto_auth.c b/source/third_party/libsodium/crypto_auth/crypto_auth.c
 new file mode 100644
-index 00000000..d061c8c1
+index 0000000..d061c8c
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_auth/crypto_auth.c
 @@ -0,0 +1,41 @@
@@ -2246,7 +2246,7 @@ index 00000000..d061c8c1
 +}
 diff --git a/source/third_party/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c b/source/third_party/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c
 new file mode 100644
-index 00000000..a951e932
+index 0000000..a951e93
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_auth/hmacsha256/auth_hmacsha256.c
 @@ -0,0 +1,118 @@
@@ -2370,7 +2370,7 @@ index 00000000..a951e932
 +}
 diff --git a/source/third_party/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c b/source/third_party/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c
 new file mode 100644
-index 00000000..018d7a4e
+index 0000000..018d7a4
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_auth/hmacsha512/auth_hmacsha512.c
 @@ -0,0 +1,118 @@
@@ -2494,7 +2494,7 @@ index 00000000..018d7a4e
 +}
 diff --git a/source/third_party/libsodium/crypto_auth/hmacsha512256/auth_hmacsha512256.c b/source/third_party/libsodium/crypto_auth/hmacsha512256/auth_hmacsha512256.c
 new file mode 100644
-index 00000000..432d6dbe
+index 0000000..432d6db
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_auth/hmacsha512256/auth_hmacsha512256.c
 @@ -0,0 +1,93 @@
@@ -2593,7 +2593,7 @@ index 00000000..432d6dbe
 +}
 diff --git a/source/third_party/libsodium/crypto_box/crypto_box.c b/source/third_party/libsodium/crypto_box/crypto_box.c
 new file mode 100644
-index 00000000..7e4f00bd
+index 0000000..7e4f00b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_box/crypto_box.c
 @@ -0,0 +1,114 @@
@@ -2713,7 +2713,7 @@ index 00000000..7e4f00bd
 +}
 diff --git a/source/third_party/libsodium/crypto_box/crypto_box_easy.c b/source/third_party/libsodium/crypto_box/crypto_box_easy.c
 new file mode 100644
-index 00000000..deb40b40
+index 0000000..deb40b4
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_box/crypto_box_easy.c
 @@ -0,0 +1,115 @@
@@ -2834,7 +2834,7 @@ index 00000000..deb40b40
 +}
 diff --git a/source/third_party/libsodium/crypto_box/crypto_box_seal.c b/source/third_party/libsodium/crypto_box/crypto_box_seal.c
 new file mode 100644
-index 00000000..71813345
+index 0000000..7181334
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_box/crypto_box_seal.c
 @@ -0,0 +1,68 @@
@@ -2908,7 +2908,7 @@ index 00000000..71813345
 +}
 diff --git a/source/third_party/libsodium/crypto_box/curve25519xchacha20poly1305/box_curve25519xchacha20poly1305.c b/source/third_party/libsodium/crypto_box/curve25519xchacha20poly1305/box_curve25519xchacha20poly1305.c
 new file mode 100644
-index 00000000..5e2532ea
+index 0000000..5e2532e
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_box/curve25519xchacha20poly1305/box_curve25519xchacha20poly1305.c
 @@ -0,0 +1,204 @@
@@ -3118,7 +3118,7 @@ index 00000000..5e2532ea
 +}
 diff --git a/source/third_party/libsodium/crypto_box/curve25519xchacha20poly1305/box_seal_curve25519xchacha20poly1305.c b/source/third_party/libsodium/crypto_box/curve25519xchacha20poly1305/box_seal_curve25519xchacha20poly1305.c
 new file mode 100644
-index 00000000..9e73a265
+index 0000000..9e73a26
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_box/curve25519xchacha20poly1305/box_seal_curve25519xchacha20poly1305.c
 @@ -0,0 +1,79 @@
@@ -3203,7 +3203,7 @@ index 00000000..9e73a265
 +}
 diff --git a/source/third_party/libsodium/crypto_box/curve25519xsalsa20poly1305/box_curve25519xsalsa20poly1305.c b/source/third_party/libsodium/crypto_box/curve25519xsalsa20poly1305/box_curve25519xsalsa20poly1305.c
 new file mode 100644
-index 00000000..4c1d62ed
+index 0000000..4c1d62e
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_box/curve25519xsalsa20poly1305/box_curve25519xsalsa20poly1305.c
 @@ -0,0 +1,156 @@
@@ -3365,7 +3365,7 @@ index 00000000..4c1d62ed
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/core_ed25519.c b/source/third_party/libsodium/crypto_core/ed25519/core_ed25519.c
 new file mode 100644
-index 00000000..1bcf5022
+index 0000000..1bcf502
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/core_ed25519.c
 @@ -0,0 +1,79 @@
@@ -3450,7 +3450,7 @@ index 00000000..1bcf5022
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/core_ristretto255.c b/source/third_party/libsodium/crypto_core/ed25519/core_ristretto255.c
 new file mode 100644
-index 00000000..cad3c802
+index 0000000..cad3c80
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/core_ristretto255.c
 @@ -0,0 +1,156 @@
@@ -3612,7 +3612,7 @@ index 00000000..cad3c802
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c b/source/third_party/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c
 new file mode 100644
-index 00000000..5a122081
+index 0000000..5a12208
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/ed25519_ref10.c
 @@ -0,0 +1,2453 @@
@@ -6071,7 +6071,7 @@ index 00000000..5a122081
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/base.h b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/base.h
 new file mode 100644
-index 00000000..e18530bb
+index 0000000..e18530b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/base.h
 @@ -0,0 +1,1344 @@
@@ -7421,7 +7421,7 @@ index 00000000..e18530bb
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/base2.h b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/base2.h
 new file mode 100644
-index 00000000..90a1457e
+index 0000000..90a1457
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/base2.h
 @@ -0,0 +1,40 @@
@@ -7467,7 +7467,7 @@ index 00000000..90a1457e
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/constants.h b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/constants.h
 new file mode 100644
-index 00000000..3dc9156a
+index 0000000..3dc9156
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/constants.h
 @@ -0,0 +1,20 @@
@@ -7493,7 +7493,7 @@ index 00000000..3dc9156a
 +};
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/fe.h b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/fe.h
 new file mode 100644
-index 00000000..f216669e
+index 0000000..f216669
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_25_5/fe.h
 @@ -0,0 +1,220 @@
@@ -7719,7 +7719,7 @@ index 00000000..f216669e
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/base.h b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/base.h
 new file mode 100644
-index 00000000..6b3b833e
+index 0000000..6b3b833
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/base.h
 @@ -0,0 +1,1344 @@
@@ -9069,7 +9069,7 @@ index 00000000..6b3b833e
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/base2.h b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/base2.h
 new file mode 100644
-index 00000000..d0882416
+index 0000000..d088241
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/base2.h
 @@ -0,0 +1,40 @@
@@ -9115,7 +9115,7 @@ index 00000000..d0882416
 +}
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/constants.h b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/constants.h
 new file mode 100644
-index 00000000..53b75c6b
+index 0000000..53b75c6
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/constants.h
 @@ -0,0 +1,21 @@
@@ -9142,7 +9142,7 @@ index 00000000..53b75c6b
 +};
 diff --git a/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/fe.h b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/fe.h
 new file mode 100644
-index 00000000..de876264
+index 0000000..de87626
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/ed25519/ref10/fe_51/fe.h
 @@ -0,0 +1,116 @@
@@ -9264,7 +9264,7 @@ index 00000000..de876264
 +}
 diff --git a/source/third_party/libsodium/crypto_core/hchacha20/core_hchacha20.c b/source/third_party/libsodium/crypto_core/hchacha20/core_hchacha20.c
 new file mode 100644
-index 00000000..39ab26a6
+index 0000000..39ab26a
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/hchacha20/core_hchacha20.c
 @@ -0,0 +1,93 @@
@@ -9363,7 +9363,7 @@ index 00000000..39ab26a6
 +}
 diff --git a/source/third_party/libsodium/crypto_core/hsalsa20/core_hsalsa20.c b/source/third_party/libsodium/crypto_core/hsalsa20/core_hsalsa20.c
 new file mode 100644
-index 00000000..37c4923a
+index 0000000..37c4923
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/hsalsa20/core_hsalsa20.c
 @@ -0,0 +1,21 @@
@@ -9390,7 +9390,7 @@ index 00000000..37c4923a
 +}
 diff --git a/source/third_party/libsodium/crypto_core/hsalsa20/ref2/core_hsalsa20_ref2.c b/source/third_party/libsodium/crypto_core/hsalsa20/ref2/core_hsalsa20_ref2.c
 new file mode 100644
-index 00000000..1d1220fe
+index 0000000..1d1220f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/hsalsa20/ref2/core_hsalsa20_ref2.c
 @@ -0,0 +1,95 @@
@@ -9491,7 +9491,7 @@ index 00000000..1d1220fe
 +}
 diff --git a/source/third_party/libsodium/crypto_core/salsa/ref/core_salsa_ref.c b/source/third_party/libsodium/crypto_core/salsa/ref/core_salsa_ref.c
 new file mode 100644
-index 00000000..a077d7f4
+index 0000000..a077d7f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_core/salsa/ref/core_salsa_ref.c
 @@ -0,0 +1,195 @@
@@ -9692,7 +9692,7 @@ index 00000000..a077d7f4
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/generichash_blake2.c b/source/third_party/libsodium/crypto_generichash/blake2b/generichash_blake2.c
 new file mode 100644
-index 00000000..781d4c58
+index 0000000..781d4c5
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/generichash_blake2.c
 @@ -0,0 +1,55 @@
@@ -9753,7 +9753,7 @@ index 00000000..781d4c58
 +}
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2.h b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2.h
 new file mode 100644
-index 00000000..c6c4fccb
+index 0000000..c6c4fcc
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2.h
 @@ -0,0 +1,109 @@
@@ -9868,7 +9868,7 @@ index 00000000..c6c4fccb
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-avx2.c b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-avx2.c
 new file mode 100644
-index 00000000..7cb41fb6
+index 0000000..7cb41fb
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-avx2.c
 @@ -0,0 +1,49 @@
@@ -9923,7 +9923,7 @@ index 00000000..7cb41fb6
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-avx2.h b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-avx2.h
 new file mode 100644
-index 00000000..bc7e42d2
+index 0000000..bc7e42d
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-avx2.h
 @@ -0,0 +1,137 @@
@@ -10066,7 +10066,7 @@ index 00000000..bc7e42d2
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ref.c b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ref.c
 new file mode 100644
-index 00000000..b0422c93
+index 0000000..b0422c9
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ref.c
 @@ -0,0 +1,93 @@
@@ -10165,7 +10165,7 @@ index 00000000..b0422c93
 +}
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-sse41.c b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-sse41.c
 new file mode 100644
-index 00000000..9e5c0c50
+index 0000000..9e5c0c5
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-sse41.c
 @@ -0,0 +1,87 @@
@@ -10258,7 +10258,7 @@ index 00000000..9e5c0c50
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-sse41.h b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-sse41.h
 new file mode 100644
-index 00000000..ac78e5bb
+index 0000000..ac78e5b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-sse41.h
 @@ -0,0 +1,103 @@
@@ -10367,7 +10367,7 @@ index 00000000..ac78e5bb
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ssse3.c b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ssse3.c
 new file mode 100644
-index 00000000..a207a64d
+index 0000000..a207a64
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ssse3.c
 @@ -0,0 +1,90 @@
@@ -10463,7 +10463,7 @@ index 00000000..a207a64d
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ssse3.h b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ssse3.h
 new file mode 100644
-index 00000000..9a7164fe
+index 0000000..9a7164f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-compress-ssse3.h
 @@ -0,0 +1,103 @@
@@ -10572,7 +10572,7 @@ index 00000000..9a7164fe
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-avx2.h b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-avx2.h
 new file mode 100644
-index 00000000..8c15f177
+index 0000000..8c15f17
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-avx2.h
 @@ -0,0 +1,340 @@
@@ -10918,7 +10918,7 @@ index 00000000..8c15f177
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-sse2.h b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-sse2.h
 new file mode 100644
-index 00000000..8e67421a
+index 0000000..8e67421
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-sse2.h
 @@ -0,0 +1,164 @@
@@ -11088,7 +11088,7 @@ index 00000000..8e67421a
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-sse41.h b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-sse41.h
 new file mode 100644
-index 00000000..31745fc1
+index 0000000..31745fc
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-load-sse41.h
 @@ -0,0 +1,307 @@
@@ -11401,7 +11401,7 @@ index 00000000..31745fc1
 +#endif
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-ref.c b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-ref.c
 new file mode 100644
-index 00000000..f5e07626
+index 0000000..f5e0762
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/blake2b-ref.c
 @@ -0,0 +1,436 @@
@@ -11843,7 +11843,7 @@ index 00000000..f5e07626
 +}
 diff --git a/source/third_party/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c b/source/third_party/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c
 new file mode 100644
-index 00000000..4bd08550
+index 0000000..4bd0855
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/blake2b/ref/generichash_blake2b.c
 @@ -0,0 +1,111 @@
@@ -11960,7 +11960,7 @@ index 00000000..4bd08550
 +}
 diff --git a/source/third_party/libsodium/crypto_generichash/crypto_generichash.c b/source/third_party/libsodium/crypto_generichash/crypto_generichash.c
 new file mode 100644
-index 00000000..a9a14e99
+index 0000000..a9a14e9
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_generichash/crypto_generichash.c
 @@ -0,0 +1,91 @@
@@ -12057,7 +12057,7 @@ index 00000000..a9a14e99
 +}
 diff --git a/source/third_party/libsodium/crypto_hash/crypto_hash.c b/source/third_party/libsodium/crypto_hash/crypto_hash.c
 new file mode 100644
-index 00000000..855c560b
+index 0000000..855c560
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_hash/crypto_hash.c
 @@ -0,0 +1,20 @@
@@ -12083,7 +12083,7 @@ index 00000000..855c560b
 +}
 diff --git a/source/third_party/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c b/source/third_party/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c
 new file mode 100644
-index 00000000..264054f9
+index 0000000..264054f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.c
 @@ -0,0 +1,254 @@
@@ -12343,7 +12343,7 @@ index 00000000..264054f9
 +}
 diff --git a/source/third_party/libsodium/crypto_hash/sha256/hash_sha256.c b/source/third_party/libsodium/crypto_hash/sha256/hash_sha256.c
 new file mode 100644
-index 00000000..e729c811
+index 0000000..e729c81
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_hash/sha256/hash_sha256.c
 @@ -0,0 +1,13 @@
@@ -12362,7 +12362,7 @@ index 00000000..e729c811
 +}
 diff --git a/source/third_party/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c b/source/third_party/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c
 new file mode 100644
-index 00000000..8e0f36fb
+index 0000000..8e0f36f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_hash/sha512/cp/hash_sha512_cp.c
 @@ -0,0 +1,282 @@
@@ -12650,7 +12650,7 @@ index 00000000..8e0f36fb
 +}
 diff --git a/source/third_party/libsodium/crypto_hash/sha512/hash_sha512.c b/source/third_party/libsodium/crypto_hash/sha512/hash_sha512.c
 new file mode 100644
-index 00000000..ba842b8b
+index 0000000..ba842b8
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_hash/sha512/hash_sha512.c
 @@ -0,0 +1,13 @@
@@ -12669,7 +12669,7 @@ index 00000000..ba842b8b
 +}
 diff --git a/source/third_party/libsodium/crypto_kdf/blake2b/kdf_blake2b.c b/source/third_party/libsodium/crypto_kdf/blake2b/kdf_blake2b.c
 new file mode 100644
-index 00000000..2a690c9a
+index 0000000..2a690c9
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_kdf/blake2b/kdf_blake2b.c
 @@ -0,0 +1,52 @@
@@ -12727,7 +12727,7 @@ index 00000000..2a690c9a
 +}
 diff --git a/source/third_party/libsodium/crypto_kdf/crypto_kdf.c b/source/third_party/libsodium/crypto_kdf/crypto_kdf.c
 new file mode 100644
-index 00000000..b215d99a
+index 0000000..b215d99
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_kdf/crypto_kdf.c
 @@ -0,0 +1,49 @@
@@ -12782,7 +12782,7 @@ index 00000000..b215d99a
 +}
 diff --git a/source/third_party/libsodium/crypto_kx/crypto_kx.c b/source/third_party/libsodium/crypto_kx/crypto_kx.c
 new file mode 100644
-index 00000000..877ab7ff
+index 0000000..877ab7f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_kx/crypto_kx.c
 @@ -0,0 +1,143 @@
@@ -12931,7 +12931,7 @@ index 00000000..877ab7ff
 +}
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/crypto_onetimeauth.c b/source/third_party/libsodium/crypto_onetimeauth/crypto_onetimeauth.c
 new file mode 100644
-index 00000000..93567aae
+index 0000000..93567aa
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/crypto_onetimeauth.c
 @@ -0,0 +1,71 @@
@@ -13008,7 +13008,7 @@ index 00000000..93567aae
 +}
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna.c b/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna.c
 new file mode 100644
-index 00000000..e798072f
+index 0000000..e798072
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna.c
 @@ -0,0 +1,124 @@
@@ -13138,7 +13138,7 @@ index 00000000..e798072f
 +    };
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna.h b/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna.h
 new file mode 100644
-index 00000000..d6474b3a
+index 0000000..d6474b3
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna.h
 @@ -0,0 +1,12 @@
@@ -13156,7 +13156,7 @@ index 00000000..d6474b3a
 +#endif /* poly1305_donna_H */
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna32.h b/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna32.h
 new file mode 100644
-index 00000000..cef64480
+index 0000000..cef6448
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna32.h
 @@ -0,0 +1,235 @@
@@ -13397,7 +13397,7 @@ index 00000000..cef64480
 +}
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna64.h b/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna64.h
 new file mode 100644
-index 00000000..c827f898
+index 0000000..c827f89
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/poly1305/donna/poly1305_donna64.h
 @@ -0,0 +1,220 @@
@@ -13623,7 +13623,7 @@ index 00000000..c827f898
 +}
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c b/source/third_party/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c
 new file mode 100644
-index 00000000..d5e2efa2
+index 0000000..d5e2efa
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.c
 @@ -0,0 +1,90 @@
@@ -13719,7 +13719,7 @@ index 00000000..d5e2efa2
 +}
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.h b/source/third_party/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.h
 new file mode 100644
-index 00000000..243eadd5
+index 0000000..243eadd
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/poly1305/onetimeauth_poly1305.h
 @@ -0,0 +1,21 @@
@@ -13746,7 +13746,7 @@ index 00000000..243eadd5
 +#endif
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/poly1305/sse2/poly1305_sse2.c b/source/third_party/libsodium/crypto_onetimeauth/poly1305/sse2/poly1305_sse2.c
 new file mode 100644
-index 00000000..e80c961d
+index 0000000..e80c961
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/poly1305/sse2/poly1305_sse2.c
 @@ -0,0 +1,949 @@
@@ -14701,7 +14701,7 @@ index 00000000..e80c961d
 +#endif
 diff --git a/source/third_party/libsodium/crypto_onetimeauth/poly1305/sse2/poly1305_sse2.h b/source/third_party/libsodium/crypto_onetimeauth/poly1305/sse2/poly1305_sse2.h
 new file mode 100644
-index 00000000..9177cad4
+index 0000000..9177cad
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_onetimeauth/poly1305/sse2/poly1305_sse2.h
 @@ -0,0 +1,12 @@
@@ -14719,7 +14719,7 @@ index 00000000..9177cad4
 +#endif /* poly1305_sse2_H */
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2-core.c b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-core.c
 new file mode 100644
-index 00000000..b52b04d3
+index 0000000..b52b04d
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-core.c
 @@ -0,0 +1,549 @@
@@ -15274,7 +15274,7 @@ index 00000000..b52b04d3
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2-core.h b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-core.h
 new file mode 100644
-index 00000000..caab1038
+index 0000000..caab103
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-core.h
 @@ -0,0 +1,297 @@
@@ -15577,7 +15577,7 @@ index 00000000..caab1038
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2-encoding.c b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-encoding.c
 new file mode 100644
-index 00000000..a08acdda
+index 0000000..a08acdd
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-encoding.c
 @@ -0,0 +1,305 @@
@@ -15888,7 +15888,7 @@ index 00000000..a08acdda
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2-encoding.h b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-encoding.h
 new file mode 100644
-index 00000000..e929b31d
+index 0000000..e929b31
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-encoding.h
 @@ -0,0 +1,33 @@
@@ -15927,7 +15927,7 @@ index 00000000..e929b31d
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-avx2.c b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-avx2.c
 new file mode 100644
-index 00000000..8acb42ca
+index 0000000..8acb42c
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-avx2.c
 @@ -0,0 +1,239 @@
@@ -16172,7 +16172,7 @@ index 00000000..8acb42ca
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-avx512f.c b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-avx512f.c
 new file mode 100644
-index 00000000..1f1ec8b3
+index 0000000..1f1ec8b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-avx512f.c
 @@ -0,0 +1,244 @@
@@ -16422,7 +16422,7 @@ index 00000000..1f1ec8b3
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-ref.c b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-ref.c
 new file mode 100644
-index 00000000..75e8d8f5
+index 0000000..75e8d8f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-ref.c
 @@ -0,0 +1,233 @@
@@ -16661,7 +16661,7 @@ index 00000000..75e8d8f5
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-ssse3.c b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-ssse3.c
 new file mode 100644
-index 00000000..796c4455
+index 0000000..796c445
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2-fill-block-ssse3.c
 @@ -0,0 +1,238 @@
@@ -16905,7 +16905,7 @@ index 00000000..796c4455
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2.c b/source/third_party/libsodium/crypto_pwhash/argon2/argon2.c
 new file mode 100644
-index 00000000..ac1628c9
+index 0000000..ac1628c
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2.c
 @@ -0,0 +1,277 @@
@@ -17188,7 +17188,7 @@ index 00000000..ac1628c9
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/argon2.h b/source/third_party/libsodium/crypto_pwhash/argon2/argon2.h
 new file mode 100644
-index 00000000..85ca4dd3
+index 0000000..85ca4dd
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/argon2.h
 @@ -0,0 +1,305 @@
@@ -17499,7 +17499,7 @@ index 00000000..85ca4dd3
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/blake2b-long.c b/source/third_party/libsodium/crypto_pwhash/argon2/blake2b-long.c
 new file mode 100644
-index 00000000..f0364aca
+index 0000000..f0364ac
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/blake2b-long.c
 @@ -0,0 +1,79 @@
@@ -17584,7 +17584,7 @@ index 00000000..f0364aca
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/blake2b-long.h b/source/third_party/libsodium/crypto_pwhash/argon2/blake2b-long.h
 new file mode 100644
-index 00000000..3d6d7755
+index 0000000..3d6d775
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/blake2b-long.h
 @@ -0,0 +1,8 @@
@@ -17598,7 +17598,7 @@ index 00000000..3d6d7755
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-avx2.h b/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-avx2.h
 new file mode 100644
-index 00000000..f3dfa0f5
+index 0000000..f3dfa0f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-avx2.h
 @@ -0,0 +1,150 @@
@@ -17754,7 +17754,7 @@ index 00000000..f3dfa0f5
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-avx512f.h b/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-avx512f.h
 new file mode 100644
-index 00000000..9a822402
+index 0000000..9a82240
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-avx512f.h
 @@ -0,0 +1,145 @@
@@ -17905,7 +17905,7 @@ index 00000000..9a822402
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-ref.h b/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-ref.h
 new file mode 100644
-index 00000000..7a2c6eb2
+index 0000000..7a2c6eb
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-ref.h
 @@ -0,0 +1,40 @@
@@ -17951,7 +17951,7 @@ index 00000000..7a2c6eb2
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-ssse3.h b/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-ssse3.h
 new file mode 100644
-index 00000000..98a47b93
+index 0000000..98a47b9
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/blamka-round-ssse3.h
 @@ -0,0 +1,120 @@
@@ -18077,7 +18077,7 @@ index 00000000..98a47b93
 +#endif
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/pwhash_argon2i.c b/source/third_party/libsodium/crypto_pwhash/argon2/pwhash_argon2i.c
 new file mode 100644
-index 00000000..0515bd61
+index 0000000..0515bd6
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/pwhash_argon2i.c
 @@ -0,0 +1,290 @@
@@ -18373,7 +18373,7 @@ index 00000000..0515bd61
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/argon2/pwhash_argon2id.c b/source/third_party/libsodium/crypto_pwhash/argon2/pwhash_argon2id.c
 new file mode 100644
-index 00000000..99d3e219
+index 0000000..99d3e21
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/argon2/pwhash_argon2id.c
 @@ -0,0 +1,234 @@
@@ -18613,7 +18613,7 @@ index 00000000..99d3e219
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/crypto_pwhash.c b/source/third_party/libsodium/crypto_pwhash/crypto_pwhash.c
 new file mode 100644
-index 00000000..8168f962
+index 0000000..8168f96
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/crypto_pwhash.c
 @@ -0,0 +1,211 @@
@@ -18830,7 +18830,7 @@ index 00000000..8168f962
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c
 new file mode 100644
-index 00000000..e15e12b2
+index 0000000..e15e12b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt-common.c
 @@ -0,0 +1,263 @@
@@ -19099,7 +19099,7 @@ index 00000000..e15e12b2
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt.h b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt.h
 new file mode 100644
-index 00000000..83101967
+index 0000000..8310196
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/crypto_scrypt.h
 @@ -0,0 +1,98 @@
@@ -19203,7 +19203,7 @@ index 00000000..83101967
 +#endif /* !_CRYPTO_SCRYPT_H_ */
 diff --git a/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/nosse/pwhash_scryptsalsa208sha256_nosse.c b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/nosse/pwhash_scryptsalsa208sha256_nosse.c
 new file mode 100644
-index 00000000..9e31352d
+index 0000000..9e31352
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/nosse/pwhash_scryptsalsa208sha256_nosse.c
 @@ -0,0 +1,375 @@
@@ -19584,7 +19584,7 @@ index 00000000..9e31352d
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.c b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.c
 new file mode 100644
-index 00000000..42cab61f
+index 0000000..42cab61
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.c
 @@ -0,0 +1,95 @@
@@ -19685,7 +19685,7 @@ index 00000000..42cab61f
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.h b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.h
 new file mode 100644
-index 00000000..f9598c87
+index 0000000..f9598c8
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pbkdf2-sha256.h
 @@ -0,0 +1,45 @@
@@ -19736,7 +19736,7 @@ index 00000000..f9598c87
 +#endif /* !_SHA256_H_ */
 diff --git a/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pwhash_scryptsalsa208sha256.c b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pwhash_scryptsalsa208sha256.c
 new file mode 100644
-index 00000000..d1afd91a
+index 0000000..d1afd91
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/pwhash_scryptsalsa208sha256.c
 @@ -0,0 +1,285 @@
@@ -20027,7 +20027,7 @@ index 00000000..d1afd91a
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/scrypt_platform.c b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/scrypt_platform.c
 new file mode 100644
-index 00000000..139a7df2
+index 0000000..139a7df
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/scrypt_platform.c
 @@ -0,0 +1,108 @@
@@ -20141,7 +20141,7 @@ index 00000000..139a7df2
 +}
 diff --git a/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/sse/pwhash_scryptsalsa208sha256_sse.c b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/sse/pwhash_scryptsalsa208sha256_sse.c
 new file mode 100644
-index 00000000..754a19fd
+index 0000000..754a19f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_pwhash/scryptsalsa208sha256/sse/pwhash_scryptsalsa208sha256_sse.c
 @@ -0,0 +1,400 @@
@@ -20547,7 +20547,7 @@ index 00000000..754a19fd
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/crypto_scalarmult.c b/source/third_party/libsodium/crypto_scalarmult/crypto_scalarmult.c
 new file mode 100644
-index 00000000..9afffce8
+index 0000000..9afffce
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/crypto_scalarmult.c
 @@ -0,0 +1,33 @@
@@ -20586,7 +20586,7 @@ index 00000000..9afffce8
 +}
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.c b/source/third_party/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.c
 new file mode 100644
-index 00000000..7506f557
+index 0000000..7506f55
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.c
 @@ -0,0 +1,165 @@
@@ -20757,7 +20757,7 @@ index 00000000..7506f557
 +    };
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.h
 new file mode 100644
-index 00000000..ea52a62a
+index 0000000..ea52a62
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/ref10/x25519_ref10.h
 @@ -0,0 +1,10 @@
@@ -20773,7 +20773,7 @@ index 00000000..ea52a62a
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/consts_namespace.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/consts_namespace.h
 new file mode 100644
-index 00000000..e0beb841
+index 0000000..e0beb84
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/consts_namespace.h
 @@ -0,0 +1,19 @@
@@ -20798,7 +20798,7 @@ index 00000000..e0beb841
 +#endif /* ifndef consts_namespace_H */
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/curve25519_sandy2x.c b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/curve25519_sandy2x.c
 new file mode 100644
-index 00000000..98b7cf79
+index 0000000..98b7cf7
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/curve25519_sandy2x.c
 @@ -0,0 +1,114 @@
@@ -20918,7 +20918,7 @@ index 00000000..98b7cf79
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/curve25519_sandy2x.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/curve25519_sandy2x.h
 new file mode 100644
-index 00000000..f02d9801
+index 0000000..f02d980
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/curve25519_sandy2x.h
 @@ -0,0 +1,9 @@
@@ -20933,7 +20933,7 @@ index 00000000..f02d9801
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe.h
 new file mode 100644
-index 00000000..b1115f86
+index 0000000..b1115f8
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe.h
 @@ -0,0 +1,26 @@
@@ -20965,7 +20965,7 @@ index 00000000..b1115f86
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51.h
 new file mode 100644
-index 00000000..8e3f199b
+index 0000000..8e3f199
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51.h
 @@ -0,0 +1,35 @@
@@ -21006,7 +21006,7 @@ index 00000000..8e3f199b
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51_invert.c b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51_invert.c
 new file mode 100644
-index 00000000..ec9bb1a9
+index 0000000..ec9bb1a
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51_invert.c
 @@ -0,0 +1,58 @@
@@ -21070,7 +21070,7 @@ index 00000000..ec9bb1a9
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51_namespace.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51_namespace.h
 new file mode 100644
-index 00000000..4654959f
+index 0000000..4654959
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe51_namespace.h
 @@ -0,0 +1,15 @@
@@ -21091,7 +21091,7 @@ index 00000000..4654959f
 +#endif /* ifndef fe51_namespace_H */
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe_frombytes_sandy2x.c b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe_frombytes_sandy2x.c
 new file mode 100644
-index 00000000..2fe081ee
+index 0000000..2fe081e
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/fe_frombytes_sandy2x.c
 @@ -0,0 +1,78 @@
@@ -21175,7 +21175,7 @@ index 00000000..2fe081ee
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder.h
 new file mode 100644
-index 00000000..059d0620
+index 0000000..059d062
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder.h
 @@ -0,0 +1,17 @@
@@ -21198,7 +21198,7 @@ index 00000000..059d0620
 +#endif /* ifndef ladder_H */
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_base.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_base.h
 new file mode 100644
-index 00000000..10e455c1
+index 0000000..10e455c
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_base.h
 @@ -0,0 +1,17 @@
@@ -21221,7 +21221,7 @@ index 00000000..10e455c1
 +#endif /* ifndef ladder_base_H */
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_base_namespace.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_base_namespace.h
 new file mode 100644
-index 00000000..54c8d3bb
+index 0000000..54c8d3b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_base_namespace.h
 @@ -0,0 +1,7 @@
@@ -21234,7 +21234,7 @@ index 00000000..54c8d3bb
 +#endif /* ifndef ladder_base_namespace_H */
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_namespace.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_namespace.h
 new file mode 100644
-index 00000000..2c7d66ab
+index 0000000..2c7d66a
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/sandy2x/ladder_namespace.h
 @@ -0,0 +1,7 @@
@@ -21247,7 +21247,7 @@ index 00000000..2c7d66ab
 +#endif /* ifndef ladder_namespace_H */
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c b/source/third_party/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c
 new file mode 100644
-index 00000000..2d3ffc05
+index 0000000..2d3ffc0
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.c
 @@ -0,0 +1,59 @@
@@ -21312,7 +21312,7 @@ index 00000000..2d3ffc05
 +}
 diff --git a/source/third_party/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.h b/source/third_party/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.h
 new file mode 100644
-index 00000000..66edbf6a
+index 0000000..66edbf6
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/curve25519/scalarmult_curve25519.h
 @@ -0,0 +1,11 @@
@@ -21329,7 +21329,7 @@ index 00000000..66edbf6a
 +#endif
 diff --git a/source/third_party/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c b/source/third_party/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c
 new file mode 100644
-index 00000000..0e317cf7
+index 0000000..0e317cf
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/ed25519/ref10/scalarmult_ed25519_ref10.c
 @@ -0,0 +1,86 @@
@@ -21421,7 +21421,7 @@ index 00000000..0e317cf7
 +}
 diff --git a/source/third_party/libsodium/crypto_scalarmult/ristretto255/ref10/scalarmult_ristretto255_ref10.c b/source/third_party/libsodium/crypto_scalarmult/ristretto255/ref10/scalarmult_ristretto255_ref10.c
 new file mode 100644
-index 00000000..433a9a26
+index 0000000..433a9a2
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_scalarmult/ristretto255/ref10/scalarmult_ristretto255_ref10.c
 @@ -0,0 +1,63 @@
@@ -21490,7 +21490,7 @@ index 00000000..433a9a26
 +}
 diff --git a/source/third_party/libsodium/crypto_secretbox/crypto_secretbox.c b/source/third_party/libsodium/crypto_secretbox/crypto_secretbox.c
 new file mode 100644
-index 00000000..45f678ec
+index 0000000..45f678e
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_secretbox/crypto_secretbox.c
 @@ -0,0 +1,67 @@
@@ -21563,7 +21563,7 @@ index 00000000..45f678ec
 +}
 diff --git a/source/third_party/libsodium/crypto_secretbox/crypto_secretbox_easy.c b/source/third_party/libsodium/crypto_secretbox/crypto_secretbox_easy.c
 new file mode 100644
-index 00000000..b1203849
+index 0000000..b120384
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_secretbox/crypto_secretbox_easy.c
 @@ -0,0 +1,144 @@
@@ -21713,7 +21713,7 @@ index 00000000..b1203849
 +}
 diff --git a/source/third_party/libsodium/crypto_secretbox/xchacha20poly1305/secretbox_xchacha20poly1305.c b/source/third_party/libsodium/crypto_secretbox/xchacha20poly1305/secretbox_xchacha20poly1305.c
 new file mode 100644
-index 00000000..e76167d2
+index 0000000..e76167d
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_secretbox/xchacha20poly1305/secretbox_xchacha20poly1305.c
 @@ -0,0 +1,177 @@
@@ -21896,7 +21896,7 @@ index 00000000..e76167d2
 +}
 diff --git a/source/third_party/libsodium/crypto_secretbox/xsalsa20poly1305/secretbox_xsalsa20poly1305.c b/source/third_party/libsodium/crypto_secretbox/xsalsa20poly1305/secretbox_xsalsa20poly1305.c
 new file mode 100644
-index 00000000..7240050d
+index 0000000..7240050
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_secretbox/xsalsa20poly1305/secretbox_xsalsa20poly1305.c
 @@ -0,0 +1,89 @@
@@ -21991,7 +21991,7 @@ index 00000000..7240050d
 +}
 diff --git a/source/third_party/libsodium/crypto_secretstream/xchacha20poly1305/secretstream_xchacha20poly1305.c b/source/third_party/libsodium/crypto_secretstream/xchacha20poly1305/secretstream_xchacha20poly1305.c
 new file mode 100644
-index 00000000..ef000d16
+index 0000000..ef000d1
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_secretstream/xchacha20poly1305/secretstream_xchacha20poly1305.c
 @@ -0,0 +1,311 @@
@@ -22308,7 +22308,7 @@ index 00000000..ef000d16
 +}
 diff --git a/source/third_party/libsodium/crypto_shorthash/crypto_shorthash.c b/source/third_party/libsodium/crypto_shorthash/crypto_shorthash.c
 new file mode 100644
-index 00000000..95f52f83
+index 0000000..95f52f8
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_shorthash/crypto_shorthash.c
 @@ -0,0 +1,34 @@
@@ -22348,7 +22348,7 @@ index 00000000..95f52f83
 +}
 diff --git a/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphash24_ref.c b/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphash24_ref.c
 new file mode 100644
-index 00000000..0c173d4c
+index 0000000..0c173d4
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphash24_ref.c
 @@ -0,0 +1,65 @@
@@ -22419,7 +22419,7 @@ index 00000000..0c173d4c
 +}
 diff --git a/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphash_ref.h b/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphash_ref.h
 new file mode 100644
-index 00000000..3f9a38b5
+index 0000000..3f9a38b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphash_ref.h
 @@ -0,0 +1,24 @@
@@ -22449,7 +22449,7 @@ index 00000000..3f9a38b5
 +#endif
 diff --git a/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphashx24_ref.c b/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphashx24_ref.c
 new file mode 100644
-index 00000000..20480d0d
+index 0000000..20480d0
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_shorthash/siphash24/ref/shorthash_siphashx24_ref.c
 @@ -0,0 +1,71 @@
@@ -22526,7 +22526,7 @@ index 00000000..20480d0d
 +}
 diff --git a/source/third_party/libsodium/crypto_shorthash/siphash24/shorthash_siphash24.c b/source/third_party/libsodium/crypto_shorthash/siphash24/shorthash_siphash24.c
 new file mode 100644
-index 00000000..e2cea776
+index 0000000..e2cea77
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_shorthash/siphash24/shorthash_siphash24.c
 @@ -0,0 +1,11 @@
@@ -22543,7 +22543,7 @@ index 00000000..e2cea776
 +}
 diff --git a/source/third_party/libsodium/crypto_shorthash/siphash24/shorthash_siphashx24.c b/source/third_party/libsodium/crypto_shorthash/siphash24/shorthash_siphashx24.c
 new file mode 100644
-index 00000000..2d487dbb
+index 0000000..2d487db
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_shorthash/siphash24/shorthash_siphashx24.c
 @@ -0,0 +1,11 @@
@@ -22560,7 +22560,7 @@ index 00000000..2d487dbb
 +}
 diff --git a/source/third_party/libsodium/crypto_sign/crypto_sign.c b/source/third_party/libsodium/crypto_sign/crypto_sign.c
 new file mode 100644
-index 00000000..127072f7
+index 0000000..127072f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_sign/crypto_sign.c
 @@ -0,0 +1,115 @@
@@ -22681,7 +22681,7 @@ index 00000000..127072f7
 +}
 diff --git a/source/third_party/libsodium/crypto_sign/ed25519/ref10/keypair.c b/source/third_party/libsodium/crypto_sign/ed25519/ref10/keypair.c
 new file mode 100644
-index 00000000..7e0224c7
+index 0000000..7e0224c
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_sign/ed25519/ref10/keypair.c
 @@ -0,0 +1,104 @@
@@ -22791,7 +22791,7 @@ index 00000000..7e0224c7
 +}
 diff --git a/source/third_party/libsodium/crypto_sign/ed25519/ref10/obsolete.c b/source/third_party/libsodium/crypto_sign/ed25519/ref10/obsolete.c
 new file mode 100644
-index 00000000..03440cfa
+index 0000000..03440cf
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_sign/ed25519/ref10/obsolete.c
 @@ -0,0 +1,116 @@
@@ -22913,7 +22913,7 @@ index 00000000..03440cfa
 +}
 diff --git a/source/third_party/libsodium/crypto_sign/ed25519/ref10/open.c b/source/third_party/libsodium/crypto_sign/ed25519/ref10/open.c
 new file mode 100644
-index 00000000..c9e8843c
+index 0000000..c9e8843
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_sign/ed25519/ref10/open.c
 @@ -0,0 +1,93 @@
@@ -23012,7 +23012,7 @@ index 00000000..c9e8843c
 +}
 diff --git a/source/third_party/libsodium/crypto_sign/ed25519/ref10/sign.c b/source/third_party/libsodium/crypto_sign/ed25519/ref10/sign.c
 new file mode 100644
-index 00000000..4df90bdd
+index 0000000..4df90bd
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_sign/ed25519/ref10/sign.c
 @@ -0,0 +1,144 @@
@@ -23162,7 +23162,7 @@ index 00000000..4df90bdd
 +}
 diff --git a/source/third_party/libsodium/crypto_sign/ed25519/ref10/sign_ed25519_ref10.h b/source/third_party/libsodium/crypto_sign/ed25519/ref10/sign_ed25519_ref10.h
 new file mode 100644
-index 00000000..29f45a85
+index 0000000..29f45a8
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_sign/ed25519/ref10/sign_ed25519_ref10.h
 @@ -0,0 +1,18 @@
@@ -23186,7 +23186,7 @@ index 00000000..29f45a85
 +#endif
 diff --git a/source/third_party/libsodium/crypto_sign/ed25519/sign_ed25519.c b/source/third_party/libsodium/crypto_sign/ed25519/sign_ed25519.c
 new file mode 100644
-index 00000000..8a69513e
+index 0000000..8a69513
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_sign/ed25519/sign_ed25519.c
 @@ -0,0 +1,97 @@
@@ -23289,7 +23289,7 @@ index 00000000..8a69513e
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-avx2.c b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-avx2.c
 new file mode 100644
-index 00000000..6149af39
+index 0000000..6149af3
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-avx2.c
 @@ -0,0 +1,180 @@
@@ -23475,7 +23475,7 @@ index 00000000..6149af39
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-avx2.h b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-avx2.h
 new file mode 100644
-index 00000000..45eb98d7
+index 0000000..45eb98d
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-avx2.h
 @@ -0,0 +1,8 @@
@@ -23489,7 +23489,7 @@ index 00000000..45eb98d7
 +    crypto_stream_chacha20_dolbeau_avx2_implementation;
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-ssse3.c b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-ssse3.c
 new file mode 100644
-index 00000000..b7b9aa4a
+index 0000000..b7b9aa4
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-ssse3.c
 @@ -0,0 +1,174 @@
@@ -23669,7 +23669,7 @@ index 00000000..b7b9aa4a
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-ssse3.h b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-ssse3.h
 new file mode 100644
-index 00000000..d67630f6
+index 0000000..d67630f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/chacha20_dolbeau-ssse3.h
 @@ -0,0 +1,8 @@
@@ -23683,7 +23683,7 @@ index 00000000..d67630f6
 +    crypto_stream_chacha20_dolbeau_ssse3_implementation;
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u0.h b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u0.h
 new file mode 100644
-index 00000000..17c3ff8e
+index 0000000..17c3ff8
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u0.h
 @@ -0,0 +1,86 @@
@@ -23775,7 +23775,7 @@ index 00000000..17c3ff8e
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u1.h b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u1.h
 new file mode 100644
-index 00000000..867b44bc
+index 0000000..867b44b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u1.h
 @@ -0,0 +1,98 @@
@@ -23879,7 +23879,7 @@ index 00000000..867b44bc
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u4.h b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u4.h
 new file mode 100644
-index 00000000..3ff83426
+index 0000000..3ff8342
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u4.h
 @@ -0,0 +1,175 @@
@@ -24060,7 +24060,7 @@ index 00000000..3ff83426
 +#undef VEC4_QUARTERROUND_SHUFFLE
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u8.h b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u8.h
 new file mode 100644
-index 00000000..22bf9fcf
+index 0000000..22bf9fc
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/dolbeau/u8.h
 @@ -0,0 +1,357 @@
@@ -24423,7 +24423,7 @@ index 00000000..22bf9fcf
 +#undef VEC8_ROUND_HALFANDHALF
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/ref/chacha20_ref.c b/source/third_party/libsodium/crypto_stream/chacha20/ref/chacha20_ref.c
 new file mode 100644
-index 00000000..f88a99db
+index 0000000..f88a99d
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/ref/chacha20_ref.c
 @@ -0,0 +1,315 @@
@@ -24744,7 +24744,7 @@ index 00000000..f88a99db
 +    };
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/ref/chacha20_ref.h b/source/third_party/libsodium/crypto_stream/chacha20/ref/chacha20_ref.h
 new file mode 100644
-index 00000000..6ac48075
+index 0000000..6ac4807
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/ref/chacha20_ref.h
 @@ -0,0 +1,8 @@
@@ -24758,7 +24758,7 @@ index 00000000..6ac48075
 +    crypto_stream_chacha20_ref_implementation;
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/stream_chacha20.c b/source/third_party/libsodium/crypto_stream/chacha20/stream_chacha20.c
 new file mode 100644
-index 00000000..3b089511
+index 0000000..3b08951
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/stream_chacha20.c
 @@ -0,0 +1,130 @@
@@ -24894,7 +24894,7 @@ index 00000000..3b089511
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/chacha20/stream_chacha20.h b/source/third_party/libsodium/crypto_stream/chacha20/stream_chacha20.h
 new file mode 100644
-index 00000000..d6b71c5e
+index 0000000..d6b71c5
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/chacha20/stream_chacha20.h
 @@ -0,0 +1,22 @@
@@ -24922,7 +24922,7 @@ index 00000000..d6b71c5e
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/crypto_stream.c b/source/third_party/libsodium/crypto_stream/crypto_stream.c
 new file mode 100644
-index 00000000..58d25381
+index 0000000..58d2538
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/crypto_stream.c
 @@ -0,0 +1,49 @@
@@ -24977,7 +24977,7 @@ index 00000000..58d25381
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/ref/salsa20_ref.c b/source/third_party/libsodium/crypto_stream/salsa20/ref/salsa20_ref.c
 new file mode 100644
-index 00000000..f0854ebf
+index 0000000..f0854eb
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/ref/salsa20_ref.c
 @@ -0,0 +1,120 @@
@@ -25103,7 +25103,7 @@ index 00000000..f0854ebf
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/ref/salsa20_ref.h b/source/third_party/libsodium/crypto_stream/salsa20/ref/salsa20_ref.h
 new file mode 100644
-index 00000000..8716cb40
+index 0000000..8716cb4
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/ref/salsa20_ref.h
 @@ -0,0 +1,8 @@
@@ -25117,7 +25117,7 @@ index 00000000..8716cb40
 +    crypto_stream_salsa20_ref_implementation;
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/stream_salsa20.c b/source/third_party/libsodium/crypto_stream/salsa20/stream_salsa20.c
 new file mode 100644
-index 00000000..45298501
+index 0000000..4529850
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/stream_salsa20.c
 @@ -0,0 +1,100 @@
@@ -25223,7 +25223,7 @@ index 00000000..45298501
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/stream_salsa20.h b/source/third_party/libsodium/crypto_stream/salsa20/stream_salsa20.h
 new file mode 100644
-index 00000000..1949d381
+index 0000000..1949d38
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/stream_salsa20.h
 @@ -0,0 +1,16 @@
@@ -25245,7 +25245,7 @@ index 00000000..1949d381
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6-asm_namespace.h b/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6-asm_namespace.h
 new file mode 100644
-index 00000000..15c5212e
+index 0000000..15c5212
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6-asm_namespace.h
 @@ -0,0 +1,10 @@
@@ -25261,7 +25261,7 @@ index 00000000..15c5212e
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.c b/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.c
 new file mode 100644
-index 00000000..0a6fee0f
+index 0000000..0a6fee0
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.c
 @@ -0,0 +1,31 @@
@@ -25298,7 +25298,7 @@ index 00000000..0a6fee0f
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.h b/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.h
 new file mode 100644
-index 00000000..d38473a9
+index 0000000..d38473a
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6/salsa20_xmm6.h
 @@ -0,0 +1,8 @@
@@ -25312,7 +25312,7 @@ index 00000000..d38473a9
 +    crypto_stream_salsa20_xmm6_implementation;
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-avx2.c b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-avx2.c
 new file mode 100644
-index 00000000..18d4773e
+index 0000000..18d4773
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-avx2.c
 @@ -0,0 +1,131 @@
@@ -25449,7 +25449,7 @@ index 00000000..18d4773e
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-avx2.h b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-avx2.h
 new file mode 100644
-index 00000000..0924e9ba
+index 0000000..0924e9b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-avx2.h
 @@ -0,0 +1,8 @@
@@ -25463,7 +25463,7 @@ index 00000000..0924e9ba
 +    crypto_stream_salsa20_xmm6int_avx2_implementation;
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-sse2.c b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-sse2.c
 new file mode 100644
-index 00000000..d8e53a65
+index 0000000..d8e53a6
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-sse2.c
 @@ -0,0 +1,122 @@
@@ -25591,7 +25591,7 @@ index 00000000..d8e53a65
 +#endif
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-sse2.h b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-sse2.h
 new file mode 100644
-index 00000000..ed52a8bc
+index 0000000..ed52a8b
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/salsa20_xmm6int-sse2.h
 @@ -0,0 +1,8 @@
@@ -25605,7 +25605,7 @@ index 00000000..ed52a8bc
 +    crypto_stream_salsa20_xmm6int_sse2_implementation;
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u0.h b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u0.h
 new file mode 100644
-index 00000000..b2d41680
+index 0000000..b2d4168
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u0.h
 @@ -0,0 +1,195 @@
@@ -25806,7 +25806,7 @@ index 00000000..b2d41680
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u1.h b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u1.h
 new file mode 100644
-index 00000000..c245d956
+index 0000000..c245d95
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u1.h
 @@ -0,0 +1,207 @@
@@ -26019,7 +26019,7 @@ index 00000000..c245d956
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u4.h b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u4.h
 new file mode 100644
-index 00000000..61d935fc
+index 0000000..61d935f
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u4.h
 @@ -0,0 +1,547 @@
@@ -26572,7 +26572,7 @@ index 00000000..61d935fc
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u8.h b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u8.h
 new file mode 100644
-index 00000000..467a9612
+index 0000000..467a961
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa20/xmm6int/u8.h
 @@ -0,0 +1,476 @@
@@ -27054,7 +27054,7 @@ index 00000000..467a9612
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa2012/ref/stream_salsa2012_ref.c b/source/third_party/libsodium/crypto_stream/salsa2012/ref/stream_salsa2012_ref.c
 new file mode 100644
-index 00000000..bfdfeedb
+index 0000000..bfdfeed
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa2012/ref/stream_salsa2012_ref.c
 @@ -0,0 +1,106 @@
@@ -27166,7 +27166,7 @@ index 00000000..bfdfeedb
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa2012/stream_salsa2012.c b/source/third_party/libsodium/crypto_stream/salsa2012/stream_salsa2012.c
 new file mode 100644
-index 00000000..d0cc0f68
+index 0000000..d0cc0f6
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa2012/stream_salsa2012.c
 @@ -0,0 +1,26 @@
@@ -27198,7 +27198,7 @@ index 00000000..d0cc0f68
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa208/ref/stream_salsa208_ref.c b/source/third_party/libsodium/crypto_stream/salsa208/ref/stream_salsa208_ref.c
 new file mode 100644
-index 00000000..7ec0c4e7
+index 0000000..7ec0c4e
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa208/ref/stream_salsa208_ref.c
 @@ -0,0 +1,106 @@
@@ -27310,7 +27310,7 @@ index 00000000..7ec0c4e7
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/salsa208/stream_salsa208.c b/source/third_party/libsodium/crypto_stream/salsa208/stream_salsa208.c
 new file mode 100644
-index 00000000..b79bda5e
+index 0000000..b79bda5
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/salsa208/stream_salsa208.c
 @@ -0,0 +1,26 @@
@@ -27342,7 +27342,7 @@ index 00000000..b79bda5e
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/xchacha20/stream_xchacha20.c b/source/third_party/libsodium/crypto_stream/xchacha20/stream_xchacha20.c
 new file mode 100644
-index 00000000..8b1bc09a
+index 0000000..8b1bc09
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/xchacha20/stream_xchacha20.c
 @@ -0,0 +1,69 @@
@@ -27417,7 +27417,7 @@ index 00000000..8b1bc09a
 +}
 diff --git a/source/third_party/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c b/source/third_party/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c
 new file mode 100644
-index 00000000..dc831a94
+index 0000000..dc831a9
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_stream/xsalsa20/stream_xsalsa20.c
 @@ -0,0 +1,66 @@
@@ -27489,7 +27489,7 @@ index 00000000..dc831a94
 +}
 diff --git a/source/third_party/libsodium/crypto_verify/sodium/verify.c b/source/third_party/libsodium/crypto_verify/sodium/verify.c
 new file mode 100644
-index 00000000..ffebf220
+index 0000000..ffebf22
 --- /dev/null
 +++ b/source/third_party/libsodium/crypto_verify/sodium/verify.c
 @@ -0,0 +1,98 @@
@@ -27593,7 +27593,7 @@ index 00000000..ffebf220
 +}
 diff --git a/source/third_party/libsodium/include/sodium.h b/source/third_party/libsodium/include/sodium.h
 new file mode 100644
-index 00000000..e7b1af46
+index 0000000..e7b1af4
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium.h
 @@ -0,0 +1,70 @@
@@ -27669,7 +27669,7 @@ index 00000000..e7b1af46
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/core.h b/source/third_party/libsodium/include/sodium/core.h
 new file mode 100644
-index 00000000..dd088d2c
+index 0000000..dd088d2
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/core.h
 @@ -0,0 +1,28 @@
@@ -27703,7 +27703,7 @@ index 00000000..dd088d2c
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_aead_aes256gcm.h b/source/third_party/libsodium/include/sodium/crypto_aead_aes256gcm.h
 new file mode 100644
-index 00000000..46a3800f
+index 0000000..46a3800
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_aead_aes256gcm.h
 @@ -0,0 +1,171 @@
@@ -27880,7 +27880,7 @@ index 00000000..46a3800f
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_aead_chacha20poly1305.h b/source/third_party/libsodium/include/sodium/crypto_aead_chacha20poly1305.h
 new file mode 100644
-index 00000000..a575ec71
+index 0000000..a575ec7
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_aead_chacha20poly1305.h
 @@ -0,0 +1,174 @@
@@ -28060,7 +28060,7 @@ index 00000000..a575ec71
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_aead_xchacha20poly1305.h b/source/third_party/libsodium/include/sodium/crypto_aead_xchacha20poly1305.h
 new file mode 100644
-index 00000000..99692aae
+index 0000000..99692aa
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_aead_xchacha20poly1305.h
 @@ -0,0 +1,97 @@
@@ -28163,7 +28163,7 @@ index 00000000..99692aae
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_auth.h b/source/third_party/libsodium/include/sodium/crypto_auth.h
 new file mode 100644
-index 00000000..7174e7bc
+index 0000000..7174e7b
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_auth.h
 @@ -0,0 +1,44 @@
@@ -28213,7 +28213,7 @@ index 00000000..7174e7bc
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha256.h b/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha256.h
 new file mode 100644
-index 00000000..deec5266
+index 0000000..deec526
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha256.h
 @@ -0,0 +1,68 @@
@@ -28287,7 +28287,7 @@ index 00000000..deec5266
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha512.h b/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha512.h
 new file mode 100644
-index 00000000..77a55fbc
+index 0000000..77a55fb
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha512.h
 @@ -0,0 +1,67 @@
@@ -28360,7 +28360,7 @@ index 00000000..77a55fbc
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha512256.h b/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha512256.h
 new file mode 100644
-index 00000000..4842f3de
+index 0000000..4842f3d
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_auth_hmacsha512256.h
 @@ -0,0 +1,62 @@
@@ -28428,7 +28428,7 @@ index 00000000..4842f3de
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_box.h b/source/third_party/libsodium/include/sodium/crypto_box.h
 new file mode 100644
-index 00000000..99ee19a8
+index 0000000..99ee19a
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_box.h
 @@ -0,0 +1,173 @@
@@ -28607,7 +28607,7 @@ index 00000000..99ee19a8
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_box_curve25519xchacha20poly1305.h b/source/third_party/libsodium/include/sodium/crypto_box_curve25519xchacha20poly1305.h
 new file mode 100644
-index 00000000..c1cf7566
+index 0000000..c1cf756
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_box_curve25519xchacha20poly1305.h
 @@ -0,0 +1,159 @@
@@ -28772,7 +28772,7 @@ index 00000000..c1cf7566
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_box_curve25519xsalsa20poly1305.h b/source/third_party/libsodium/include/sodium/crypto_box_curve25519xsalsa20poly1305.h
 new file mode 100644
-index 00000000..c5b15f42
+index 0000000..c5b15f4
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_box_curve25519xsalsa20poly1305.h
 @@ -0,0 +1,109 @@
@@ -28887,7 +28887,7 @@ index 00000000..c5b15f42
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_core_ed25519.h b/source/third_party/libsodium/include/sodium/crypto_core_ed25519.h
 new file mode 100644
-index 00000000..1536294b
+index 0000000..1536294
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_core_ed25519.h
 @@ -0,0 +1,37 @@
@@ -28930,7 +28930,7 @@ index 00000000..1536294b
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_core_hchacha20.h b/source/third_party/libsodium/include/sodium/crypto_core_hchacha20.h
 new file mode 100644
-index 00000000..05e5670c
+index 0000000..05e5670
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_core_hchacha20.h
 @@ -0,0 +1,35 @@
@@ -28971,7 +28971,7 @@ index 00000000..05e5670c
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_core_hsalsa20.h b/source/third_party/libsodium/include/sodium/crypto_core_hsalsa20.h
 new file mode 100644
-index 00000000..82e475b8
+index 0000000..82e475b
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_core_hsalsa20.h
 @@ -0,0 +1,35 @@
@@ -29012,7 +29012,7 @@ index 00000000..82e475b8
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_core_ristretto255.h b/source/third_party/libsodium/include/sodium/crypto_core_ristretto255.h
 new file mode 100644
-index 00000000..f2820e55
+index 0000000..f2820e5
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_core_ristretto255.h
 @@ -0,0 +1,100 @@
@@ -29118,7 +29118,7 @@ index 00000000..f2820e55
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_core_salsa20.h b/source/third_party/libsodium/include/sodium/crypto_core_salsa20.h
 new file mode 100644
-index 00000000..160cc56d
+index 0000000..160cc56
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_core_salsa20.h
 @@ -0,0 +1,35 @@
@@ -29159,7 +29159,7 @@ index 00000000..160cc56d
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_core_salsa2012.h b/source/third_party/libsodium/include/sodium/crypto_core_salsa2012.h
 new file mode 100644
-index 00000000..bdd5f9fd
+index 0000000..bdd5f9f
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_core_salsa2012.h
 @@ -0,0 +1,35 @@
@@ -29200,7 +29200,7 @@ index 00000000..bdd5f9fd
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_core_salsa208.h b/source/third_party/libsodium/include/sodium/crypto_core_salsa208.h
 new file mode 100644
-index 00000000..876bda89
+index 0000000..876bda8
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_core_salsa208.h
 @@ -0,0 +1,39 @@
@@ -29245,7 +29245,7 @@ index 00000000..876bda89
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_generichash.h b/source/third_party/libsodium/include/sodium/crypto_generichash.h
 new file mode 100644
-index 00000000..2398fb9d
+index 0000000..2398fb9
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_generichash.h
 @@ -0,0 +1,75 @@
@@ -29326,7 +29326,7 @@ index 00000000..2398fb9d
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_generichash_blake2b.h b/source/third_party/libsodium/include/sodium/crypto_generichash_blake2b.h
 new file mode 100644
-index 00000000..9326a04a
+index 0000000..9326a04
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_generichash_blake2b.h
 @@ -0,0 +1,117 @@
@@ -29449,7 +29449,7 @@ index 00000000..9326a04a
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_hash.h b/source/third_party/libsodium/include/sodium/crypto_hash.h
 new file mode 100644
-index 00000000..302ed5c5
+index 0000000..302ed5c
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_hash.h
 @@ -0,0 +1,40 @@
@@ -29495,7 +29495,7 @@ index 00000000..302ed5c5
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_hash_sha256.h b/source/third_party/libsodium/include/sodium/crypto_hash_sha256.h
 new file mode 100644
-index 00000000..f64d16e0
+index 0000000..f64d16e
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_hash_sha256.h
 @@ -0,0 +1,57 @@
@@ -29558,7 +29558,7 @@ index 00000000..f64d16e0
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_hash_sha512.h b/source/third_party/libsodium/include/sodium/crypto_hash_sha512.h
 new file mode 100644
-index 00000000..6b0330f1
+index 0000000..6b0330f
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_hash_sha512.h
 @@ -0,0 +1,57 @@
@@ -29621,7 +29621,7 @@ index 00000000..6b0330f1
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_kdf.h b/source/third_party/libsodium/include/sodium/crypto_kdf.h
 new file mode 100644
-index 00000000..52e496a7
+index 0000000..52e496a
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_kdf.h
 @@ -0,0 +1,51 @@
@@ -29678,7 +29678,7 @@ index 00000000..52e496a7
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_kdf_blake2b.h b/source/third_party/libsodium/include/sodium/crypto_kdf_blake2b.h
 new file mode 100644
-index 00000000..5480ebe8
+index 0000000..5480ebe
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_kdf_blake2b.h
 @@ -0,0 +1,42 @@
@@ -29726,7 +29726,7 @@ index 00000000..5480ebe8
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_kx.h b/source/third_party/libsodium/include/sodium/crypto_kx.h
 new file mode 100644
-index 00000000..d1fce90d
+index 0000000..d1fce90
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_kx.h
 @@ -0,0 +1,64 @@
@@ -29796,7 +29796,7 @@ index 00000000..d1fce90d
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_onetimeauth.h b/source/third_party/libsodium/include/sodium/crypto_onetimeauth.h
 new file mode 100644
-index 00000000..5951c5b8
+index 0000000..5951c5b
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_onetimeauth.h
 @@ -0,0 +1,62 @@
@@ -29864,7 +29864,7 @@ index 00000000..5951c5b8
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_onetimeauth_poly1305.h b/source/third_party/libsodium/include/sodium/crypto_onetimeauth_poly1305.h
 new file mode 100644
-index 00000000..4b89c4f0
+index 0000000..4b89c4f
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_onetimeauth_poly1305.h
 @@ -0,0 +1,67 @@
@@ -29937,7 +29937,7 @@ index 00000000..4b89c4f0
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_pwhash.h b/source/third_party/libsodium/include/sodium/crypto_pwhash.h
 new file mode 100644
-index 00000000..2c76461f
+index 0000000..2c76461
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_pwhash.h
 @@ -0,0 +1,147 @@
@@ -30090,7 +30090,7 @@ index 00000000..2c76461f
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_pwhash_argon2i.h b/source/third_party/libsodium/include/sodium/crypto_pwhash_argon2i.h
 new file mode 100644
-index 00000000..8e4c1c35
+index 0000000..8e4c1c3
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_pwhash_argon2i.h
 @@ -0,0 +1,122 @@
@@ -30218,7 +30218,7 @@ index 00000000..8e4c1c35
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_pwhash_argon2id.h b/source/third_party/libsodium/include/sodium/crypto_pwhash_argon2id.h
 new file mode 100644
-index 00000000..51b17aa8
+index 0000000..51b17aa
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_pwhash_argon2id.h
 @@ -0,0 +1,122 @@
@@ -30346,7 +30346,7 @@ index 00000000..51b17aa8
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_pwhash_scryptsalsa208sha256.h b/source/third_party/libsodium/include/sodium/crypto_pwhash_scryptsalsa208sha256.h
 new file mode 100644
-index 00000000..951b87b9
+index 0000000..951b87b
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_pwhash_scryptsalsa208sha256.h
 @@ -0,0 +1,120 @@
@@ -30472,7 +30472,7 @@ index 00000000..951b87b9
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_scalarmult.h b/source/third_party/libsodium/include/sodium/crypto_scalarmult.h
 new file mode 100644
-index 00000000..f7fa6f8f
+index 0000000..f7fa6f8
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_scalarmult.h
 @@ -0,0 +1,45 @@
@@ -30523,7 +30523,7 @@ index 00000000..f7fa6f8f
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_scalarmult_curve25519.h b/source/third_party/libsodium/include/sodium/crypto_scalarmult_curve25519.h
 new file mode 100644
-index 00000000..ae85eadc
+index 0000000..ae85ead
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_scalarmult_curve25519.h
 @@ -0,0 +1,40 @@
@@ -30569,7 +30569,7 @@ index 00000000..ae85eadc
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_scalarmult_ed25519.h b/source/third_party/libsodium/include/sodium/crypto_scalarmult_ed25519.h
 new file mode 100644
-index 00000000..3d512351
+index 0000000..3d51235
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_scalarmult_ed25519.h
 @@ -0,0 +1,41 @@
@@ -30616,7 +30616,7 @@ index 00000000..3d512351
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_scalarmult_ristretto255.h b/source/third_party/libsodium/include/sodium/crypto_scalarmult_ristretto255.h
 new file mode 100644
-index 00000000..40a45cce
+index 0000000..40a45cc
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_scalarmult_ristretto255.h
 @@ -0,0 +1,43 @@
@@ -30665,7 +30665,7 @@ index 00000000..40a45cce
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_secretbox.h b/source/third_party/libsodium/include/sodium/crypto_secretbox.h
 new file mode 100644
-index 00000000..55e94a02
+index 0000000..55e94a0
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_secretbox.h
 @@ -0,0 +1,91 @@
@@ -30762,7 +30762,7 @@ index 00000000..55e94a02
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_secretbox_xchacha20poly1305.h b/source/third_party/libsodium/include/sodium/crypto_secretbox_xchacha20poly1305.h
 new file mode 100644
-index 00000000..2919da16
+index 0000000..2919da1
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_secretbox_xchacha20poly1305.h
 @@ -0,0 +1,68 @@
@@ -30836,7 +30836,7 @@ index 00000000..2919da16
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_secretbox_xsalsa20poly1305.h b/source/third_party/libsodium/include/sodium/crypto_secretbox_xsalsa20poly1305.h
 new file mode 100644
-index 00000000..4b8c7c8e
+index 0000000..4b8c7c8
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_secretbox_xsalsa20poly1305.h
 @@ -0,0 +1,67 @@
@@ -30909,7 +30909,7 @@ index 00000000..4b8c7c8e
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_secretstream_xchacha20poly1305.h b/source/third_party/libsodium/include/sodium/crypto_secretstream_xchacha20poly1305.h
 new file mode 100644
-index 00000000..7d3fa2a9
+index 0000000..7d3fa2a
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_secretstream_xchacha20poly1305.h
 @@ -0,0 +1,102 @@
@@ -31017,7 +31017,7 @@ index 00000000..7d3fa2a9
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_shorthash.h b/source/third_party/libsodium/include/sodium/crypto_shorthash.h
 new file mode 100644
-index 00000000..a4988082
+index 0000000..a498808
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_shorthash.h
 @@ -0,0 +1,39 @@
@@ -31062,7 +31062,7 @@ index 00000000..a4988082
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_shorthash_siphash24.h b/source/third_party/libsodium/include/sodium/crypto_shorthash_siphash24.h
 new file mode 100644
-index 00000000..745ed48f
+index 0000000..745ed48
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_shorthash_siphash24.h
 @@ -0,0 +1,48 @@
@@ -31116,7 +31116,7 @@ index 00000000..745ed48f
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_sign.h b/source/third_party/libsodium/include/sodium/crypto_sign.h
 new file mode 100644
-index 00000000..85aff0c9
+index 0000000..85aff0c
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_sign.h
 @@ -0,0 +1,103 @@
@@ -31225,7 +31225,7 @@ index 00000000..85aff0c9
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_sign_ed25519.h b/source/third_party/libsodium/include/sodium/crypto_sign_ed25519.h
 new file mode 100644
-index 00000000..38d2b9dd
+index 0000000..38d2b9d
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_sign_ed25519.h
 @@ -0,0 +1,114 @@
@@ -31345,7 +31345,7 @@ index 00000000..38d2b9dd
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_sign_edwards25519sha512batch.h b/source/third_party/libsodium/include/sodium/crypto_sign_edwards25519sha512batch.h
 new file mode 100644
-index 00000000..4bb91924
+index 0000000..4bb9192
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_sign_edwards25519sha512batch.h
 @@ -0,0 +1,55 @@
@@ -31406,7 +31406,7 @@ index 00000000..4bb91924
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_stream.h b/source/third_party/libsodium/include/sodium/crypto_stream.h
 new file mode 100644
-index 00000000..d288f0b6
+index 0000000..d288f0b
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_stream.h
 @@ -0,0 +1,56 @@
@@ -31468,7 +31468,7 @@ index 00000000..d288f0b6
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_stream_chacha20.h b/source/third_party/libsodium/include/sodium/crypto_stream_chacha20.h
 new file mode 100644
-index 00000000..d3e2b234
+index 0000000..d3e2b23
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_stream_chacha20.h
 @@ -0,0 +1,98 @@
@@ -31572,7 +31572,7 @@ index 00000000..d3e2b234
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_stream_salsa20.h b/source/third_party/libsodium/include/sodium/crypto_stream_salsa20.h
 new file mode 100644
-index 00000000..0c7688c7
+index 0000000..0c7688c
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_stream_salsa20.h
 @@ -0,0 +1,57 @@
@@ -31635,7 +31635,7 @@ index 00000000..0c7688c7
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_stream_salsa2012.h b/source/third_party/libsodium/include/sodium/crypto_stream_salsa2012.h
 new file mode 100644
-index 00000000..c93d1c81
+index 0000000..c93d1c8
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_stream_salsa2012.h
 @@ -0,0 +1,50 @@
@@ -31691,7 +31691,7 @@ index 00000000..c93d1c81
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_stream_salsa208.h b/source/third_party/libsodium/include/sodium/crypto_stream_salsa208.h
 new file mode 100644
-index 00000000..653f6504
+index 0000000..653f650
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_stream_salsa208.h
 @@ -0,0 +1,56 @@
@@ -31753,7 +31753,7 @@ index 00000000..653f6504
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_stream_xchacha20.h b/source/third_party/libsodium/include/sodium/crypto_stream_xchacha20.h
 new file mode 100644
-index 00000000..cf0407ff
+index 0000000..cf0407f
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_stream_xchacha20.h
 @@ -0,0 +1,57 @@
@@ -31816,7 +31816,7 @@ index 00000000..cf0407ff
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_stream_xsalsa20.h b/source/third_party/libsodium/include/sodium/crypto_stream_xsalsa20.h
 new file mode 100644
-index 00000000..cb4c44a8
+index 0000000..cb4c44a
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_stream_xsalsa20.h
 @@ -0,0 +1,57 @@
@@ -31879,7 +31879,7 @@ index 00000000..cb4c44a8
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_verify_16.h b/source/third_party/libsodium/include/sodium/crypto_verify_16.h
 new file mode 100644
-index 00000000..5e9eeabe
+index 0000000..5e9eeab
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_verify_16.h
 @@ -0,0 +1,23 @@
@@ -31908,7 +31908,7 @@ index 00000000..5e9eeabe
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_verify_32.h b/source/third_party/libsodium/include/sodium/crypto_verify_32.h
 new file mode 100644
-index 00000000..281b5a1b
+index 0000000..281b5a1
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_verify_32.h
 @@ -0,0 +1,23 @@
@@ -31937,7 +31937,7 @@ index 00000000..281b5a1b
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/crypto_verify_64.h b/source/third_party/libsodium/include/sodium/crypto_verify_64.h
 new file mode 100644
-index 00000000..0dc7c304
+index 0000000..0dc7c30
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/crypto_verify_64.h
 @@ -0,0 +1,23 @@
@@ -31966,7 +31966,7 @@ index 00000000..0dc7c304
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/export.h b/source/third_party/libsodium/include/sodium/export.h
 new file mode 100644
-index 00000000..a0074fc9
+index 0000000..a0074fc
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/export.h
 @@ -0,0 +1,57 @@
@@ -32029,7 +32029,7 @@ index 00000000..a0074fc9
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/private/common.h b/source/third_party/libsodium/include/sodium/private/common.h
 new file mode 100644
-index 00000000..632fc8a7
+index 0000000..632fc8a
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/private/common.h
 @@ -0,0 +1,246 @@
@@ -32281,7 +32281,7 @@ index 00000000..632fc8a7
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/private/ed25519_ref10.h b/source/third_party/libsodium/include/sodium/private/ed25519_ref10.h
 new file mode 100644
-index 00000000..42fcd981
+index 0000000..42fcd98
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/private/ed25519_ref10.h
 @@ -0,0 +1,125 @@
@@ -32412,7 +32412,7 @@ index 00000000..42fcd981
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/private/ed25519_ref10_fe_25_5.h b/source/third_party/libsodium/include/sodium/private/ed25519_ref10_fe_25_5.h
 new file mode 100644
-index 00000000..5c0874b0
+index 0000000..5c0874b
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/private/ed25519_ref10_fe_25_5.h
 @@ -0,0 +1,1055 @@
@@ -33473,7 +33473,7 @@ index 00000000..5c0874b0
 +}
 diff --git a/source/third_party/libsodium/include/sodium/private/ed25519_ref10_fe_51.h b/source/third_party/libsodium/include/sodium/private/ed25519_ref10_fe_51.h
 new file mode 100644
-index 00000000..3a30f301
+index 0000000..3a30f30
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/private/ed25519_ref10_fe_51.h
 @@ -0,0 +1,518 @@
@@ -33997,7 +33997,7 @@ index 00000000..3a30f301
 +}
 diff --git a/source/third_party/libsodium/include/sodium/private/implementations.h b/source/third_party/libsodium/include/sodium/private/implementations.h
 new file mode 100644
-index 00000000..c7237f85
+index 0000000..c7237f8
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/private/implementations.h
 @@ -0,0 +1,11 @@
@@ -34014,7 +34014,7 @@ index 00000000..c7237f85
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/private/mutex.h b/source/third_party/libsodium/include/sodium/private/mutex.h
 new file mode 100644
-index 00000000..322b6742
+index 0000000..322b674
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/private/mutex.h
 @@ -0,0 +1,7 @@
@@ -34027,7 +34027,7 @@ index 00000000..322b6742
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/private/sse2_64_32.h b/source/third_party/libsodium/include/sodium/private/sse2_64_32.h
 new file mode 100644
-index 00000000..d0455b41
+index 0000000..d0455b4
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/private/sse2_64_32.h
 @@ -0,0 +1,50 @@
@@ -34083,7 +34083,7 @@ index 00000000..d0455b41
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/randombytes.h b/source/third_party/libsodium/include/sodium/randombytes.h
 new file mode 100644
-index 00000000..d19f684e
+index 0000000..d19f684
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/randombytes.h
 @@ -0,0 +1,68 @@
@@ -34157,7 +34157,7 @@ index 00000000..d19f684e
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/randombytes_internal_random.h b/source/third_party/libsodium/include/sodium/randombytes_internal_random.h
 new file mode 100644
-index 00000000..2b2b7d6e
+index 0000000..2b2b7d6
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/randombytes_internal_random.h
 @@ -0,0 +1,22 @@
@@ -34185,7 +34185,7 @@ index 00000000..2b2b7d6e
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/randombytes_nativeclient.h b/source/third_party/libsodium/include/sodium/randombytes_nativeclient.h
 new file mode 100644
-index 00000000..5158d8c3
+index 0000000..5158d8c
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/randombytes_nativeclient.h
 @@ -0,0 +1,23 @@
@@ -34214,7 +34214,7 @@ index 00000000..5158d8c3
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/randombytes_salsa20_random.h b/source/third_party/libsodium/include/sodium/randombytes_salsa20_random.h
 new file mode 100644
-index 00000000..4deae15b
+index 0000000..4deae15
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/randombytes_salsa20_random.h
 @@ -0,0 +1,19 @@
@@ -34239,7 +34239,7 @@ index 00000000..4deae15b
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/randombytes_sysrandom.h b/source/third_party/libsodium/include/sodium/randombytes_sysrandom.h
 new file mode 100644
-index 00000000..9e27b674
+index 0000000..9e27b67
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/randombytes_sysrandom.h
 @@ -0,0 +1,19 @@
@@ -34264,7 +34264,7 @@ index 00000000..9e27b674
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/runtime.h b/source/third_party/libsodium/include/sodium/runtime.h
 new file mode 100644
-index 00000000..7f15d58e
+index 0000000..7f15d58
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/runtime.h
 @@ -0,0 +1,52 @@
@@ -34322,7 +34322,7 @@ index 00000000..7f15d58e
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/utils.h b/source/third_party/libsodium/include/sodium/utils.h
 new file mode 100644
-index 00000000..46eb331c
+index 0000000..46eb331
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/utils.h
 @@ -0,0 +1,170 @@
@@ -34498,7 +34498,7 @@ index 00000000..46eb331c
 +#endif
 diff --git a/source/third_party/libsodium/include/sodium/version.h b/source/third_party/libsodium/include/sodium/version.h
 new file mode 100644
-index 00000000..174d9921
+index 0000000..174d992
 --- /dev/null
 +++ b/source/third_party/libsodium/include/sodium/version.h
 @@ -0,0 +1,32 @@
@@ -34536,7 +34536,7 @@ index 00000000..174d9921
 +#endif
 diff --git a/source/third_party/libsodium/module.mk b/source/third_party/libsodium/module.mk
 new file mode 100644
-index 00000000..22964c3e
+index 0000000..22964c3
 --- /dev/null
 +++ b/source/third_party/libsodium/module.mk
 @@ -0,0 +1,56 @@
@@ -34598,7 +34598,7 @@ index 00000000..22964c3e
 +CFLAGS += -I./crypto_sign/ed25519/ref10
 diff --git a/source/third_party/libsodium/port/randombytes_default.h b/source/third_party/libsodium/port/randombytes_default.h
 new file mode 100644
-index 00000000..9247c74c
+index 0000000..9247c74
 --- /dev/null
 +++ b/source/third_party/libsodium/port/randombytes_default.h
 @@ -0,0 +1,10 @@
@@ -34614,7 +34614,7 @@ index 00000000..9247c74c
 +#define RANDOMBYTES_DEFAULT_IMPLEMENTATION &randombytes_mt7682_implementation
 diff --git a/source/third_party/libsodium/port/randombytes_mt7682.c b/source/third_party/libsodium/port/randombytes_mt7682.c
 new file mode 100644
-index 00000000..97358eb7
+index 0000000..97358eb
 --- /dev/null
 +++ b/source/third_party/libsodium/port/randombytes_mt7682.c
 @@ -0,0 +1,57 @@
@@ -34677,7 +34677,7 @@ index 00000000..97358eb7
 +};
 diff --git a/source/third_party/libsodium/randombytes/internal/randombytes_internal_random.c b/source/third_party/libsodium/randombytes/internal/randombytes_internal_random.c
 new file mode 100644
-index 00000000..24e79696
+index 0000000..24e7969
 --- /dev/null
 +++ b/source/third_party/libsodium/randombytes/internal/randombytes_internal_random.c
 @@ -0,0 +1,637 @@
@@ -35320,7 +35320,7 @@ index 00000000..24e79696
 +};
 diff --git a/source/third_party/libsodium/randombytes/nativeclient/randombytes_nativeclient.c b/source/third_party/libsodium/randombytes/nativeclient/randombytes_nativeclient.c
 new file mode 100644
-index 00000000..85ffa9b2
+index 0000000..85ffa9b
 --- /dev/null
 +++ b/source/third_party/libsodium/randombytes/nativeclient/randombytes_nativeclient.c
 @@ -0,0 +1,61 @@
@@ -35387,7 +35387,7 @@ index 00000000..85ffa9b2
 +#endif
 diff --git a/source/third_party/libsodium/randombytes/randombytes.c b/source/third_party/libsodium/randombytes/randombytes.c
 new file mode 100644
-index 00000000..d87d5192
+index 0000000..d87d519
 --- /dev/null
 +++ b/source/third_party/libsodium/randombytes/randombytes.c
 @@ -0,0 +1,221 @@
@@ -35614,7 +35614,7 @@ index 00000000..d87d5192
 +}
 diff --git a/source/third_party/libsodium/randombytes/salsa20/randombytes_salsa20_random.c b/source/third_party/libsodium/randombytes/salsa20/randombytes_salsa20_random.c
 new file mode 100644
-index 00000000..79916eab
+index 0000000..79916ea
 --- /dev/null
 +++ b/source/third_party/libsodium/randombytes/salsa20/randombytes_salsa20_random.c
 @@ -0,0 +1,564 @@
@@ -36184,7 +36184,7 @@ index 00000000..79916eab
 +};
 diff --git a/source/third_party/libsodium/randombytes/sysrandom/randombytes_sysrandom.c b/source/third_party/libsodium/randombytes/sysrandom/randombytes_sysrandom.c
 new file mode 100644
-index 00000000..f4dec08f
+index 0000000..f4dec08
 --- /dev/null
 +++ b/source/third_party/libsodium/randombytes/sysrandom/randombytes_sysrandom.c
 @@ -0,0 +1,382 @@
@@ -36572,7 +36572,7 @@ index 00000000..f4dec08f
 +};
 diff --git a/source/third_party/libsodium/sodium/codecs.c b/source/third_party/libsodium/sodium/codecs.c
 new file mode 100644
-index 00000000..77fa464c
+index 0000000..77fa464
 --- /dev/null
 +++ b/source/third_party/libsodium/sodium/codecs.c
 @@ -0,0 +1,333 @@
@@ -36911,7 +36911,7 @@ index 00000000..77fa464c
 +}
 diff --git a/source/third_party/libsodium/sodium/core.c b/source/third_party/libsodium/sodium/core.c
 new file mode 100644
-index 00000000..1ac29d09
+index 0000000..1ac29d0
 --- /dev/null
 +++ b/source/third_party/libsodium/sodium/core.c
 @@ -0,0 +1,231 @@
@@ -37148,7 +37148,7 @@ index 00000000..1ac29d09
 +}
 diff --git a/source/third_party/libsodium/sodium/runtime.c b/source/third_party/libsodium/sodium/runtime.c
 new file mode 100644
-index 00000000..f5c805cf
+index 0000000..f5c805c
 --- /dev/null
 +++ b/source/third_party/libsodium/sodium/runtime.c
 @@ -0,0 +1,297 @@
@@ -37451,7 +37451,7 @@ index 00000000..f5c805cf
 +}
 diff --git a/source/third_party/libsodium/sodium/utils.c b/source/third_party/libsodium/sodium/utils.c
 new file mode 100644
-index 00000000..3a5f835b
+index 0000000..3a5f835
 --- /dev/null
 +++ b/source/third_party/libsodium/sodium/utils.c
 @@ -0,0 +1,733 @@
@@ -38190,7 +38190,7 @@ index 00000000..3a5f835b
 +}
 diff --git a/source/third_party/libsodium/sodium/version.c b/source/third_party/libsodium/sodium/version.c
 new file mode 100644
-index 00000000..4e584a6e
+index 0000000..4e584a6
 --- /dev/null
 +++ b/source/third_party/libsodium/sodium/version.c
 @@ -0,0 +1,30 @@

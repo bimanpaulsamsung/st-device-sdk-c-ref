@@ -1,7 +1,7 @@
-From d3c473af5da9b79f13e323d525a9418efac5dbc7 Mon Sep 17 00:00:00 2001
+From 76ffbb39575a1562a299e424dfa1288bd732f35d Mon Sep 17 00:00:00 2001
 From: "qiang3.zhang" <28670379+xiarihf@users.noreply.github.com>
 Date: Thu, 2 Apr 2020 14:15:24 +0800
-Subject: [PATCH 5/5] Add stdk build project & configurations
+Subject: [PATCH] Add stdk build project & configurations
 
 Signed-off-by: qiang3.zhang <28670379+xiarihf@users.noreply.github.com>
 Signed-off-by: feng.song <56996751+hisongfeng@users.noreply.github.com>
@@ -18,7 +18,7 @@ Signed-off-by: feng.song <56996751+hisongfeng@users.noreply.github.com>
  .../stdk/ti_drivers_config.c                  | 690 ++++++++++++++++++
  .../stdk/ti_drivers_config.h                  | 154 ++++
  .../stdk/ti_drivers_net_wifi_config.c         |  39 +
- .../CC3220SF_LAUNCHXL/stdk/ti_net_config.c    |  47 ++
+ .../CC3220SF_LAUNCHXL/stdk/ti_net_config.c    |  46 ++
  .../rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c   | 235 ++++++
  .../rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h   |  27 +
  imports.mak                                   |  14 +-
@@ -26,9 +26,9 @@ Signed-off-by: feng.song <56996751+hisongfeng@users.noreply.github.com>
  kernel/freertos/makefile                      |   8 -
  kernel/makefile                               |  32 +-
  source/ti/net/bsd/sys/select.h                |   2 -
- source/ti/net/bsd/sys/socket.h                |  25 +
+ source/ti/net/bsd/sys/socket.h                |  33 +
  source/ti/net/slnetsock.h                     |   2 +-
- 22 files changed, 2321 insertions(+), 47 deletions(-)
+ 22 files changed, 2328 insertions(+), 47 deletions(-)
  create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/CC3220SF_LAUNCHXL_FREERTOS.lds
  create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
  create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.c
@@ -44,10 +44,11 @@ Signed-off-by: feng.song <56996751+hisongfeng@users.noreply.github.com>
  create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_net_config.c
  create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c
  create mode 100644 examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h
+ mode change 100644 => 100755 source/ti/net/bsd/sys/socket.h
 
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/CC3220SF_LAUNCHXL_FREERTOS.lds b/examples/rtos/CC3220SF_LAUNCHXL/stdk/CC3220SF_LAUNCHXL_FREERTOS.lds
 new file mode 100644
-index 00000000..e6e1f3a7
+index 0000000..e6e1f3a
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/CC3220SF_LAUNCHXL_FREERTOS.lds
 @@ -0,0 +1,142 @@
@@ -196,7 +197,7 @@ index 00000000..e6e1f3a7
 \ No newline at end of file
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk b/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
 new file mode 100644
-index 00000000..cce2137d
+index 0000000..cce2137
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/config.mk
 @@ -0,0 +1,54 @@
@@ -257,7 +258,7 @@ index 00000000..cce2137d
 \ No newline at end of file
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.c
 new file mode 100644
-index 00000000..7b36bd8b
+index 0000000..7b36bd8
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.c
 @@ -0,0 +1,129 @@
@@ -392,7 +393,7 @@ index 00000000..7b36bd8b
 +}
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.h b/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.h
 new file mode 100644
-index 00000000..ed698ce7
+index 0000000..ed698ce
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/freertos_portable_wrapper.h
 @@ -0,0 +1,29 @@
@@ -427,7 +428,7 @@ index 00000000..ed698ce7
 +#endif
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c
 new file mode 100644
-index 00000000..1b678e6d
+index 0000000..0639a23
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/main_freertos.c
 @@ -0,0 +1,208 @@
@@ -513,7 +514,7 @@ index 00000000..1b678e6d
 +	if (0 != RetVal) {
 +		IOT_ERROR("Failed to initialize SlNetSock");
 +	}
-+	
++
 +	/* Create the sl_Task internal spawn thread */
 +	/* The SimpleLink host driver architecture mandate spawn
 +	   thread to be created prior to calling Sl_start (turning the NWP on). */
@@ -521,7 +522,7 @@ index 00000000..1b678e6d
 +	   asynchronous events sent from the NWP.
 +	 * Every event is classified and later handled
 +	   by the Host driver event handlers. */
-+	
++
 +	void *threadid = pvPortMalloc(sizeof(TaskHandle_t));
 +	schedulerStarted = (xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) ? false : true;
 +
@@ -641,7 +642,7 @@ index 00000000..1b678e6d
 +}
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile b/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile
 new file mode 100644
-index 00000000..3e3f8fac
+index 0000000..8f8b6a1
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/makefile
 @@ -0,0 +1,239 @@
@@ -778,7 +779,7 @@ index 00000000..3e3f8fac
 +
 +IOT_CORE_C_O = $(patsubst %.c,%.o,$(IOT_CORE_TEST_C))
 +
-+#stdk app 
++#stdk app
 +IOT_APP_C += $(wildcard $(PROJECT_PATH)/main/*.c)
 +IOT_APP_C_O = $(patsubst %.c,%.o,$(IOT_APP_C))
 +
@@ -843,7 +844,7 @@ index 00000000..3e3f8fac
 +	@ echo Building $@
 +	$(CC) $(CFLAGS) -c $< -o $@
 +
-+$(IOT_CORE_C_O): %.o : %.c 
++$(IOT_CORE_C_O): %.o : %.c
 +	@ echo Building $@
 +	$(CC) $(CFLAGS) -c $< -o $@
 +	cp $(PROJECT_PATH)/main/onboarding_config.json ./
@@ -886,7 +887,7 @@ index 00000000..3e3f8fac
 +	@ $(RM) ti_drivers_config.c ti_drivers_config.h > $(DEVNULL) 2>&1
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/portableNative_CC3220SF_LAUNCHXL_freertos_gcc.projectspec b/examples/rtos/CC3220SF_LAUNCHXL/stdk/portableNative_CC3220SF_LAUNCHXL_freertos_gcc.projectspec
 new file mode 100644
-index 00000000..5ad24091
+index 0000000..5ad2409
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/portableNative_CC3220SF_LAUNCHXL_freertos_gcc.projectspec
 @@ -0,0 +1,96 @@
@@ -989,7 +990,7 @@ index 00000000..5ad24091
 \ No newline at end of file
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/stdk.syscfg b/examples/rtos/CC3220SF_LAUNCHXL/stdk/stdk.syscfg
 new file mode 100644
-index 00000000..4958b818
+index 0000000..4958b81
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/stdk.syscfg
 @@ -0,0 +1,177 @@
@@ -1172,7 +1173,7 @@ index 00000000..4958b818
 +}
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/syscfg_c.rov.xs b/examples/rtos/CC3220SF_LAUNCHXL/stdk/syscfg_c.rov.xs
 new file mode 100644
-index 00000000..bcc10200
+index 0000000..df683e4
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/syscfg_c.rov.xs
 @@ -0,0 +1,15 @@
@@ -1183,7 +1184,7 @@ index 00000000..bcc10200
 + *
 + *  Specifically, this file names the C-ROV implementation files declared
 + *  by the modules that are part of the app's configuration.  In the
-+ *  future this file will also contain a serialization of corresponding 
++ *  future this file will also contain a serialization of corresponding
 + *  module configuration parameters which can be used by the ROV provided
 + *  views.
 + *
@@ -1193,7 +1194,7 @@ index 00000000..bcc10200
 +];
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.c
 new file mode 100644
-index 00000000..288bb556
+index 0000000..288bb55
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.c
 @@ -0,0 +1,690 @@
@@ -1889,7 +1890,7 @@ index 00000000..288bb556
 +#endif
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.h b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.h
 new file mode 100644
-index 00000000..123ccd19
+index 0000000..123ccd1
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_config.h
 @@ -0,0 +1,154 @@
@@ -2049,7 +2050,7 @@ index 00000000..123ccd19
 +#endif /* include guard */
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_net_wifi_config.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_net_wifi_config.c
 new file mode 100644
-index 00000000..fe0c84e3
+index 0000000..fe0c84e
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_drivers_net_wifi_config.c
 @@ -0,0 +1,39 @@
@@ -2094,10 +2095,10 @@ index 00000000..fe0c84e3
 +};
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_net_config.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_net_config.c
 new file mode 100644
-index 00000000..b3c0ad7e
+index 0000000..e6062ba
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/ti_net_config.c
-@@ -0,0 +1,47 @@
+@@ -0,0 +1,46 @@
 +/*
 + *  ======== ti_net_config.c ========
 + *  Configured module definitions for NS
@@ -2144,10 +2145,9 @@ index 00000000..b3c0ad7e
 +
 +    return (status);
 +}
-+
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c b/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c
 new file mode 100644
-index 00000000..0dcab4d8
+index 0000000..3b77e18
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.c
 @@ -0,0 +1,235 @@
@@ -2257,7 +2257,7 @@ index 00000000..0dcab4d8
 +//*****************************************************************************
 +int __wrap_vprintf(const char *pcFormat,
 +           va_list args)
-+{   
++{
 +    int iRet = 0;
 +    char        *pcBuff;
 +    char        *pcTemp;
@@ -2388,7 +2388,7 @@ index 00000000..0dcab4d8
 +}
 diff --git a/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h b/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h
 new file mode 100644
-index 00000000..c38019ca
+index 0000000..c38019c
 --- /dev/null
 +++ b/examples/rtos/CC3220SF_LAUNCHXL/stdk/uart_term.h
 @@ -0,0 +1,27 @@
@@ -2420,7 +2420,7 @@ index 00000000..c38019ca
 +
 +#endif // __UART_IF_H__
 diff --git a/imports.mak b/imports.mak
-index ad678662..e9313ed7 100644
+index ad67866..e9313ed 100644
 --- a/imports.mak
 +++ b/imports.mak
 @@ -17,14 +17,18 @@
@@ -2448,7 +2448,7 @@ index ad678662..e9313ed7 100644
  # The IAR compiler is not supported on Linux
  # IAR_ARMCOMPILER      ?=
 diff --git a/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/FreeRTOSConfig.h b/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/FreeRTOSConfig.h
-index 6e7fc379..bf7a703e 100644
+index 6e7fc37..bf7a703 100644
 --- a/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/FreeRTOSConfig.h
 +++ b/kernel/freertos/builds/CC3220SF_LAUNCHXL/release/FreeRTOSConfig.h
 @@ -66,7 +66,7 @@ supported, or if both static and dynamic allocation are supported. */
@@ -2470,7 +2470,7 @@ index 6e7fc379..bf7a703e 100644
  #if defined(__TI_COMPILER_VERSION__)
  #include <ti/posix/freertos/PTLS.h>
 diff --git a/kernel/freertos/makefile b/kernel/freertos/makefile
-index edbce1e3..ec5b9be0 100644
+index edbce1e..ec5b9be 100644
 --- a/kernel/freertos/makefile
 +++ b/kernel/freertos/makefile
 @@ -19,22 +19,14 @@
@@ -2497,7 +2497,7 @@ index edbce1e3..ec5b9be0 100644
  .PHONY: release debug $(RELEASE-SUBDIRS) $(DEBUG-SUBDIRS)
  
 diff --git a/kernel/makefile b/kernel/makefile
-index ce65da7e..60179e19 100644
+index ce65da7..60179e1 100644
 --- a/kernel/makefile
 +++ b/kernel/makefile
 @@ -1,35 +1,6 @@
@@ -2547,7 +2547,7 @@ index ce65da7e..60179e19 100644
  clean-release: clean-freertos-release
  
 diff --git a/source/ti/net/bsd/sys/select.h b/source/ti/net/bsd/sys/select.h
-index 71f85c8e..5d2674d0 100644
+index 71f85c8..5d2674d 100644
 --- a/source/ti/net/bsd/sys/select.h
 +++ b/source/ti/net/bsd/sys/select.h
 @@ -39,8 +39,6 @@
@@ -2560,7 +2560,9 @@ index 71f85c8e..5d2674d0 100644
  #include <ti/net/bsd/errnoutil.h>
  #include <ti/net/slnetsock.h>
 diff --git a/source/ti/net/bsd/sys/socket.h b/source/ti/net/bsd/sys/socket.h
-index 69696e02..6b3f7319 100644
+old mode 100644
+new mode 100755
+index 69696e0..17d7917
 --- a/source/ti/net/bsd/sys/socket.h
 +++ b/source/ti/net/bsd/sys/socket.h
 @@ -38,11 +38,17 @@
@@ -2593,12 +2595,20 @@ index 69696e02..6b3f7319 100644
  #define MSG_OOB                             SLNETSOCK_MSG_OOB
  #define MSG_PEEK                            SLNETSOCK_MSG_PEEK
  #define MSG_WAITALL                         SLNETSOCK_MSG_WAITALL
-@@ -88,7 +96,24 @@ typedef struct linger
+@@ -88,8 +96,33 @@ typedef struct linger
  #define MSG_NOSIGNAL                        SLNETSOCK_MSG_NOSIGNAL
  #define SO_REUSEADDR                        (201)
  #define SO_SNDBUF                           (202)
 +#define SO_TYPE                             (0x1008)
 +
++
++#define TCP_NODELAY    0x01    /* don't delay send to coalesce packets */
++#define TCP_KEEPALIVE  0x02    /* send KEEPALIVE probes when idle for pcb->keep_idle milliseconds */
++#define TCP_KEEPIDLE   0x03    /* set pcb->keep_idle  - Same as TCP_KEEPALIVE, but use seconds for get/setsockopt */
++#define TCP_KEEPINTVL  0x04    /* set pcb->keep_intvl - Use seconds for get/setsockopt */
++#define TCP_KEEPCNT    0x05    /* set pcb->keep_cnt   - Use number of probes sent for get/setsockopt */
+ 
+ 
 +/* commands for fnctl */
 +#ifndef F_GETFL
 +#define F_GETFL 3
@@ -2606,7 +2616,7 @@ index 69696e02..6b3f7319 100644
 +#ifndef F_SETFL
 +#define F_SETFL 4
 +#endif
- 
++
 +/* File status flags and file access modes for fnctl,
 +   these are bits in an int. */
 +#ifndef O_NONBLOCK
@@ -2615,11 +2625,12 @@ index 69696e02..6b3f7319 100644
 +#ifndef O_NDELAY
 +#define O_NDELAY    1 /* same as O_NONBLOCK, for compatibility */
 +#endif
- 
++
  /* socket shutdown opts */
  #define SHUT_RD                             SLNETSOCK_SHUT_RD
+ #define SHUT_WR                             SLNETSOCK_SHUT_WR
 diff --git a/source/ti/net/slnetsock.h b/source/ti/net/slnetsock.h
-index 11594b50..80e537ab 100644
+index 11594b5..80e537a 100644
 --- a/source/ti/net/slnetsock.h
 +++ b/source/ti/net/slnetsock.h
 @@ -191,7 +191,7 @@ interface.  Some are mandatory, others are optional (but recommended).
