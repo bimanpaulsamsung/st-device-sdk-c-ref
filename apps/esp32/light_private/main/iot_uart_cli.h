@@ -21,7 +21,8 @@
 
 #define ARRAY_SIZE(x) (int)(sizeof(x)/sizeof(x[0]))
 #define CLI_TASK_PRIORITY (5)
-#define MAX_UART_LINE_SIZE	(400)
+#define CLI_TASK_SIZE	(8192)
+#define MAX_UART_LINE_SIZE	(1024)
 typedef void (* command_function_t)(char *string);
 
 typedef struct cli_command {

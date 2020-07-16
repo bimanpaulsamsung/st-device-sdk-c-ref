@@ -31,7 +31,6 @@
 #include "iot_os_util.h"
 
 #define UART_BUF_SIZE (20)
-#define UART_LINE_SIZE (MAX_UART_LINE_SIZE)
 
 #define PROMPT_STRING "STDK # "
 
@@ -192,7 +191,7 @@ static void esp_uart_init() {
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
     };
     uart_param_config(UART_NUM_0, &uart_config);
-    uart_driver_install(UART_NUM_0, UART_LINE_SIZE * 2, 0, 0, NULL);
+    uart_driver_install(UART_NUM_0, MAX_UART_LINE_SIZE * 2, 0, 0, NULL);
 }
 
 static void esp_uart_cli_task()
@@ -200,10 +199,10 @@ static void esp_uart_cli_task()
 
     // Configure a temporary buffer for the incoming data
     uint8_t data[UART_BUF_SIZE];
-    uint8_t line[UART_LINE_SIZE];
-    uint8_t prev_line[UART_LINE_SIZE];
-	memset(line, 0, UART_LINE_SIZE);
-	memset(prev_line, 0, UART_LINE_SIZE);
+    uint8_t line[MAX_UART_LINE_SIZE];
+    uint8_t prev_line[MAX_UART_LINE_SIZE];
+	memset(line, 0, MAX_UART_LINE_SIZE);
+	memset(prev_line, 0, MAX_UART_LINE_SIZE);
 	int line_len = 0;
 
 	cli_register_command(&help_cmd);
@@ -229,8 +228,8 @@ static void esp_uart_cli_task()
 					uart_write_bytes(UART_NUM_0, "\r\n", 2);
 					if (line_len) {
 						cli_process_command((char *)line);
-						memcpy(prev_line, line, UART_LINE_SIZE);
-						memset(line, 0, UART_LINE_SIZE);
+						memcpy(prev_line, line, MAX_UART_LINE_SIZE);
+						memset(line, 0, MAX_UART_LINE_SIZE);
 						line_len = 0;
 					}
 					uart_write_bytes(UART_NUM_0, PROMPT_STRING, sizeof(PROMPT_STRING));
@@ -246,7 +245,7 @@ static void esp_uart_cli_task()
 
 				case 0x03: //Ctrl + C
 					uart_write_bytes(UART_NUM_0, "^C\n", 3);
-					memset(line, 0, UART_LINE_SIZE);
+					memset(line, 0, MAX_UART_LINE_SIZE);
 					line_len = 0;
 					uart_write_bytes(UART_NUM_0, PROMPT_STRING, sizeof(PROMPT_STRING));
 					break;
@@ -255,7 +254,7 @@ static void esp_uart_cli_task()
 					if ( data[i+1] == 0x5B ) {
 						switch (data[i+2]) {
 							case 0x41: //UP
-								memcpy(line, prev_line, UART_LINE_SIZE);
+								memcpy(line, prev_line, MAX_UART_LINE_SIZE);
 								line_len = strlen((char*)line);
 								uart_write_bytes(UART_NUM_0, (const char *)&data[i+1], 2);
 								uart_write_bytes(UART_NUM_0, "\r\n", 2);
@@ -289,7 +288,7 @@ static void esp_uart_cli_task()
 					default:
 					//check whether character is valid
 					if ((data[i] >= ' ') && (data[i] <= '~')) {
-						if (line_len >= UART_LINE_SIZE - 2)
+						if (line_len >= MAX_UART_LINE_SIZE - 2)
 							break;
 
 						// print character back
@@ -310,7 +309,7 @@ void uart_cli_main()
 	g_StopMainTask = 1;	//default value is 1;  stop for a timeout
 
 	esp_uart_init();
-	xTaskCreate(esp_uart_cli_task, "uart_cli_task", 4096, NULL, CLI_TASK_PRIORITY, NULL);
+	xTaskCreate(esp_uart_cli_task, "uart_cli_task", CLI_TASK_SIZE, NULL, CLI_TASK_PRIORITY, NULL);
 
 	_cli_util_wait_for_user_input(2000);
 }
