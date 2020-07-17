@@ -1,4 +1,4 @@
-From 08642b28317223c1d1d15d46da3155b08b5036ca Mon Sep 17 00:00:00 2001
+From 9f1d28b65dc456c1d977c0bb48272d153187bf51 Mon Sep 17 00:00:00 2001
 From: "qin.li" <qin.li@samsung.com>
 Date: Fri, 8 May 2020 14:38:19 +0800
 Subject: [PATCH] add socket wrapper for stdk
@@ -6,11 +6,11 @@ Subject: [PATCH] add socket wrapper for stdk
 ---
  middleware/stdk-deps/socket_wrapper/lwip/sockets.h |  17 +
  middleware/stdk-deps/socket_wrapper/nxp_socket.c   | 814 +++++++++++++++++++++
- middleware/stdk-deps/socket_wrapper/nxp_socket.h   | 799 ++++++++++++++++++++
- 3 files changed, 1630 insertions(+)
+ middleware/stdk-deps/socket_wrapper/nxp_socket.h   | 802 ++++++++++++++++++++
+ 3 files changed, 1633 insertions(+)
  create mode 100755 middleware/stdk-deps/socket_wrapper/lwip/sockets.h
  create mode 100755 middleware/stdk-deps/socket_wrapper/nxp_socket.c
- create mode 100755 middleware/stdk-deps/socket_wrapper/nxp_socket.h
+ create mode 100644 middleware/stdk-deps/socket_wrapper/nxp_socket.h
 
 diff --git a/middleware/stdk-deps/socket_wrapper/lwip/sockets.h b/middleware/stdk-deps/socket_wrapper/lwip/sockets.h
 new file mode 100755
@@ -856,11 +856,11 @@ index 0000000..4bf28f5
 +	  return err;
 +}
 diff --git a/middleware/stdk-deps/socket_wrapper/nxp_socket.h b/middleware/stdk-deps/socket_wrapper/nxp_socket.h
-new file mode 100755
-index 0000000..bb6dc54
+new file mode 100644
+index 0000000..25c1850
 --- /dev/null
 +++ b/middleware/stdk-deps/socket_wrapper/nxp_socket.h
-@@ -0,0 +1,799 @@
+@@ -0,0 +1,802 @@
 +/**
 + ******************************************************************************
 + * @file    nxp_socket.h
@@ -1033,6 +1033,9 @@ index 0000000..bb6dc54
 +/**
 +  * @brief  Socket option types, level: SOL_SOCKET
 +  */
++#ifndef SO_KEEPALIVE
++#define SO_KEEPALIVE	0x0008 /**< keep connections alive */
++#endif
 +typedef enum {
 +    SO_DEBUG              = 0x0001,     /**< Unimplemented: turn on debugging info recording */
 +    SO_ACCEPTCONN         = 0x0002,     /**< socket has had listen() */
