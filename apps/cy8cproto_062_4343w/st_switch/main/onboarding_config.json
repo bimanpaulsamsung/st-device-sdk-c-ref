@@ -1,16 +1,18 @@
 {
   "onboardingConfig": {
-    "deviceOnboardingId": "NAME",
-    "mnId": "MNID",
-    "setupId": "999",
-    "vid": "VID",
-    "deviceTypeId": "TYPE",
+    "deviceOnboardingId": "STMONBOARD",
+    "mnId": "fAte",
+    "setupId": "321",
+    "vid": "STDKSTM01",
+    "deviceTypeId": "Switch",
     "ownershipValidationTypes": [
-      "JUSTWORKS",
-      "BUTTON",
-      "PIN",
-      "QR"
+      "JUSTWORKS"
     ],
-    "identityType": "ED25519_or_CERIFICATE"
+    "identityType": "ED25519",
+    "deviceIntegrationProfileKey": {
+      "id": "4370fb28-6ea1-4f7a-b7e0-de7dccafa37c",
+      "majorVersion": 0,
+      "minorVersion": 1
+    }
   }
 }
