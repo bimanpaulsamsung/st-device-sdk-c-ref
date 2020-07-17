@@ -1,11 +1,11 @@
-From 90e7f3c24b5ef421c9443519b76376258f9569b5 Mon Sep 17 00:00:00 2001
+From 998f49abc84a26b29f34eebe9d64a483b27a9d28 Mon Sep 17 00:00:00 2001
 From: "qin.li" <qin.li@samsung.com>
 Date: Tue, 10 Mar 2020 17:39:01 +0800
 Subject: [PATCH] Enable stdk compile in emw3080, with MoCOS and MoCIP
 
 ---
  MiCO/MiCO.mk                                | 13 ++++---
- MiCO/iot_main.c                             | 17 ++++++++
+ MiCO/iot_main.c                             | 23 +++++++++++
  MiCO/mico_config.h                          | 16 ++++++++
  MiCO/net/mbedtls/include/mbedtls/platform.h |  2 +-
  MiCO/net/mbedtls/library/platform.c         |  6 +--
@@ -20,7 +20,7 @@ Subject: [PATCH] Enable stdk compile in emw3080, with MoCOS and MoCIP
  libraries/utilities/json_c/cJSON.c          |  2 +-
  makefiles/mico_target_config.mk             | 31 ++++++++++++---
  makefiles/micoder_host_cmd.mk               |  2 +-
- 16 files changed, 184 insertions(+), 28 deletions(-)
+ 16 files changed, 190 insertions(+), 28 deletions(-)
  create mode 100644 MiCO/iot_main.c
  create mode 100644 MiCO/mico_config.h
  create mode 100644 MiCO/net/stdk/config.mk
@@ -69,14 +69,20 @@ index 28c4f83..686cfc9 100644
  
 diff --git a/MiCO/iot_main.c b/MiCO/iot_main.c
 new file mode 100644
-index 0000000..3df3432
+index 0000000..af09542
 --- /dev/null
 +++ b/MiCO/iot_main.c
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,23 @@
 +#include <stdio.h>
 +#include "iot_debug.h"
++#include <sys/times.h>
 +
 +extern void app_main(void);
++
++clock_t _times(struct tms* tms)
++{
++	return (clock_t)-1;
++}
 +
 +static void user_init_entry(void *arg)
 +{
