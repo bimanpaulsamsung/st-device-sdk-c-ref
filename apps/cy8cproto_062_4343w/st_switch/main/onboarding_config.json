@@ -1,16 +1,16 @@
 {
   "onboardingConfig": {
-    "deviceOnboardingId": "STMONBOARD",
+    "deviceOnboardingId": "ST32ONBOARD",
     "mnId": "fAte",
-    "setupId": "321",
-    "vid": "STDKSTM01",
+    "setupId": "132",
+    "vid": "ST32MBED01",
     "deviceTypeId": "Switch",
     "ownershipValidationTypes": [
       "JUSTWORKS"
     ],
     "identityType": "ED25519",
     "deviceIntegrationProfileKey": {
-      "id": "4370fb28-6ea1-4f7a-b7e0-de7dccafa37c",
+      "id": "94414de1-8472-4e98-9d86-f7850fcd8dd2",
       "majorVersion": 0,
       "minorVersion": 1
     }
