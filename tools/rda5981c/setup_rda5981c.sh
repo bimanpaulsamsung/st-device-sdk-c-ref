@@ -45,4 +45,3 @@ else
 	echo "Check source code in mbed-os"
 fi
 
-mv bsp/${CHIP_NAME}/mbed-os/.mbedignore bsp/${CHIP_NAME}/

@@ -1,0 +1,56 @@
+{
+    "name": "st_switch",
+    "config": {
+        "present": 1,
+        "security-backend-soft": {
+            "help": "Use security-backend-software",
+            "macro_name": "CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE",
+            "value": true
+        },
+        "iot-core": {
+            "help": "Enable iot-core",
+            "macro_name": "CONFIG_STDK_IOT_CORE",
+            "value": true
+        },
+        "debug-level-error": {
+            "help": "Debug Level Error",
+            "macro_name": "CONFIG_STDK_IOT_CORE_LOG_LEVEL_ERROR",
+            "value": true
+        },
+        "debug-level-info": {
+            "help": "Debug Level Information",
+            "macro_name": "CONFIG_STDK_IOT_CORE_LOG_LEVEL_INFO",
+            "value": true
+        },
+        "debug-level-warn": {
+            "help": "Debug Level Warning",
+            "macro_name": "CONFIG_STDK_IOT_CORE_LOG_LEVEL_WARN",
+            "value": true
+        },
+        "use-lwip": {
+            "help": "Use LwIP stack",
+            "macro_name": "CONFIG_STDK_IOT_CORE_USE_LWIP",
+            "value": true
+        },
+        "use-mbedtls": {
+            "help": "Use mbedtls",
+            "macro_name": "CONFIG_STDK_IOT_CORE_USE_MBEDTLS",
+            "value": true
+        },
+        "net-mbedtls": {
+            "help": "net-mbedtls",
+            "macro_name": "CONFIG_STDK_IOT_CORE_NET_MBEDTLS",
+            "value": true
+        },
+        "crypto-ed25519": {
+            "help": "STDK crypto Support ED25519",
+            "macro_name": "CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519",
+            "value": true
+        },
+        "stdk-mqtt-use-ssl": {
+            "help": "stdk-mqtt-use-ssl",
+            "macro_name": "CONFIG_STDK_MQTT_USE_SSL",
+            "value": 1
+        }
+    }
+}
