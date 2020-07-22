@@ -1,0 +1,74 @@
+From 0757834748c92fc63cdcc9dedcf31c7cb4004aee Mon Sep 17 00:00:00 2001
+From: "qin.li" <qin.li@samsung.com>
+Date: Wed, 22 Jul 2020 11:57:15 +0800
+Subject: [PATCH] update socket to adapt d2d keep-alive connection
+
+---
+ .../pic32mz_ef_curiosity/framework/tcpip/berkeley_api.h           | 5 ++++-
+ .../pic32mz_ef_curiosity/framework/tcpip/src/berkeley_api.c       | 8 +++++++-
+ src/system_config/pic32mz_ef_curiosity/system_config.h            | 2 +-
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/src/system_config/pic32mz_ef_curiosity/framework/tcpip/berkeley_api.h b/src/system_config/pic32mz_ef_curiosity/framework/tcpip/berkeley_api.h
+index d9912ac..8dff453 100644
+--- a/src/system_config/pic32mz_ef_curiosity/framework/tcpip/berkeley_api.h
++++ b/src/system_config/pic32mz_ef_curiosity/framework/tcpip/berkeley_api.h
+@@ -89,7 +89,10 @@ typedef int16_t SOCKET;   //Socket descriptor
+ #define IP_DROP_MEMBERSHIP      36  // Leave a multicast group - Not yet supported
+ 
+ // Definitions for setsockopt for the TCP Layer  (IPPROTO_TCP)
+-#define TCP_NODELAY 1 //Indicates if TCP is to buffer packets - Not yet supported
++#define TCP_NODELAY   1 //Indicates if TCP is to buffer packets - Not yet supported
++#define TCP_KEEPIDLE  3 //set pcb->keep_idle - send KEEPALIVE probes when idle for pcb->keep_idle milliseconds - Not yet supported
++#define TCP_KEEPINTVL 4 //set pcb->keep_intvl - Use seconds for get/setsockopt - Not yet supported
++#define TCP_KEEPCNT   5 //set pcb->keep_cnt - Use number of probes sent for get/setsockopt - Not yet supported
+ 
+ // Definitions for setsockopt for the socket layer (SOL_SOCKET)
+ #define SO_BROADCAST            6   //Enables the Socket for sending broadcast data
+diff --git a/src/system_config/pic32mz_ef_curiosity/framework/tcpip/src/berkeley_api.c b/src/system_config/pic32mz_ef_curiosity/framework/tcpip/src/berkeley_api.c
+index 5062639..a0ebf03 100644
+--- a/src/system_config/pic32mz_ef_curiosity/framework/tcpip/src/berkeley_api.c
++++ b/src/system_config/pic32mz_ef_curiosity/framework/tcpip/src/berkeley_api.c
+@@ -2058,12 +2058,12 @@ int _setsockopt_socket(struct BSDSocket * s,
+ 
+ 		/*stdk porting, not supported option, just return 0*/
+         case SO_REUSEADDR:
++        case SO_KEEPALIVE:
+             errno = EOPNOTSUPP;
+             return 0;
+ 
+         case SO_DEBUG:
+         case SO_DONTROUTE:
+-        case SO_KEEPALIVE:
+         case SO_RCVLOWAT:
+         case SO_RCVTIMEO:
+         case SO_OOBINLINE:
+@@ -2095,6 +2095,12 @@ int _setsockopt_tcp(struct BSDSocket * s,
+         }
+         break;
+ 
++        case TCP_KEEPIDLE:
++        case TCP_KEEPINTVL:
++        case TCP_KEEPCNT:
++            errno = EOPNOTSUPP;
++            return 0;
++
+         default:
+             errno = EOPNOTSUPP;
+             return SOCKET_ERROR;
+diff --git a/src/system_config/pic32mz_ef_curiosity/system_config.h b/src/system_config/pic32mz_ef_curiosity/system_config.h
+index b17e4c1..190882c 100644
+--- a/src/system_config/pic32mz_ef_curiosity/system_config.h
++++ b/src/system_config/pic32mz_ef_curiosity/system_config.h
+@@ -623,7 +623,7 @@ extern "C" {
+ #define TCPIP_TCP_MAX_SEG_SIZE_TX		        	1460
+ #define TCPIP_TCP_MAX_SEG_SIZE_RX_LOCAL		    		1460
+ #define TCPIP_TCP_MAX_SEG_SIZE_RX_NON_LOCAL			536
+-#define TCPIP_TCP_SOCKET_DEFAULT_TX_SIZE			512
++#define TCPIP_TCP_SOCKET_DEFAULT_TX_SIZE			2000
+ #define TCPIP_TCP_SOCKET_DEFAULT_RX_SIZE			512
+ #define TCPIP_TCP_DYNAMIC_OPTIONS             			true
+ #define TCPIP_TCP_START_TIMEOUT_VAL		        	1000
+-- 
+2.7.4
+
