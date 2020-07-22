@@ -44,22 +44,23 @@ extern const uint8_t onboarding_config_end[]    asm("_binary_onboarding_config_j
 extern const uint8_t device_info_start[]    asm("_binary_device_info_json_start");
 extern const uint8_t device_info_end[]        asm("_binary_device_info_json_end");
 
+static iot_status_t g_iot_status = IOT_STATUS_IDLE;
+static iot_stat_lv_t g_iot_stat_lv;
+
+IOT_CTX* ctx = NULL;
+
+//#define SET_PIN_NUMBER_CONFRIM
+
+static int noti_led_mode = LED_ANIMATION_MODE_IDLE;
+
 static caps_switch_data_t *cap_switch_data;
 static caps_switchLevel_data_t *cap_switchLevel_data;
 static caps_colorTemperature_data_t *cap_colorTemp_data;
 static caps_activityLightingMode_data_t *cap_lightMode_data;
 static caps_dustSensor_data_t *cap_dustSensor_data;
 
-static iot_status_t g_iot_status = IOT_STATUS_IDLE;
-static iot_stat_lv_t g_iot_stat_lv;
-
-static int noti_led_mode = LED_ANIMATION_MODE_IDLE;
 int monitor_enable = false;
 int monitor_period_ms = 30000;
-
-IOT_CTX* ctx = NULL;
-
-//#define SET_PIN_NUMBER_CONFRIM
 
 static int get_switch_state(void)
 {
@@ -286,7 +287,7 @@ void button_event(IOT_CAP_HANDLE *handle, int type, int count)
         }
     } else if (type == BUTTON_LONG_PRESS) {
         printf("Button long press, iot_status: %d\n", g_iot_status);
-        led_blink(get_switch_state(), 100, 3);
+        led_blink(get_switch_staqte(), 100, 3);
         st_conn_cleanup(ctx, false);
         xTaskCreate(connection_start_task, "connection_task", 2048, NULL, 10, NULL);
     }
@@ -338,23 +339,20 @@ void app_main(void)
       SmartThings Device SDK(STDK) aims to make it easier to develop IoT devices by providing
       additional st_iot_core layer to the existing chip vendor SW Architecture.
 
-      That is, you can simply develop a basic application by just calling the APIs provided by st_iot_core layer
-      like below. st_iot_core currently offers 14 API.
+      That is, you can simply develop a basic application
+      by just calling the APIs provided by st_iot_core layer like below.
 
-      //create a iot context
+      // create a iot context
       1. st_conn_init();
 
-      //create a handle to process capability
-      2. st_cap_handle_init();
+      // create a handle to process capability
+      2. st_cap_handle_init(); (called in function 'capability_init')
 
-      //register a callback function to process capability command when it comes from the SmartThings Server.
-      3. st_cap_cmd_set_cb();
+      // register a callback function to process capability command when it comes from the SmartThings Server.
+      3. st_cap_cmd_set_cb(); (called in function 'capability_init')
 
-      //needed when it is necessary to keep monitoring the device status
-      4. user_defined_task()
-
-      //process on-boarding procedure. There is nothing more to do on the app side than call the API.
-      5. st_conn_start();
+      // process on-boarding procedure. There is nothing more to do on the app side than call the API.
+      4. st_conn_start(); (called in function 'connection_start')
      */
 
     unsigned char *onboarding_config = (unsigned char *) onboarding_config_start;
@@ -378,12 +376,10 @@ void app_main(void)
     capability_init();
 
     gpio_init();
-
     register_iot_cli_cmd();
     uart_cli_main();
-
-    // needed when it is necessary to keep monitoring the device status
     xTaskCreate(app_main_task, "app_main_task", 4096, NULL, 10, NULL);
 
+    // connect to server
     connection_start();
 }
