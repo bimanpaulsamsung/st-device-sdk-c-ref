@@ -160,6 +160,7 @@ set +e
 git merge --log --commit develop_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
 while [ $? != 0 ];
 do
+	set -e
 	echo
 	echo "               MERGE CONFLICT(sdk-core)                  "
 	echo "      (Public)                         {Internal)        "
@@ -172,6 +173,7 @@ do
 	if [ "$TRY_MERGE_RESOLVE" = "Y" ] || [ "$TRY_MERGE_RESOLVE" = "y" ] || [ "$TRY_MERGE_RESOLVE" = "" ]
 	then
 		bash --rcfile ${WORK_SPACE}/tmpbashrc
+		set +e
 		git merge --continue
 	else
 		exit 1
@@ -200,6 +202,7 @@ set +e
 git merge --log --commit private_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
 while [ $? != 0 ];
 do
+	set -e
 	echo
 	echo "               MERGE CONFLICT(sdk-core)                  "
 	echo "      (Public)                         {Internal)        "
@@ -212,6 +215,7 @@ do
 	if [ "$TRY_MERGE_RESOLVE" = "Y" ] || [ "$TRY_MERGE_RESOLVE" = "y" ] || [ "$TRY_MERGE_RESOLVE" = "" ]
 	then
 		bash --rcfile ${WORK_SPACE}/tmpbashrc
+		set +e
 		git merge --continue
 	else
 		exit 1
@@ -240,10 +244,11 @@ git fetch $REMOTE_INTERNAL_REPO_NAME --prune
 git checkout -B develop
 git reset --hard origin/develop
 git pull origin develop
-git merge --log --commit $REMOTE_INTERNAL_REPO_NAME/develop_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
 set +e
+git merge --log --commit $REMOTE_INTERNAL_REPO_NAME/develop_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
 while [ $? != 0 ];
 do
+	set -e
 	echo
 	echo "               MERGE CONFLICT(sdk-core)                  "
 	echo "      (Public)                         {Internal)        "
@@ -256,6 +261,7 @@ do
 	if [ "$TRY_MERGE_RESOLVE" = "Y" ] || [ "$TRY_MERGE_RESOLVE" = "y" ] || [ "$TRY_MERGE_RESOLVE" = "" ]
 	then
 		bash --rcfile ${WORK_SPACE}/tmpbashrc
+		set +e
 		git merge --continue
 	else
 		exit 1
@@ -326,6 +332,7 @@ DIFF_RESULT=$?
 if [ $DIFF_RESULT != 0 ]; then
 	while [ $DIFF_RESULT != 0 ];
 	do
+		set -e
 		echo
 		echo "               MERGE CONFLICT(sdk-ref)                   "
 		echo "      (Public)                         {Internal)        "
@@ -338,6 +345,7 @@ if [ $DIFF_RESULT != 0 ]; then
 		if [ "$TRY_MERGE_RESOLVE" = "Y" ] || [ "$TRY_MERGE_RESOLVE" = "y" ] || [ "$TRY_MERGE_RESOLVE" = "" ]
 		then
 			bash --rcfile ${WORK_SPACE}/tmpbashrc
+			set +e
 			git merge --continue
 			DIFF_RESULT=$?
 		else
@@ -373,6 +381,7 @@ set +e
 git merge --log --commit private_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
 while [ $? != 0 ];
 do
+	set -e
 	echo
 	echo "               MERGE CONFLICT(sdk-ref)                   "
 	echo "      (Public)                         {Internal)        "
@@ -385,6 +394,7 @@ do
 	if [ "$TRY_MERGE_RESOLVE" = "Y" ] || [ "$TRY_MERGE_RESOLVE" = "y" ] || [ "$TRY_MERGE_RESOLVE" = "" ]
 	then
 		bash --rcfile ${WORK_SPACE}/tmpbashrc
+		set +e
 		git merge --continue
 	else
 		exit 1
@@ -413,10 +423,11 @@ git fetch $REMOTE_INTERNAL_REPO_NAME --prune
 git checkout -B develop
 git reset --hard origin/develop
 git pull origin develop
-git merge --log --commit $REMOTE_INTERNAL_REPO_NAME/develop_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
 set +e
+git merge --log --commit $REMOTE_INTERNAL_REPO_NAME/develop_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
 while [ $? != 0 ];
 do
+	set -e
 	echo
 	echo "               MERGE CONFLICT(sdk-ref)                   "
 	echo "      (Public)                         {Internal)        "
@@ -429,6 +440,7 @@ do
 	if [ "$TRY_MERGE_RESOLVE" = "Y" ] || [ "$TRY_MERGE_RESOLVE" = "y" ] || [ "$TRY_MERGE_RESOLVE" = "" ]
 	then
 		bash --rcfile ${WORK_SPACE}/tmpbashrc
+		set +e
 		git merge --continue
 	else
 		exit 1
