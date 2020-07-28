@@ -81,6 +81,28 @@ static void _cli_cmd_cleanup(char *string)
     st_conn_cleanup(ctx, true);
 }
 
+static void _cli_cmd_get_log_dump(char *string)
+{
+    char buf[MAX_UART_LINE_SIZE];
+    char* log;
+    size_t size = 2048;
+    size_t written_size = 0;
+    int ret;
+    int mode = IOT_DUMP_MODE_NEED_BASE64 | IOT_DUMP_MODE_NEED_DUMP_STATE;
+
+    if (_cli_copy_nth_arg(buf, string, sizeof(buf), 1) >= 0) {
+        size = strtol(buf, NULL, 10);
+    }
+    ret = st_create_log_dump(ctx, &log, size, &written_size, mode);
+    if (ret < 0) {
+        printf("Fail to get log dump!\n");
+        return;
+    }
+    printf("log_dump - size: %d / %d\n", written_size, size);
+    printf("%s\n", log);
+    free(log);
+}
+
 extern void button_event(IOT_CAP_HANDLE *handle, int type, int count);
 static void _cli_cmd_butten_event(char *string)
 {
@@ -281,6 +303,7 @@ static void _cli_cmd_get_log_dump(char *string)
 
 static struct cli_command cmd_list[] = {
     {"cleanup", "clean-up data with reboot option", _cli_cmd_cleanup},
+    {"get_log_dump", "get_log_dump {size(default 2048)} ",  _cli_cmd_get_log_dump},
     {"button", "button {count} {type} : ex) button 5 / button 1 long", _cli_cmd_butten_event},
     {"monitor_enable", "monitor_enable {0|1}", _cli_cmd_monitor_enable},
     {"monitor_period", "monitor_period {period_ms}", _cli_cmd_monitor_period},
@@ -290,7 +313,6 @@ static struct cli_command cmd_list[] = {
     {"reboot", "[private] reboot the system", _cli_cmd_reboot},
     {"pub_event", "[private] pub_event [event payload]", _cli_cmd_pub_event},
     {"device_info", "[private] show device info", _cli_cmd_device_info},
-    {"get_log_dump", "[private] get_log_dump [size(default 2048)] ",  _cli_cmd_get_log_dump},
 };
 
 void register_iot_cli_cmd(void) {
