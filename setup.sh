@@ -1,19 +1,19 @@
 #!/bin/bash
 
 CORE_PATH="iot-core"
-CHIP_NAME=${1}
+BSP_NAME=${1}
 ARGUMENTS=$@
 
 print_usage () {
-	echo "    Usage: ./setup.sh CHIP_NAME"
+	echo "    Usage: ./setup.sh BSP_NAME"
 	echo "- - - - - - - - - - - - - - - - - - -"
 	echo "    ex) ./setup.sh esp8266"
 	echo "    ex) ./setup.sh esp32"
 	echo "    ex) ./setup.sh rtl8195"
 	echo "    ex) ./setup.sh rtl8720c"
 	echo "    ex) ./setup.sh rtl8721c"
-	echo "    ex) ./setup.sh mt7682_ss"
 	echo "    ex) ./setup.sh emw3166"
+	echo "    ex) ./setup.sh mt7682_ss"
 	echo "    ex) ./setup.sh emw3080"
 	echo "    ex) ./setup.sh tizenrt esp32"
 	echo "    ex) ./setup.sh tizenrt esp32wr"
@@ -22,21 +22,20 @@ print_usage () {
 	echo "    ex) ./setup.sh cy8cproto_062_4343w"
 	echo "    ex) ./setup.sh rda5981c"
 	echo "    ex) ./setup.sh pic32mz"
-	echo
 }
 
-if [ "${CHIP_NAME}" == "esp32" ]; then
-    CHIP_NAME="esp32_v3.3"
+if [ "${BSP_NAME}" == "esp32" ]; then
+    BSP_NAME="esp32_v3.3"
     ARGUMENTS=`echo ${ARGUMENTS} | sed 's/esp32/esp32_v3.3/'`
 fi
 
-if [ "${CHIP_NAME}" == "" ]; then
+if [ "${BSP_NAME}" == "" ]; then
 	print_usage
 	exit 0
 fi
 
-if [ ! -e tools/${CHIP_NAME}/setup_${CHIP_NAME}.sh ]; then
-	echo "Failed to find tools/${CHIP_NAME}/setup_${CHIP_NAME}.sh"
+if [ ! -e tools/${BSP_NAME}/setup_${BSP_NAME}.sh ]; then
+	echo "Failed to find tools/${BSP_NAME}/setup_${BSP_NAME}.sh"
 	print_usage
 	exit 1
 fi
@@ -51,14 +50,14 @@ if [ "$?" == "0" ]; then
 	cd ..
 fi
 
-git submodule status bsp/${CHIP_NAME} &> /dev/null
+git submodule status bsp/${BSP_NAME} &> /dev/null
 if [ "$?" == "0" ]; then
-	git submodule sync bsp/${CHIP_NAME}
-	git submodule init bsp/${CHIP_NAME}
-	git submodule update bsp/${CHIP_NAME}
-	cd bsp/${CHIP_NAME}
+	git submodule sync bsp/${BSP_NAME}
+	git submodule init bsp/${BSP_NAME}
+	git submodule update bsp/${BSP_NAME}
+	cd bsp/${BSP_NAME}
 	git reset --hard HEAD
 	cd ../..
 fi
 
-tools/${CHIP_NAME}/setup_${CHIP_NAME}.sh ${ARGUMENTS}
+tools/${BSP_NAME}/setup_${BSP_NAME}.sh ${ARGUMENTS}
