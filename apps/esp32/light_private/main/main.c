@@ -287,7 +287,7 @@ void button_event(IOT_CAP_HANDLE *handle, int type, int count)
         }
     } else if (type == BUTTON_LONG_PRESS) {
         printf("Button long press, iot_status: %d\n", g_iot_status);
-        led_blink(get_switch_staqte(), 100, 3);
+        led_blink(get_switch_state(), 100, 3);
         st_conn_cleanup(ctx, false);
         xTaskCreate(connection_start_task, "connection_task", 2048, NULL, 10, NULL);
     }
