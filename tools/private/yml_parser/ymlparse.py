@@ -22,7 +22,7 @@ STDK_REF_PATH = PARSE_FILE_PATH + "/../../../"
 STC_PATH = STDK_REF_PATH + "../SmartThingsCapabilities/"
 YAML_PATH = STC_PATH + "capabilities/"
 HELPER_OUTPUT_PATH = STDK_REF_PATH + "iot-core/src/include/caps/"
-CAPS_OUTPUT_PATH = STDK_REF_PATH + "apps/esp8266/capability_example/main/"
+CAPS_OUTPUT_PATH = STDK_REF_PATH + "apps/capability_sample"
 SAMPLE_C_PATH = os.path.dirname(os.path.abspath(__file__)) + "/sample/"
 
 COPYRIGHT_FILE_PATH = PARSE_FILE_PATH + "/COPYRIGHT"
