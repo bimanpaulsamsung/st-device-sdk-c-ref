@@ -6,8 +6,8 @@ static int caps_$CAPS_ID$_attr_$ATTR_NAME$_str2idx(const char *value)
         if (!strcmp(value, caps_helper_$CAPS_ID$.attr_$ATTR_NAME$.values[index])) {
             return index;
         }
-    }   
-    return -1; 
+    }
+    return -1;
 }
 
 static const char *caps_$CAPS_ID$_get_$ATTR_NAME$_value(caps_$CAPS_ID$_data_t *caps_data)

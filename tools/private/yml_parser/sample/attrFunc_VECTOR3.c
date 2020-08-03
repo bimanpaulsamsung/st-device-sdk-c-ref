@@ -28,7 +28,7 @@ static void caps_$CAPS_ID$_set_$ATTR_NAME$_value(caps_$CAPS_ID$_data_t *caps_dat
     JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
     array_obj = JSON_CREATE_NUMBER((double) z);
     JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
-    
+
     JSON_DELETE(caps_data->$ATTR_NAME$_value);
     caps_data->$ATTR_NAME$_value = array;
 }
