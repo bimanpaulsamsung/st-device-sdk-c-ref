@@ -650,11 +650,11 @@ def make_caps_c_file_output(caps):
         return
 
     output.write(            "#include <string.h>\n")
+    output.write(            "#include <stdio.h>\n")
+    output.write(            "#include <stdlib.h>\n")
     output.write(            "\n")
     output.write(            "#include \"st_dev.h\"\n")
     output.write(            "#include \"caps_" + caps.id + ".h\"\n")
-    output.write(            "\n")
-    output.write(            "#include \"freertos/FreeRTOS.h\"\n")
     output.write(            "\n")
 
     for attr in caps.attr_list:
