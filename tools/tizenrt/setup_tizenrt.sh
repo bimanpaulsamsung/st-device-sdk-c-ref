@@ -3,6 +3,10 @@
 CHIP_NAME=${1}
 BOARD_NAME=${2}
 
+if ["${BOARD_NAME}" == ""]; then
+	echo "Error: need board name to setup tizenrt, e.g. ./setup.sh tizenrt esp32"
+fi
+
 git submodule status bsp/${CHIP_NAME} &> /dev/null
 if [ "$?" == "0" ]; then
 	cd bsp/${CHIP_NAME}

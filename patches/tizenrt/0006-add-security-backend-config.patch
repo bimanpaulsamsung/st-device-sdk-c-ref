@@ -1,0 +1,106 @@
+From b87a67b1a64b344cc66cf142efcac236051e5b17 Mon Sep 17 00:00:00 2001
+From: "qin.li" <qin.li@samsung.com>
+Date: Mon, 3 Aug 2020 14:20:51 +0800
+Subject: [PATCH] add security backend config
+
+---
+ build/configs/artik053/STDK/defconfig       |  4 ++--
+ build/configs/esp32_DevKitC/STDK/defconfig  |  4 ++--
+ build/configs/esp_wrover_kit/STDK/defconfig |  4 ++--
+ external/stdk/Kconfig                       | 25 +++++++++----------------
+ 4 files changed, 15 insertions(+), 22 deletions(-)
+ mode change 100755 => 100644 build/configs/esp32_DevKitC/STDK/defconfig
+ mode change 100755 => 100644 build/configs/esp_wrover_kit/STDK/defconfig
+
+diff --git a/build/configs/artik053/STDK/defconfig b/build/configs/artik053/STDK/defconfig
+index 7c5511a..94623e7 100644
+--- a/build/configs/artik053/STDK/defconfig
++++ b/build/configs/artik053/STDK/defconfig
+@@ -1255,9 +1255,9 @@ CONFIG_STDK_IOT_CORE_OS_SUPPORT_TIZENRT=y
+ CONFIG_STDK_IOT_CORE_USE_MBEDTLS=y
+ # CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_RSA is not set
+ CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519=y
++CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE=y
+ # CONFIG_STDK_IOT_CORE_FS_SW_ENCRYPTION is not set
+-CONFIG_STDK_IOT_CORE_FS_HW_ENCRYPTION=y
+-# CONFIG_STDK_IOT_CORE_FS_SE_ENCRYPTION is not set
++# CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_HARDWARE is not set
+ 
+ #
+ # Network
+diff --git a/build/configs/esp32_DevKitC/STDK/defconfig b/build/configs/esp32_DevKitC/STDK/defconfig
+old mode 100755
+new mode 100644
+index 276883e..45919ef
+--- a/build/configs/esp32_DevKitC/STDK/defconfig
++++ b/build/configs/esp32_DevKitC/STDK/defconfig
+@@ -1101,9 +1101,9 @@ CONFIG_STDK_IOT_CORE_OS_SUPPORT_TIZENRT=y
+ CONFIG_STDK_IOT_CORE_USE_MBEDTLS=y
+ # CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_RSA is not set
+ CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519=y
++CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE=y
+ # CONFIG_STDK_IOT_CORE_FS_SW_ENCRYPTION is not set
+-CONFIG_STDK_IOT_CORE_FS_HW_ENCRYPTION=y
+-# CONFIG_STDK_IOT_CORE_FS_SE_ENCRYPTION is not set
++# CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_HARDWARE is not set
+ 
+ #
+ # Network
+diff --git a/build/configs/esp_wrover_kit/STDK/defconfig b/build/configs/esp_wrover_kit/STDK/defconfig
+old mode 100755
+new mode 100644
+index 189ee12..19ac512
+--- a/build/configs/esp_wrover_kit/STDK/defconfig
++++ b/build/configs/esp_wrover_kit/STDK/defconfig
+@@ -1147,9 +1147,9 @@ CONFIG_STDK_IOT_CORE_OS_SUPPORT_TIZENRT=y
+ CONFIG_STDK_IOT_CORE_USE_MBEDTLS=y
+ # CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_RSA is not set
+ CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519=y
++CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE=y
+ # CONFIG_STDK_IOT_CORE_FS_SW_ENCRYPTION is not set
+-CONFIG_STDK_IOT_CORE_FS_HW_ENCRYPTION=y
+-# CONFIG_STDK_IOT_CORE_FS_SE_ENCRYPTION is not set
++# CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_HARDWARE is not set
+ 
+ #
+ # Network
+diff --git a/external/stdk/Kconfig b/external/stdk/Kconfig
+index 2602734..0e8fe94 100644
+--- a/external/stdk/Kconfig
++++ b/external/stdk/Kconfig
+@@ -138,23 +138,16 @@ config STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519
+ 	---help---
+ 		Support Ed25519 based sign, encryption functions.
+ 
+-choice STDK_IOT_CORE_FS_ENCRYPTION
+-	prompt "Choose FS encryption method"
+-	default STDK_IOT_CORE_FS_HW_ENCRYPTION
+-	depends on STDK_IOT_CORE
+-	---help---
+-		Choose the file system encryption method.
+-
+-		Software based encryption or Hardware based encryption or
+-		SE(Secure Element) based encryption.
+-
++config STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE
++	bool "Software backend"
++	default y
+ config STDK_IOT_CORE_FS_SW_ENCRYPTION
+-	bool "Software"
+-config STDK_IOT_CORE_FS_HW_ENCRYPTION
+-	bool "Hardware"
+-config STDK_IOT_CORE_FS_SE_ENCRYPTION
+-	bool "Hardware (SE)"
+-endchoice
++	depends on STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE
++	bool "Software encryption lib"
++	default n
++config STDK_IOT_CORE_SECURITY_BACKEND_HARDWARE
++	bool "Hardware backend"
++	default n
+ 
+ endmenu # Crypto
+ 
+-- 
+2.7.4
+
