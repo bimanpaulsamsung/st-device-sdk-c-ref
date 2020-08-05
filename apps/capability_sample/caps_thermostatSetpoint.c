@@ -17,11 +17,11 @@
  ****************************************************************************/
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "st_dev.h"
 #include "caps_thermostatSetpoint.h"
-
-#include "freertos/FreeRTOS.h"
 
 static double caps_thermostatSetpoint_get_thermostatSetpoint_value(caps_thermostatSetpoint_data_t *caps_data)
 {
@@ -61,27 +61,24 @@ static void caps_thermostatSetpoint_set_thermostatSetpoint_unit(caps_thermostatS
 
 static void caps_thermostatSetpoint_attr_thermostatSetpoint_send(caps_thermostatSetpoint_data_t *caps_data)
 {
-    IOT_EVENT *cap_evt;
-    uint8_t evt_num = 1;
-    int sequence_no;
+    int sequence_no = -1;
 
     if (!caps_data || !caps_data->handle) {
         printf("fail to get handle\n");
         return;
     }
 
-    cap_evt = st_cap_attr_create_number((char *) caps_helper_thermostatSetpoint.attr_thermostatSetpoint.name, caps_data->thermostatSetpoint_value, caps_data->thermostatSetpoint_unit);
-    if (!cap_evt) {
-        printf("fail to create cap_evt\n");
-        return;
-    }
+    ST_CAP_SEND_ATTR_NUMBER(caps_data->handle,
+            (char *)caps_helper_thermostatSetpoint.attr_thermostatSetpoint.name,
+            caps_data->thermostatSetpoint_value,
+            caps_data->thermostatSetpoint_unit,
+            NULL,
+            sequence_no);
 
-    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
     if (sequence_no < 0)
         printf("fail to send thermostatSetpoint value\n");
-
-    printf("Sequence number return : %d\n", sequence_no);
-    st_cap_attr_free(cap_evt);
+    else
+        printf("Sequence number return : %d\n", sequence_no);
 }
 
 

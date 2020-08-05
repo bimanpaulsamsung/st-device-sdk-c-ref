@@ -17,11 +17,11 @@
  ****************************************************************************/
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "st_dev.h"
 #include "caps_robotCleanerMovement.h"
-
-#include "freertos/FreeRTOS.h"
 
 static int caps_robotCleanerMovement_attr_robotCleanerMovement_str2idx(const char *value)
 {
@@ -31,8 +31,8 @@ static int caps_robotCleanerMovement_attr_robotCleanerMovement_str2idx(const cha
         if (!strcmp(value, caps_helper_robotCleanerMovement.attr_robotCleanerMovement.values[index])) {
             return index;
         }
-    }   
-    return -1; 
+    }
+    return -1;
 }
 
 static const char *caps_robotCleanerMovement_get_robotCleanerMovement_value(caps_robotCleanerMovement_data_t *caps_data)
@@ -58,9 +58,7 @@ static void caps_robotCleanerMovement_set_robotCleanerMovement_value(caps_robotC
 
 static void caps_robotCleanerMovement_attr_robotCleanerMovement_send(caps_robotCleanerMovement_data_t *caps_data)
 {
-    IOT_EVENT *cap_evt;
-    uint8_t evt_num = 1;
-    int sequence_no;
+    int sequence_no = -1;
 
     if (!caps_data || !caps_data->handle) {
         printf("fail to get handle\n");
@@ -71,19 +69,18 @@ static void caps_robotCleanerMovement_attr_robotCleanerMovement_send(caps_robotC
         return;
     }
 
-    cap_evt = st_cap_attr_create_string((char *)caps_helper_robotCleanerMovement.attr_robotCleanerMovement.name,
-        caps_data->robotCleanerMovement_value, NULL);
-    if (!cap_evt) {
-        printf("fail to create cap_evt\n");
-        return;
-    }
+    ST_CAP_SEND_ATTR_STRING(caps_data->handle,
+            (char *)caps_helper_robotCleanerMovement.attr_robotCleanerMovement.name,
+            caps_data->robotCleanerMovement_value,
+            NULL,
+            NULL,
+            sequence_no);
 
-    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
     if (sequence_no < 0)
         printf("fail to send robotCleanerMovement value\n");
+    else
+        printf("Sequence number return : %d\n", sequence_no);
 
-    printf("Sequence number return : %d\n", sequence_no);
-    st_cap_attr_free(cap_evt);
 }
 
 
