@@ -15,6 +15,7 @@ static void caps_$CAPS_ID$_attr_$ATTR_NAME$_send(caps_$CAPS_ID$_data_t *caps_dat
 {
     IOT_EVENT *cap_evt[2];
     uint8_t evt_num = 2;
+    iot_cap_val_t value[2];
     int32_t sequence_no;
 
     if (!caps_data || !caps_data->handle) {
@@ -22,20 +23,37 @@ static void caps_$CAPS_ID$_attr_$ATTR_NAME$_send(caps_$CAPS_ID$_data_t *caps_dat
         return;
     }
 
-    cap_evt[0] = st_cap_attr_create_number((char *) caps_helper_$CAPS_ID$.attr_hue.name, caps_data->hue_value, NULL);
-    cap_evt[1] = st_cap_attr_create_number((char *) caps_helper_$CAPS_ID$.attr_saturation.name, caps_data->saturation_value, NULL);
+    value[0].type = IOT_CAP_VAL_TYPE_NUMBER;
+    value[0].number = caps_data->hue_value;
+
+    cap_evt[0] = st_cap_create_attr(caps_data->handle,
+            (char *) caps_helper_$CAPS_ID$.attr_hue.name,
+            &value[0],
+            NULL,
+            NULL);
+
+    value[1].type = IOT_CAP_VAL_TYPE_NUMBER;
+    value[1].number = caps_data->hue_value;
+
+    cap_evt[1] = st_cap_create_attr(caps_data->handle,
+            (char *) caps_helper_$CAPS_ID$.attr_saturation.name,
+            &value[1],
+            NULL,
+            NULL);
+
     if (!cap_evt[0] || !cap_evt[1]) {
         printf("fail to create cap_evt\n");
         free(cap_evt[0]);
+        free(cap_evt[1]);
         return;
     }
 
-    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, cap_evt);
+    sequence_no = st_cap_send_attr(cap_evt, evt_num);
     if (sequence_no < 0)
         printf("fail to send $ATTR_NAME$ data\n");
 
     printf("Sequence number return : %d\n", sequence_no);
-    st_cap_attr_free(cap_evt[0]);
-    st_cap_attr_free(cap_evt[1]);
+    st_cap_free_attr(cap_evt[0]);
+    st_cap_free_attr(cap_evt[1]);
 }
 

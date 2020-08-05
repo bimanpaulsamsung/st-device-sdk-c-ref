@@ -37,7 +37,7 @@ static void caps_$CAPS_ID$_attr_$ATTR_NAME$_send(caps_$CAPS_ID$_data_t *caps_dat
 {
     IOT_EVENT *cap_evt;
     uint8_t evt_num = 1;
-    int sequence_no;
+    int sequence_no = -1;
     iot_cap_val_t value;
 
     if (!caps_data || !caps_data->handle) {
@@ -53,18 +53,22 @@ static void caps_$CAPS_ID$_attr_$ATTR_NAME$_send(caps_$CAPS_ID$_data_t *caps_dat
     value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
     value.json_object = JSON_PRINT(caps_data->$ATTR_NAME$_value);
 
-    cap_evt = st_cap_attr_create((char *)caps_helper_$CAPS_ID$.attr_$ATTR_NAME$.name,
-            &value, NULL, NULL);
+    cap_evt = st_cap_create_attr(caps_data->handle,
+            (char *)caps_helper_$CAPS_ID$.attr_$ATTR_NAME$.name,
+            &value,
+            NULL,
+            NULL);
+
     if (!cap_evt) {
         printf("fail to create cap_evt\n");
         return;
     }
 
-    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    sequence_no = st_cap_send_attr(&cap_evt, evt_num);
     if (sequence_no < 0)
         printf("fail to send $ATTR_NAME$ value\n");
 
     printf("Sequence number return : %d\n", sequence_no);
-    st_cap_attr_free(cap_evt);
+    st_cap_free_attr(cap_evt);
 }
 
