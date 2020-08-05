@@ -17,11 +17,11 @@
  ****************************************************************************/
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "st_dev.h"
 #include "caps_threeAxis.h"
-
-#include "freertos/FreeRTOS.h"
 
 static const JSON_H *caps_threeAxis_get_threeAxis_value(caps_threeAxis_data_t *caps_data)
 {
@@ -53,7 +53,7 @@ static void caps_threeAxis_set_threeAxis_value(caps_threeAxis_data_t *caps_data,
     JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
     array_obj = JSON_CREATE_NUMBER((double) z);
     JSON_ADD_ITEM_TO_ARRAY(array, array_obj);
-    
+
     JSON_DELETE(caps_data->threeAxis_value);
     caps_data->threeAxis_value = array;
 }
@@ -62,7 +62,7 @@ static void caps_threeAxis_attr_threeAxis_send(caps_threeAxis_data_t *caps_data)
 {
     IOT_EVENT *cap_evt;
     uint8_t evt_num = 1;
-    int sequence_no;
+    int sequence_no = -1;
     iot_cap_val_t value;
 
     if (!caps_data || !caps_data->handle) {
@@ -78,19 +78,23 @@ static void caps_threeAxis_attr_threeAxis_send(caps_threeAxis_data_t *caps_data)
     value.type = IOT_CAP_VAL_TYPE_JSON_OBJECT;
     value.json_object = JSON_PRINT(caps_data->threeAxis_value);
 
-    cap_evt = st_cap_attr_create((char *)caps_helper_threeAxis.attr_threeAxis.name,
-            &value, NULL, NULL);
+    cap_evt = st_cap_create_attr(caps_data->handle,
+            (char *)caps_helper_threeAxis.attr_threeAxis.name,
+            &value,
+            NULL,
+            NULL);
+
     if (!cap_evt) {
         printf("fail to create cap_evt\n");
         return;
     }
 
-    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
+    sequence_no = st_cap_send_attr(&cap_evt, evt_num);
     if (sequence_no < 0)
         printf("fail to send threeAxis value\n");
 
     printf("Sequence number return : %d\n", sequence_no);
-    st_cap_attr_free(cap_evt);
+    st_cap_free_attr(cap_evt);
 }
 
 
