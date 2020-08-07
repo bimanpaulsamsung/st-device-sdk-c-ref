@@ -16,6 +16,8 @@ print_usage () {
   echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
   echo "    ex) ./build.sh ${CHIP_NAME} st_switch"
   echo "    ex) ./build.sh ${CHIP_NAME} st_switch flash"
+  echo "    ex) ./build.sh ${CHIP_NAME} st_switch clean"
+  echo "    ex) ./build.sh ${CHIP_NAME} st_switch clean flash"
   echo
 }
 
@@ -30,11 +32,17 @@ if [ ! -d ${PROJECT_PATH} ]; then
   exit 1
 fi
 
-if [ "${3}" = "flash" ]; then
-  shift 2
-  FLASH_OPTION="--$@"
-fi
+for arg in "$@"; do
+    if [ "$arg" == "flash" -o  "$arg" == "clean" ]; then
+        FLASH_OPTION="${FLASH_OPTION} --$arg"
+    fi
+done
 
+# Add config file and Generate .mbedignore file
+cp ${PROJECT_PATH}/usr_config.py ${CORE_PATH}/src
+cd ./bsp/${CHIP_NAME}
+python iot-core/src/component.py
+rm ${CORE_PATH}/src/usr_config.*
 
 #Genarate Root CA
 cd ${CORE_PATH}
@@ -51,5 +59,6 @@ arm-none-eabi-ld -r -b binary -o onboarding_config.o onboarding_config.json
 arm-none-eabi-ld -r -b binary -o device_info.o device_info.json
 cd ${STDK_PATH}
 
+cd ./bsp/${CHIP_NAME}
 ### Build
 mbed compile -m cy8cproto_062_4343w -t GCC_ARM ${FLASH_OPTION}
