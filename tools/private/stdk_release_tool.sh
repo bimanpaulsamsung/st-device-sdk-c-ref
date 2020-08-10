@@ -101,6 +101,8 @@ set -e
 if [ ! -d "$SDK_REF_PATH_PUBLIC" ]; then
 	git clone https://github.com/SmartThingsCommunity/st-device-sdk-c-ref.git $SDK_REF_PATH_PUBLIC
     cd $SDK_REF_PATH_PUBLIC
+	git config user.email "63764571+stdk-scm@users.noreply.github.com"
+	git config user.name "stdk-scm"
 	git remote add $REMOTE_INTERNAL_REPO_NAME git@github.sec.samsung.net:STDK/st-device-sdk-c-ref.git
     git submodule init iot-core
 	git submodule sync iot-core
@@ -112,6 +114,8 @@ fi
 if [ ! -d "$SDK_REF_PATH_INTERNAL" ]; then
 	git clone git@github.sec.samsung.net:STDK/st-device-sdk-c-ref.git $SDK_REF_PATH_INTERNAL
 	cd $SDK_REF_PATH_INTERNAL
+	git config user.email "63764571+stdk-scm@users.noreply.github.com"
+	git config user.name "stdk-scm"
     git submodule init iot-core
 	git submodule sync iot-core
 	git submodule update iot-core
