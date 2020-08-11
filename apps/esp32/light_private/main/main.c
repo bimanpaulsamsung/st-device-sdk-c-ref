@@ -28,12 +28,14 @@
 
 #include "iot_uart_cli.h"
 #include "iot_cli_cmd.h"
+#include "ota_util.h"
 
 #include "caps_switch.h"
 #include "caps_switchLevel.h"
 #include "caps_colorTemperature.h"
 #include "caps_activityLightingMode.h"
 #include "caps_dustSensor.h"
+#include "caps_firmwareUpdate.h"
 
 // onboarding_config_start is null-terminated string
 extern const uint8_t onboarding_config_start[]    asm("_binary_onboarding_config_json_start");
@@ -57,6 +59,9 @@ static caps_switchLevel_data_t *cap_switchLevel_data;
 static caps_colorTemperature_data_t *cap_colorTemp_data;
 static caps_activityLightingMode_data_t *cap_lightMode_data;
 static caps_dustSensor_data_t *cap_dustSensor_data;
+static caps_ota_data_t *cap_ota_data;
+
+TaskHandle_t ota_task_handle = NULL;
 
 int monitor_enable = false;
 int monitor_period_ms = 30000;
@@ -124,6 +129,72 @@ static void cap_lightMode_cmd_cb(struct caps_activityLightingMode_data *caps_dat
     cap_colorTemp_data->attr_colorTemperature_send(cap_colorTemp_data);
 }
 
+static char *get_current_firmware_version(void)
+{
+    char *current_version = NULL;
+
+    unsigned char *device_info = (unsigned char *) device_info_start;
+    unsigned int device_info_len = device_info_end - device_info_start;
+
+    ota_err_t err = ota_api_get_firmware_version_load(device_info, device_info_len, &current_version);
+    if (err != OTA_OK) {
+        printf("ota_api_get_firmware_version_load is failed : %d\n", err);
+    }
+
+    return current_version;
+}
+
+#define OTA_UPDATE_MAX_RETRY_COUNT 100
+
+static void ota_update_task(void * pvParameter)
+{
+    printf("\n Starting OTA...\n");
+
+    static int count = 0;
+
+    while (1) {
+
+        ota_err_t ret = ota_update_device();
+        if (ret != OTA_OK) {
+            printf("Firmware Upgrades Failed (%d) \n", ret);
+            vTaskDelay(600 * 1000 / portTICK_PERIOD_MS);
+            count++;
+        } else {
+            break;
+        }
+
+        if (count > OTA_UPDATE_MAX_RETRY_COUNT)
+            break;
+    }
+
+    printf("Prepare to restart system!");
+    ota_restart_device();
+}
+
+void ota_polling_task(void *arg)
+{
+    while (1) {
+
+        vTaskDelay(30 * 1000 / portTICK_PERIOD_MS);
+
+        if (ota_task_handle != NULL) {
+            printf("Device is updating.. \n");
+            continue;
+        }
+
+        ota_check_for_update((void *)arg);
+
+        vTaskDelay(600 * 1000 / portTICK_PERIOD_MS);
+    }
+}
+
+static void cap_update_cmd_cb(struct caps_ota_data *caps_data)
+{
+	ota_nvs_flash_init();
+
+	xTaskCreate(&ota_update_task, "ota_update_task", 8096, NULL, 5, &ota_task_handle);
+}
+
 static void capability_init()
 {
     cap_switch_data = caps_switch_initialize(ctx, "main", NULL, NULL);
@@ -170,6 +241,17 @@ static void capability_init()
 
         cap_dustSensor_data->set_dustLevel_unit(cap_dustSensor_data, caps_helper_dustSensor.attr_dustLevel.unit_ug_per_m3);
         cap_dustSensor_data->set_fineDustLevel_unit(cap_dustSensor_data, caps_helper_dustSensor.attr_fineDustLevel.unit_ug_per_m3);
+    }
+
+    cap_ota_data = caps_ota_initialize(ctx, "main", NULL, NULL);
+    if (cap_ota_data) {
+
+        char *firmware_version = get_current_firmware_version();
+
+        cap_ota_data->set_currentVersion(cap_ota_data, firmware_version);
+        cap_ota_data->cmd_update_firmware_usr_cb = cap_update_cmd_cb;
+
+        free(firmware_version);
     }
 }
 
@@ -378,6 +460,8 @@ void app_main(void)
     register_iot_cli_cmd();
     uart_cli_main();
     xTaskCreate(app_main_task, "app_main_task", 4096, NULL, 10, NULL);
+
+    xTaskCreate(ota_polling_task, "ota_polling_task", 8096, (void *)cap_ota_data, 5, NULL);
 
     // connect to server
     connection_start();
