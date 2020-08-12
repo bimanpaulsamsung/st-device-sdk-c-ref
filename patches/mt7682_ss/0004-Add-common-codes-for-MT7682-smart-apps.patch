@@ -1,7 +1,7 @@
-From fd85e787e6c0e9de575da64b1f3e6173a992d89e Mon Sep 17 00:00:00 2001
+From 34951489bce37d6f7d862f403c54393a31730c10 Mon Sep 17 00:00:00 2001
 From: "baojun.luo" <baojun.luo@samsung.com>
 Date: Tue, 17 Dec 2019 00:12:16 +0900
-Subject: [PATCH 4/4] Add common codes for MT7682 smart apps
+Subject: [PATCH] Add common codes for MT7682 smart apps
 
 Change-Id: I45360bbfc5727eaec15fe73a4460f8ae2f6af6df
 Signed-off-by: baojun.luo <43360374+baojunluo@users.noreply.github.com>
@@ -10,7 +10,7 @@ Signed-off-by: baojun.luo <43360374+baojunluo@users.noreply.github.com>
  config/chip/mt7682/chip.mk                         |    6 -
  .../rtos/FreeRTOS/Source/portable/MemMang/heap_4.c |   19 +-
  project/mt7682_hdk/apps/stdk_project/GCC/Makefile  |  292 ++++++
- project/mt7682_hdk/apps/stdk_project/GCC/config.mk |   43 +
+ project/mt7682_hdk/apps/stdk_project/GCC/config.mk |   69 ++
  .../mt7682_hdk/apps/stdk_project/GCC/feature.mk    |   40 +
  .../apps/stdk_project/GCC/feature_advance.mk       |    8 +
  .../apps/stdk_project/GCC/mt7682_flash.ld          |  236 +++++
@@ -43,7 +43,7 @@ Signed-off-by: baojun.luo <43360374+baojunluo@users.noreply.github.com>
  .../apps/stdk_project/src/system_mt7682.c          |  191 ++++
  .../mt7682_hdk/apps/stdk_project/src/wifi_helper.c |  465 +++++++++
  .../apps/stdk_project/src/wifi_nvdm_config.c       | 1055 ++++++++++++++++++++
- 37 files changed, 6598 insertions(+), 14 deletions(-)
+ 37 files changed, 6624 insertions(+), 14 deletions(-)
  mode change 100644 => 100755 config/chip/mt7682/chip.mk
  mode change 100644 => 100755 kernel/rtos/FreeRTOS/Source/portable/MemMang/heap_4.c
  create mode 100644 project/mt7682_hdk/apps/stdk_project/GCC/Makefile
@@ -495,40 +495,63 @@ index 0000000..897c379
 +print-%  : ; @echo $* = $($*)
 diff --git a/project/mt7682_hdk/apps/stdk_project/GCC/config.mk b/project/mt7682_hdk/apps/stdk_project/GCC/config.mk
 new file mode 100644
-index 0000000..a3eb922
+index 0000000..583ae0f
 --- /dev/null
 +++ b/project/mt7682_hdk/apps/stdk_project/GCC/config.mk
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,69 @@
 +########################################
 +# Config
 +########################################
 +
++include $(PROJECT_PATH)/usr_config.mk
++
 +#/* For STDK */
 +CONFIG_STDK_IOT_CORE=y
 +CONFIG_STDK_IOT_CORE_USE_MBEDTLS=y
++CONFIG_STDK_IOT_CORE_NET_MBEDTLS=y
 +CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP=y
 +CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP=y
 +CONFIG_STDK_IOT_CORE_BSP_SUPPORT_MT7682=y
 +CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS=y
++CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519=y
++
++CONFIG_SAMSUNG_BUILD_ENG=y
++CONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG=
 +
 +ifeq ($(CONFIG_STDK_IOT_CORE),y)
 +CFLAGS += -DCONFIG_STDK_IOT_CORE
-+endif
-+
-+ifeq ($(CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP),y)
-+CFLAGS += -DCONFIG_STDK_IOT_CORE_EASYSETUP_HTTP
 +endif
 +
 +ifeq ($(CONFIG_STDK_IOT_CORE_USE_MBEDTLS),y)
 +CFLAGS += -DCONFIG_STDK_IOT_CORE_USE_MBEDTLS
 +endif
 +
-+ifeq ($(CONFIG_STDK_IOT_CORE_BSP_SUPPORT_MT7682),y)
-+CFLAGS += -DCONFIG_STDK_IOT_CORE_BSP_SUPPORT_MT7682
++ifeq ($(CONFIG_STDK_IOT_CORE_NET_MBEDTLS),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_NET_MBEDTLS
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_EASYSETUP_HTTP
 +endif
 +
 +ifeq ($(CONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP),y)
 +CFLAGS += -DCONFIG_LWIP_USE_HTTPD_FOR_EASYSETUP
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_BSP_SUPPORT_MT7682),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_BSP_SUPPORT_MT7682
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE
++endif
++
++ifeq ($(CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519),y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519
 +endif
 +
 +ifeq ($(CONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION),y)
@@ -537,10 +560,13 @@ index 0000000..a3eb922
 +
 +ifeq ($(CONFIG_SAMSUNG_BUILD_ENG),y)
 +CFLAGS += -DCONFIG_SAMSUNG_BUILD_ENG
++CFLAGS += -DCONFIG_STDK_IOT_CORE_LOG_LEVEL_WARN
++CFLAGS += -DCONFIG_STDK_IOT_CORE_LOG_LEVEL_INFO
++CFLAGS += -DCONFIG_STDK_IOT_CORE_LOG_LEVEL_ERROR
 +endif
 +
-+ifeq ($(CONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS),y)
-+CFLAGS += -DCONFIG_STDK_IOT_CORE_OS_SUPPORT_FREERTOS
++ifeq ($(CONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG), y)
++CFLAGS += -DCONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG
 +endif
 diff --git a/project/mt7682_hdk/apps/stdk_project/GCC/feature.mk b/project/mt7682_hdk/apps/stdk_project/GCC/feature.mk
 new file mode 100644
