@@ -581,7 +581,7 @@ def make_caps_c_header_output(caps):
     #exception check
     sample_path = SAMPLE_C_PATH + "/exception_" + caps.id + "_capsCheader.h"
     if (os.path.isfile(sample_path)):
-        output.write(replace_sampleString_with_caps_attr_cmds(open(sample_path, 'r').read(), caps, attr, None))
+        output.write(replace_sampleString_with_caps_attr_cmds(open(sample_path, 'r').read(), caps, None, None))
         return
 
     output.write(            "#include \"caps/iot_caps_helper_" + caps.id + ".h\"\n")

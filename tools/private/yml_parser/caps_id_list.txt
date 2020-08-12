@@ -25,6 +25,7 @@ fanOscillationMode
 fanSpeed
 filterStatus
 fineDustSensor
+firmwareUpdate
 formaldehydeMeasurement
 garageDoorControl
 gasMeter
