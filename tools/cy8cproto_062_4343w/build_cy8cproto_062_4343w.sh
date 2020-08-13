@@ -18,6 +18,8 @@ print_usage () {
   echo "    ex) ./build.sh ${CHIP_NAME} st_switch flash"
   echo "    ex) ./build.sh ${CHIP_NAME} st_switch clean"
   echo "    ex) ./build.sh ${CHIP_NAME} st_switch clean flash"
+  echo "    ex) ./build.sh ${CHIP_NAME} st_switch menuconfig"
+  echo "    ex) ./build.sh ${CHIP_NAME} st_switch menuconfig flash"
   echo
 }
 
@@ -36,7 +38,26 @@ for arg in "$@"; do
     if [ "$arg" == "flash" -o  "$arg" == "clean" ]; then
         FLASH_OPTION="${FLASH_OPTION} --$arg"
     fi
+    if [ "$arg" == "menuconfig" ]; then
+	    CONFIG_OPTION=true
+    fi
 done
+
+#Generate Configuration in Json formate
+if [ "$CONFIG_OPTION" ]; then cmd=kconfig-mconf; else cmd=kconfig-conf; fi
+if which $cmd &> /dev/null; then
+    if [ $CONFIG_OPTION ]; then
+        kconfig-mconf "${CORE_PATH}/src/kconfig-mbed"
+    else
+        kconfig-conf "${CORE_PATH}/src/kconfig-mbed"
+    fi
+    INPUT_FILE="${PWD}/.config"
+    OUTPUT_FILE="${CORE_PATH}/mbed_lib.json"
+    CONFIG_SCRIPT="${CORE_PATH}/src/ConfigToJson.py"
+    python $CONFIG_SCRIPT $INPUT_FILE $OUTPUT_FILE
+else
+    echo "Install kconfig-frontends"
+fi
 
 # Add config file and Generate .mbedignore file
 cp ${PROJECT_PATH}/usr_config.py ${CORE_PATH}/src
