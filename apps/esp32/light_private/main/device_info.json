@@ -1,9 +1,9 @@
 {
 	"deviceInfo": {
-		"firmwareVersion": "1.0",
+		"firmwareVersion": "1.0.0",
 		"manufacturerName": "Samsung",
-		"modelNumber": "SM-M800",
+		"modelNumber": "SM-TEST",
 		"marketingName": "IOT Smart Lamp",
-		"manufacturerCode": "102"
+		"manufacturerCode": "101"
 	}
 }
