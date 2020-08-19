@@ -362,6 +362,8 @@ fi
 set -e
 echo "${TARGET_MAJOR_VER}.${TARGET_MINOR_VER}.${TARGET_PATCH_VER}" > VERSION
 git add VERSION
+sed -i '/firmwareVersion/c\\t\t\"firmwareVersion\": \"'${TARGET_MAJOR_VER}'.'${TARGET_MINOR_VER}'.'${TARGET_PATCH_VER}'\",' ./apps/esp32/light_private/main/device_info.json
+git add ./apps/esp32/light_private/main/device_info.json
 git commit -s -m "Update VERSION to ${TARGET_MAJOR_VER}.${TARGET_MINOR_VER}.${TARGET_PATCH_VER}"
 git checkout -B private_rel_${TARGET_MAJOR_VER}_${TARGET_MINOR_VER}_${TARGET_PATCH_VER}
 set +e
