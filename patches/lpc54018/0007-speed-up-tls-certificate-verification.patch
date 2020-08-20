@@ -1,0 +1,180 @@
+From 531bf25305c03284b46c5707b9c781ffcb0e2a9e Mon Sep 17 00:00:00 2001
+From: "qin.li" <qin.li@samsung.com>
+Date: Thu, 20 Aug 2020 13:34:37 +0800
+Subject: [PATCH] speed up tls certificate verification 1. set tls related code
+ to non xip 2. add m_data2 and apply building optimization to avoid m_data
+ overflow
+
+---
+ .../lpc54018iotmodule/stdk/armgcc/CMakeLists.txt   |  5 +-
+ .../stdk/armgcc/LPC54018_spifi_flash.ld            | 88 +++++++++++++---------
+ 2 files changed, 57 insertions(+), 36 deletions(-)
+
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt b/boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt
+index 73c8642..8ce5707 100755
+--- a/boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt
++++ b/boards/lpc54018iotmodule/stdk/armgcc/CMakeLists.txt
+@@ -121,9 +121,10 @@ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DSERIAL_PORT_TYPE_UART=1")
+ 
+ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DFSL_RTOS_FREE_RTOS")
+ 
+-SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
+ 
+-SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Os")
++
++SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -s")
+ 
+ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -mcpu=cortex-m4")
+ 
+diff --git a/boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld b/boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld
+index 97a055c..3260cb4 100755
+--- a/boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld
++++ b/boards/lpc54018iotmodule/stdk/armgcc/LPC54018_spifi_flash.ld
+@@ -35,13 +35,15 @@ IMAGE_START_ADDR  = DEFINED(XIP_IMAGE)  ? 0x10000000  : 0x00000000;
+ DATA_START_ADDR   = DEFINED(XIP_IMAGE)  ? 0x00000004  : 0x20000000;
+ TEXT_SECTION_SIZE = DEFINED(XIP_IMAGE)  ? 0x00FFFE00  : 0x0002FE00;
+ DATA_SECTION_SIZE = DEFINED(XIP_IMAGE)  ? 0x0002FFFC  : 0x00028000;
+-
++DATA2_START_ADDR   = 0x20000000;
++DATA2_SECTION_SIZE = 0x00028000;
+ /* Specify the memory areas */
+ MEMORY
+ {
+   m_interrupts          (RX)  : ORIGIN = IMAGE_START_ADDR, LENGTH = 0x00000200
+   m_text                (RX)  : ORIGIN = IMAGE_START_ADDR + 0x00000200, LENGTH = TEXT_SECTION_SIZE
+   m_data                (RW)  : ORIGIN = DATA_START_ADDR, LENGTH = DATA_SECTION_SIZE
++  m_data2               (RW)  : ORIGIN = DATA2_START_ADDR, LENGTH = DATA2_SECTION_SIZE
+   m_usb_sram            (RW)  : ORIGIN = 0x40100000, LENGTH = 0x00002000
+ }
+ 
+@@ -61,20 +63,30 @@ SECTIONS
+   .text :
+   {
+     . = ALIGN(4);
+-	*(EXCLUDE_FILE(
+-		/* Exclude flash and frequently executed functions from XIP */
+-		*/mflash_drv.c.obj
+-		*/fsl_spifi.c.obj
+-		*/fsl_spi_dma.c.obj
+-		*/fsl_dma.c.obj
+-	) .text)                 /* .text sections (code) */
+-	*(EXCLUDE_FILE(
+-		/* Exclude flash and frequently executed functions from XIP */
+-		*/mflash_drv.c.obj
+-		*/fsl_spifi.c.obj
+-		*/fsl_spi_dma.c.obj
+-		*/fsl_dma.c.obj
+-	) .text*)                /* .text* sections (code) */
++    *(EXCLUDE_FILE(
++        /* Exclude flash and frequently executed functions from XIP */
++        */mflash_drv.c.obj
++        */fsl_spifi.c.obj
++        */bignum.c.obj
++        /* Optimization based on Lauterbach Perf */
++        */aes.c.obj
++        */sha1.c.obj
++        */fsl_spi_dma.c.obj
++        */fsl_dma.c.obj
++        */ecp_curves.c.obj
++    ) .text)                 /* .text sections (code) */
++    *(EXCLUDE_FILE(
++        /* Exclude flash and frequently executed functions from XIP */
++        */mflash_drv.c.obj
++        */fsl_spifi.c.obj
++        */bignum.c.obj
++        /* Optimization based on Lauterbach Perf */
++        */aes.c.obj
++        */sha1.c.obj
++        */fsl_spi_dma.c.obj
++        */fsl_dma.c.obj
++        */ecp_curves.c.obj
++    ) .text*)                /* .text* sections (code) */
+     *(.rodata)               /* .rodata sections (constants, strings, etc.) */
+     *(.rodata*)              /* .rodata* sections (constants, strings, etc.) */
+     *(.glue_7)               /* glue arm to thumb code */
+@@ -164,11 +176,17 @@ SECTIONS
+     __DATA_RAM = .;
+     __data_start__ = .;      /* create a global symbol at data start */
+     *(.ramfunc*)             /* for functions in ram */
+-	/* Explicit placement of flash and frequently executed functions in RAM */
+-	*/mflash_drv.c.obj(.text .text* .rodata .rodata*)
+-	*/fsl_spifi.c.obj(.text .text* .rodata .rodata*)
+-	*/fsl_spi_dma.c.obj(.text .text* .rodata .rodata*)
+-	*/fsl_dma.c.obj(.text .text* .rodata .rodata*)
++    /* Explicit placement of flash and frequently executed functions in RAM */
++    */mflash_drv.c.obj(.text .text* .rodata .rodata*)
++    */fsl_spifi.c.obj(.text .text* .rodata .rodata*)
++    */bignum.c.obj(.text .text* .rodata .rodata*)
++    /* Optimization based on Lauterbach Perf */
++    */aes.c.obj(.text .text* .rodata .rodata*)
++    */sha1.c.obj(.text .text* .rodata .rodata*)
++    */fsl_spi_dma.c.obj(.text .text* .rodata .rodata*)
++    */fsl_dma.c.obj(.text .text* .rodata .rodata*)
++    */ecp_curves.c.obj(.text .text* .rodata .rodata*)
++    /* Data placement */
+     *(.data)                 /* .data sections */
+     *(.data*)                /* .data* sections */
+     KEEP(*(.jcr*))
+@@ -182,7 +200,19 @@ SECTIONS
+   __IMAGE_SIZE = __IMAGE_END - __IMAGE_START;
+ 
+   text_end = ORIGIN(m_text) + LENGTH(m_text);
+-  ASSERT(__DATA_END <= text_end, "region m_text overflowed with text and data")
++
++  .heap :
++  {
++    
++    . = ALIGN(8);
++    __end__ = .;
++    PROVIDE(end = .);
++    /* Reserved for FreeRTOS heap3 implementation */
++    __HeapBase = .;
++    . += HEAP_SIZE;
++    __HeapLimit = .;
++    __heap_limit = .; /* Add for _sbrk */
++  } > m_data2
+ 
+   /* Uninitialized data section */
+   .bss :
+@@ -199,22 +229,11 @@ SECTIONS
+     __END_BSS = .;
+   } > m_data
+ 
+-  .heap :
+-  {
+-    . = ALIGN(8);
+-    __end__ = .;
+-    PROVIDE(end = .);
+-    __HeapBase = .;
+-    . += HEAP_SIZE;
+-    __HeapLimit = .;
+-    __heap_limit = .; /* Add for _sbrk */
+-  } > m_data
+-
+   .stack :
+   {
+     . = ALIGN(8);
+     . += STACK_SIZE;
+-  } > m_data
++  } > m_data2
+ 
+   m_usb_bdt (NOLOAD) :
+   {
+@@ -228,11 +247,12 @@ SECTIONS
+   } > m_usb_sram
+ 
+   /* Initializes stack on the end of block */
+-  __StackTop   = ORIGIN(m_data) + LENGTH(m_data);
++  __StackTop   = ORIGIN(m_data2) + LENGTH(m_data2);
+   __StackLimit = __StackTop - STACK_SIZE;
+   PROVIDE(__stack = __StackTop);
+ 
+   .ARM.attributes 0 : { *(.ARM.attributes) }
+ 
++  ASSERT((SIZEOF(.data) + SIZEOF(.bss) <= DATA_SECTION_SIZE), "region m_data overflowed with data and bss")
+   ASSERT(__StackLimit >= __HeapLimit, "region m_data overflowed with stack and heap")
+ }
+-- 
+2.7.4
+
