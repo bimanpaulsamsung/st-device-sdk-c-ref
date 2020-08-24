@@ -945,6 +945,9 @@ void ota_check_for_update(void *user_data)
         else
             ret = _get_available_version(read_data, read_data_len, current_version, &available_version);
 
+        if (read_data)
+            free(read_data);
+
         if (ret != OTA_OK) {
             printf("Cannot find new version: %d\n", ret);
             return;
