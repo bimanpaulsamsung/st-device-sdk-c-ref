@@ -15,6 +15,7 @@ print_usage () {
 	echo "    ex) ./setup.sh emw3166"
 	echo "    ex) ./setup.sh emw3080"
 	echo "    ex) ./setup.sh cy8cproto_062_4343w"
+	echo "    ex) ./setup.sh stm32"
 	echo
 }
 

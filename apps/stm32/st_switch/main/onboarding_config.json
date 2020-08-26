@@ -1,0 +1,13 @@
+{
+  "onboardingConfig": {
+    "deviceOnboardingId": "MBEDONBOARD",
+    "mnId": "fLqY",
+    "setupId": "123",
+    "vid": "CYSRIB01",
+    "deviceTypeId": "Switch",
+    "ownershipValidationTypes": [
+      "JUSTWORKS"
+    ],
+    "identityType": "ED25519"
+  }
+}

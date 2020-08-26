@@ -31,6 +31,7 @@ print_usage () {
     echo "    ex) ./build.sh emw3166 switch_example"
     echo "    ex) ./build.sh emw3080 switch_example"
     echo "    ex) ./build.sh cy8cproto_062_4343w st_switch"
+    echo "    ex) ./build.sh stm32 st_switch"
     echo
 }
 
