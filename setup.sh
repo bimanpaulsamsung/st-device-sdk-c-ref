@@ -13,6 +13,8 @@ print_usage () {
 	echo "    ex) ./setup.sh rtl8720c"
 	echo "    ex) ./setup.sh rtl8721c"
 	echo "    ex) ./setup.sh emw3166"
+	echo "    ex) ./setup.sh emw3080"
+
 	echo "    ex) ./setup.sh mt7682_ss"
 	echo "    ex) ./setup.sh emw3080"
 	echo "    ex) ./setup.sh tizenrt esp32"
@@ -22,6 +24,7 @@ print_usage () {
 	echo "    ex) ./setup.sh cy8cproto_062_4343w"
 	echo "    ex) ./setup.sh rda5981c"
 	echo "    ex) ./setup.sh pic32mz"
+	echo
 }
 
 if [ "${BSP_NAME}" == "esp32" ]; then

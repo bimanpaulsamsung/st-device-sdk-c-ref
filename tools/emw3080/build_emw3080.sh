@@ -15,8 +15,8 @@ export PROJECT_PATH="${IOT_APPS_PATH}/${PROJECT_TITLE}"
 print_usage () {
 	echo "    Usage: ./build.sh emw3080 APP_NAME"
 	echo "- - - - - - - - - - - - - - - - - - -"
-	echo "    ex) ./build.sh emw3080 smart_switch"
-	echo "    ex) ./build.sh emw3080 smart_lamp"
+	echo "    ex) ./build.sh emw3080 switch_example"
+	echo "    ex) ./build.sh emw3080 light_example"
 	echo
 }
 

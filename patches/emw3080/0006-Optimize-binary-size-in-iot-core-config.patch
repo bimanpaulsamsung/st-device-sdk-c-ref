@@ -1,4 +1,4 @@
-From 1852935c9d9ad75fb9a3989d7b772bf4357274eb Mon Sep 17 00:00:00 2001
+From 8e5b79179e4b766b709eaffa32b2f4737944879d Mon Sep 17 00:00:00 2001
 From: "qin.li" <qin.li@samsung.com>
 Date: Thu, 16 Jul 2020 17:44:46 +0800
 Subject: [PATCH] Optimize binary size in iot-core config
@@ -8,7 +8,7 @@ Subject: [PATCH] Optimize binary size in iot-core config
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/MiCO/net/stdk/config.mk b/MiCO/net/stdk/config.mk
-index cbe9b23..e2a1aee 100644
+index cbe9b23..26a7b28 100644
 --- a/MiCO/net/stdk/config.mk
 +++ b/MiCO/net/stdk/config.mk
 @@ -10,7 +10,7 @@ CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP=y
@@ -24,7 +24,7 @@ index cbe9b23..e2a1aee 100644
  STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE_LOG_LEVEL_DEBUG
  endif
  
-+STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE_LOG_LEVEL_ERROR
++STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE_LOG_LEVEL_INFO
  STDK_CFLAGS += -DCONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_ED25519
  STDK_CFLAGS += -DCONFIG_SAMSUNG_RUN_TIME_STATS
  CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE=y
