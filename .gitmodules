@@ -25,12 +25,13 @@
 [submodule "bsp/emw3166/mico-os"]
 	path = bsp/emw3166/mico-os
 	url = https://github.com/MXCHIP/mico-os
-[submodule "bsp/mt7682_ss"]
-	path = bsp/mt7682_ss
-	url = ssh://slp-info.sec.samsung.net:29418/rtos/freertos/mediatek/mt7682
 [submodule "bsp/emw3080/mico-os"]
 	path = bsp/emw3080/mico-os
 	url = https://github.com/MXCHIP/mico-os
+
+[submodule "bsp/mt7682_ss"]
+	path = bsp/mt7682_ss
+	url = ssh://slp-info.sec.samsung.net:29418/rtos/freertos/mediatek/mt7682
 [submodule "bsp/tizenrt"]
 	path = bsp/tizenrt
 	url = https://github.com/Samsung/TizenRT/
@@ -43,3 +44,4 @@
 [submodule "bsp/pic32mz"]
 	path = bsp/pic32mz
 	url = git@github.sec.samsung.net:STDK/microchip-pic32mz.git
+
