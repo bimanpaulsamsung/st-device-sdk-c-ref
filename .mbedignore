@@ -72,6 +72,7 @@ iot-core/src/port/bsp/rtl8195/
 iot-core/src/port/bsp/rtl8720c/
 iot-core/src/port/bsp/rtl8721c/
 iot-core/src/port/bsp/tizenrt/
+iot-core/src/port/bsp/esp32s2/
 
 #Block the Apps not required
 apps/cc3220sf/
@@ -94,3 +95,4 @@ apps/esp8266/
 apps/rtl8195/
 apps/rtl8720c/
 apps/rtl8721c/
+apps/esp32s2/
