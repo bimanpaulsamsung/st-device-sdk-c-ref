@@ -1,0 +1,25 @@
+From 71f20ac9dcf0a28fe1e5b86db3d3cadcc198f777 Mon Sep 17 00:00:00 2001
+From: Biman Paul <biman.paul@samsung.com>
+Date: Mon, 13 Apr 2020 23:42:31 +0530
+Subject: [PATCH 7/9] sntp: enable dns resolution for sntp
+
+---
+ features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h b/features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h
+index ed98040..6422b88 100644
+--- a/features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h
++++ b/features/lwipstack/lwip/src/include/lwip/apps/sntp_opts.h
+@@ -72,7 +72,7 @@
+  * \#define SNTP_SERVER_ADDRESS "pool.ntp.org"
+  */
+ #if !defined SNTP_SERVER_DNS || defined __DOXYGEN__
+-#define SNTP_SERVER_DNS            0
++#define SNTP_SERVER_DNS            1
+ #endif
+ 
+ /**
+-- 
+2.7.4
+

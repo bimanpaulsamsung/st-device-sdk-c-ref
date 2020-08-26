@@ -12,7 +12,7 @@ iot-core/test/
 
 #Block openssl or mbedtls
 iot-core/src/port/net/openssl/
-#iot-core/src/port/net/mbedtls/
+iot-core/src/port/net/mbedtls/
 
 #Block Linux specific files
 iot-core/src/easysetup/http/lwip_httpd/fsdata_custom.c
@@ -60,7 +60,7 @@ iot-core/src/port/os/tizenrt/
 
 #Block the BSP not interested
 iot-core/src/port/bsp/cc3220sf/
-#iot-core/src/port/bsp/cy8cproto_062_4343w/
+iot-core/src/port/bsp/cy8cproto_062_4343w/
 iot-core/src/port/bsp/emw3080/
 iot-core/src/port/bsp/emw3166/
 iot-core/src/port/bsp/esp32/
@@ -75,13 +75,22 @@ iot-core/src/port/bsp/tizenrt/
 
 #Block the Apps not required
 apps/cc3220sf/
-#apps/cy8cproto_062_4343w/
+apps/cy8cproto_062_4343w/
 apps/emw3080/
 apps/emw3166/
 apps/esp32/
 apps/esp8266/
 apps/lpc54018/
 apps/mt7682_ss/
+apps/rtl8195/
+apps/rtl8720c/
+apps/rtl8721c/
+apps/capability_sample/
+apps/emw3166/
+apps/esp32/
+apps/esp32_v3.3/
+apps/esp32_v4.x/
+apps/esp8266/
 apps/rtl8195/
 apps/rtl8720c/
 apps/rtl8721c/
