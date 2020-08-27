@@ -46,6 +46,7 @@ iot_error_t _iot_security_storage_set_storage_id(iot_security_context_t *context
 
 iot_error_t iot_security_storage_init(iot_security_context_t *context)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_error_t err;
 	iot_security_storage_params_t *storage_params;
 
@@ -66,15 +67,19 @@ iot_error_t iot_security_storage_init(iot_security_context_t *context)
 	if (context->be_context &&
 		context->be_context->fn &&
 		context->be_context->fn->storage_init) {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		err = context->be_context->fn->storage_init(context);
 		if (err) {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 			iot_os_free(context->storage_params);
 			context->storage_params = NULL;
 			return err;
 		}
 	}
 
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	context->sub_system |= IOT_SECURITY_SUB_STORAGE;
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 
 	return IOT_ERROR_NONE;
 }
@@ -150,6 +155,7 @@ iot_error_t iot_security_storage_read(iot_security_context_t *context, iot_secur
 
 iot_error_t iot_security_storage_write(iot_security_context_t *context, iot_security_storage_id_t storage_id, iot_security_buffer_t *input_buf)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_error_t err;
 
 	IOT_DEBUG("id:%d", storage_id);
@@ -174,12 +180,15 @@ iot_error_t iot_security_storage_write(iot_security_context_t *context, iot_secu
 		IOT_ERROR_DUMP_AND_RETURN(BE_FUNC_NULL, 0);
 	}
 
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	err = context->be_context->fn->storage_write(context, input_buf);
 	if (err) {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		return err;
 	}
 
 	IOT_DEBUG("id:%d written %d@%p", context->storage_params->storage_id, (int)input_buf->len, input_buf->p);
+	printf("id:%d written %d@%p", context->storage_params->storage_id, (int)input_buf->len, input_buf->p);
 
 	return IOT_ERROR_NONE;
 }

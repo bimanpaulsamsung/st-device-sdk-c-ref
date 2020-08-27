@@ -39,6 +39,21 @@
             "help": "ssl-dtls-max-buffering",
             "macro_name": "MBEDTLS_SSL_DTLS_MAX_BUFFERING",
             "value": 8192
+        },
+	"crypto-software": {
+            "help": "crypto-software",
+            "macro_name": "CONFIG_STDK_IOT_CORE_SECURITY_BACKEND_SOFTWARE",
+            "value": true
+        },
+        "crypto-support": {
+            "help": "crypto-support",
+            "macro_name": "CONFIG_STDK_IOT_CORE_CRYPTO_SUPPORT_VERIFY",
+            "value": true
+        },
+        "uuid-string-length": {
+            "help": "uuid string length",
+            "macro_name": "UUID_STR_LEN",
+            "value": 36
         }
     },
     "macros": [

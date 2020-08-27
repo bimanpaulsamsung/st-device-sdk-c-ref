@@ -587,7 +587,8 @@ iot_error_t iot_get_time_in_sec_by_long(long *sec)
 	/* In systems with tv_sec declared as long long int, %ld cannot be used
 	 * as format specifier even if the value is within limit of long. Hence,
 	 * typecast the value of tv_sec. */
-	*sec = (long)tv_now.tv_sec;
+	//*sec = (long)tv_now.tv_sec;
+	memcpy(sec, &(tv_now.tv_sec), sizeof(long));
 
 	return IOT_ERROR_NONE;
 }

@@ -25,7 +25,7 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include <unistd.h>
-#include <netinet/in.h>
+//#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <iot_main.h>
 #include <external/JSON.h>
@@ -62,7 +62,8 @@ int TC_iot_easysetup_httpd_setup(void **state)
 
     err = iot_easysetup_init(context);
     assert_int_equal(err, IOT_ERROR_NONE);
-    usleep(100);
+    //usleep(100);
+    //osDelay(100);
 
     *state = context;
 
@@ -113,7 +114,8 @@ static int _connect_to_server(char *server_addr)
             if (++connect_retry > 5) {
                 assert_return_code(rc, errno);
             }
-            sleep(1);
+            //sleep(1);
+	    //osDelay(1 * 1000);
         }
     } while (rc < 0);
 
@@ -411,7 +413,8 @@ void TC_iot_easysetup_httpd_keyinfo_separated_transfer_success(void **state)
     len = send(sock, post_header, strlen(post_header), 0);
     // Then
     assert_int_equal(len, strlen(post_header));
-    usleep(100); // to make sure send separately.
+    //usleep(100); // to make sure send separately.
+    //osDelay(100);
     // When: send body only
     len = send(sock, post_body, strlen(post_body), 0);
     // Then

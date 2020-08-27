@@ -580,6 +580,7 @@ const iot_security_be_funcs_t iot_security_be_virtual_funcs = {
 
 iot_security_be_context_t *iot_security_be_init(external_nv_callback external_nv_cb)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_error_t err;
 	iot_security_be_context_t *be_context;
 

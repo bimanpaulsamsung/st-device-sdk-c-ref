@@ -40,6 +40,7 @@
 
 iot_error_t iot_easysetup_create_ssid(struct iot_devconf_prov_data *devconf, char *ssid, size_t ssid_len)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	char *serial = NULL;
 	unsigned char hash_buffer[IOT_SECURITY_SHA256_LEN] = { 0, };
 	unsigned char base64url_buffer[IOT_SECURITY_B64_ENCODE_LEN(IOT_SECURITY_SHA256_LEN)] = { 0, };
@@ -575,7 +576,7 @@ iot_error_t _es_keyinfo_handler(struct iot_context *ctx, char *in_payload, char 
 		IOT_INFO("no datetime info");
 		IOT_ES_DUMP(IOT_DEBUG_LEVEL_ERROR, IOT_DUMP_EASYSETUP_INVALID_REQUEST, 0);
 		err  = IOT_ERROR_EASYSETUP_INVALID_REQUEST;
-		goto exit_ecdh_deinit;
+		goto skip_time_set;
 	}
 	p_datetime_str = (unsigned char *)JSON_GET_STRING_VALUE(recv);
 
@@ -669,6 +670,8 @@ iot_error_t _es_keyinfo_handler(struct iot_context *ctx, char *in_payload, char 
 	}
 
 	IOT_DEBUG("timezoneid = %s", decode_buf); // TODO: where to store
+
+skip_time_set:
 
 	JSON_DELETE(root);
 

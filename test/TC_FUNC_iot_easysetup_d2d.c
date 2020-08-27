@@ -20,6 +20,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 #include <string.h>
+#include <slre.h>
 #include <iot_error.h>
 #include <iot_easysetup.h>
 #include <iot_nv_data.h>
@@ -33,7 +34,6 @@
 #include <iot_debug.h>
 #include "TC_MOCK_functions.h"
 #include "TC_UTIL_easysetup_common.h"
-
 #define UNUSED(x) (void**)(x)
 
 static const char sample_ssid[] = "STDK_E4fTST0016LWpcd226";
@@ -300,6 +300,7 @@ static void assert_wifi_provisioning(struct iot_context *context, struct test_wi
 
 void TC_STATIC_es_wifiprovisioninginfo_handler_success(void **state)
 {
+    printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     iot_error_t err;
     char *out_payload = NULL;
     char *in_payload = NULL;
@@ -347,6 +348,7 @@ void TC_STATIC_es_wifiprovisioninginfo_handler_success(void **state)
 
 void TC_STATIC_es_wifiprovisioninginfo_handler_success_without_authtype(void **state)
 {
+    printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     iot_error_t err;
     char *out_payload = NULL;
     char *in_payload = NULL;
@@ -1119,22 +1121,40 @@ static void assert_deviceinfo(char *payload, char *expected_firmware_version, ch
     JSON_DELETE(root);
 }
 
+int uuid_is_valid(const char *input_string)
+{
+    unsigned int i;
+    for (i = 0; i < UUID_STR_LEN; i++) {
+        if (i == 8 || i == 13 || i == 18 || i == 23) {
+            if (input_string[i] != '-')
+                return 0;
+        } else if (!isxdigit(input_string[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 static void assert_uuid_format(char *input_string)
 {
+    printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     regex_t regex;
     int result;
     const char *uuid_pattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$";
-
     assert_non_null(input_string);
-    result = regcomp(&regex, uuid_pattern, REG_EXTENDED);
-    assert_return_code(result, errno);
-    result = regexec(&regex, input_string, 0, NULL, 0);
-    assert_int_not_equal(result, REG_NOMATCH);
-    assert_int_equal(result, 0);
+    result = uuid_is_valid(input_string);
+    assert_int_equal(result, 1);
+    
+    //result = regcomp(&regex, uuid_pattern, REG_EXTENDED);
+    //assert_return_code(result, errno);
+    //result = regexec(&regex, input_string, 0, NULL, 0);
+    //assert_int_not_equal(result, REG_NOMATCH);
+    // assert_int_equal(result, 0);
 }
 
 static void assert_lookup_id(const char *payload, iot_security_cipher_params_t *cipher)
 {
+    printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     JSON_H *root;
     JSON_H *item;
     unsigned char *b64url_aes256_message;

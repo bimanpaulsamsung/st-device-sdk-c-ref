@@ -56,6 +56,7 @@ static const char name_serialNumber[] = "serialNumber";
 STATIC_FUNCTION
 iot_security_context_t *_iot_nv_io_storage_init(void)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_error_t err;
 	iot_security_context_t *security_context;
 
@@ -96,6 +97,7 @@ iot_error_t _iot_nv_io_storage_deinit(iot_security_context_t *security_context)
 STATIC_FUNCTION
 iot_error_t _iot_nv_io_storage(const iot_nvd_t nv_id, iot_nv_io_mode_t mode, char *data, size_t data_len)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_error_t err = IOT_ERROR_NONE;
 	iot_security_context_t *security_context;
 	iot_security_buffer_t data_buf = {0};
@@ -114,6 +116,7 @@ iot_error_t _iot_nv_io_storage(const iot_nvd_t nv_id, iot_nv_io_mode_t mode, cha
 
 	security_context = _iot_nv_io_storage_init();
 	IOT_ERROR_CHECK(security_context == NULL, IOT_ERROR_NV_DATA_ERROR, "failed to init storage");
+   //printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 
 	switch (mode) {
 	case IOT_NV_MODE_READ:
@@ -148,6 +151,7 @@ iot_error_t _iot_nv_io_storage(const iot_nvd_t nv_id, iot_nv_io_mode_t mode, cha
 		data_buf.p = (unsigned char *)data;
 		data_buf.len = data_len;
 
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		err = iot_security_storage_write(security_context, nv_id, &data_buf);
 		if (err != IOT_ERROR_NONE) {
 			IOT_ERROR("iot_security_storage_write = %d", err);
@@ -180,6 +184,7 @@ iot_error_t _iot_nv_read_data(const iot_nvd_t nv_type, char *data, size_t data_l
 
 iot_error_t _iot_nv_write_data(const iot_nvd_t nv_type, const char *data, size_t data_len)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	return _iot_nv_io_storage(nv_type, IOT_NV_MODE_WRITE, (char *)data, data_len);
 }
 
@@ -190,6 +195,7 @@ iot_error_t _iot_nv_remove_data(const iot_nvd_t nv_type)
 
 iot_error_t iot_nv_init(unsigned char *device_info, size_t device_info_len)
 {
+	printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	HIT();
 	iot_error_t ret = iot_bsp_fs_init();
 	IOT_DEBUG_CHECK(ret != IOT_ERROR_NONE, IOT_ERROR_INIT_FAIL, "NV init fail");

@@ -34,11 +34,13 @@
 STATIC_FUNCTION
 iot_security_storage_target_t _iot_security_be_bsp_fs_storage_id2target(iot_security_storage_id_t storage_id)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	if (storage_id == IOT_NVD_UNKNOWN) {
 		return IOT_SECURITY_STORAGE_TARGET_UNKNOWN;
 	}
 
 	if (storage_id < IOT_NVD_FACTORY) {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		return IOT_SECURITY_STORAGE_TARGET_NV;
 	}
 
@@ -56,6 +58,7 @@ iot_security_storage_target_t _iot_security_be_bsp_fs_storage_id2target(iot_secu
 STATIC_FUNCTION
 iot_error_t _iot_security_be_bsp_fs_storage_id2filename(iot_security_storage_id_t storage_id, char *filename, size_t filename_len)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	const char *storage_file;
 	const char *extra_path = (const char *)IOT_SECURITY_STORAGE_EXTRA_PATH;
 	int c = 0;
@@ -205,6 +208,7 @@ iot_error_t _iot_security_be_bsp_fs_load(iot_security_be_context_t *be_context, 
 STATIC_FUNCTION
 iot_error_t _iot_security_be_bsp_fs_store_to_nv(iot_security_storage_id_t storage_id, iot_security_buffer_t *input_buf)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_error_t err;
 	iot_bsp_fs_handle_t handle;
 	char filename[IOT_SECURITY_STORAGE_FILENAME_MAX_LEN];
@@ -214,6 +218,7 @@ iot_error_t _iot_security_be_bsp_fs_store_to_nv(iot_security_storage_id_t storag
 		return err;
 	}
 
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	err = iot_bsp_fs_open(filename, FS_READWRITE, &handle);
 	if (err) {
 		IOT_ERROR("iot_bsp_fs_open(%s) = %d", filename, err);
@@ -239,6 +244,7 @@ iot_error_t _iot_security_be_bsp_fs_store_to_nv(iot_security_storage_id_t storag
 STATIC_FUNCTION
 iot_error_t _iot_security_be_bsp_fs_store(iot_security_be_context_t *be_context, iot_security_storage_id_t storage_id, iot_security_buffer_t *input_buf)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_security_storage_target_t storage_target;
 
 	IOT_DEBUG("id = %d", storage_id);
@@ -252,6 +258,7 @@ iot_error_t _iot_security_be_bsp_fs_store(iot_security_be_context_t *be_context,
 
 	switch (storage_target) {
 	case IOT_SECURITY_STORAGE_TARGET_NV:
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		return _iot_security_be_bsp_fs_store_to_nv(storage_id, input_buf);
 	case IOT_SECURITY_STORAGE_TARGET_FACTORY:
 		IOT_ERROR("cannot update factory nv for id = %d", storage_id);
@@ -321,6 +328,7 @@ const iot_security_be_bsp_funcs_t iot_security_be_software_bsp_funcs = {
 
 iot_error_t iot_security_be_bsp_init(iot_security_be_context_t *be_context)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	if (!be_context) {
 		IOT_ERROR_DUMP_AND_RETURN(BE_CONTEXT_NULL, 0);
 	}

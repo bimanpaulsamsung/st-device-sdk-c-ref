@@ -20,6 +20,7 @@
 #include "iot_debug.h"
 
 const char* iot_bsp_nv_get_data_path(iot_nvd_t nv_type) {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	HIT();
 	IOT_WARN_CHECK((nv_type < 0 || nv_type > IOT_NVD_MAX), NULL,
 			"Invalid args");
@@ -49,6 +50,8 @@ const char* iot_bsp_nv_get_data_path(iot_nvd_t nv_type) {
 		return "/fs/Label";
 	case IOT_NVD_DEVICE_ID:
 		return "/fs/DeviceID";
+	case IOT_NVD_MISC_INFO:
+		return "/fs/MiscInfo";
 
 	/* TODO: Get Manufacturer data */
 	/* stored in stnv partition (manufacturer data) */
@@ -60,6 +63,8 @@ const char* iot_bsp_nv_get_data_path(iot_nvd_t nv_type) {
 		return "/rom/CACert";
 	case IOT_NVD_SUB_CA_CERT:
 		return "/rom/SubCert";
+	case IOT_NVD_DEVICE_CERT:
+		return "/rom/DeviceCert";
 	case IOT_NVD_SERIAL_NUM:
 		return "/rom/SerialNum";
 

@@ -51,11 +51,13 @@ iot_error_t iot_security_check_backend_funcs_entry_is_valid(iot_security_context
 
 iot_security_context_t *iot_security_init(void)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_security_context_t *context;
 	iot_security_be_context_t *be_context;
 #if defined(CONFIG_STDK_IOT_CORE_SUPPORT_STNV_PARTITION)
 	external_nv_callback external_nv_cb = NULL;
 #else
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	external_nv_callback external_nv_cb = iot_nv_get_data_from_device_info;
 #endif
 

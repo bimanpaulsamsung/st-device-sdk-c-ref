@@ -71,20 +71,27 @@ iot_error_t iot_bsp_fs_deinit()
 
 iot_error_t iot_bsp_fs_open(const char *filename, iot_bsp_fs_open_mode_t mode, iot_bsp_fs_handle_t *handle)
 {
+	printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	int fd;
 	int open_mode;
 
 	if (mode == FS_READONLY) {
+	//printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		open_mode = O_RDONLY;
 	} else {
+	//printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		open_mode = O_RDWR | O_CREAT;
 	}
 
+	//printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	fd = open(filename, open_mode, 0644);
+	//printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	if (fd == -1) {
+	//printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		IOT_DEBUG("file open failed [%s]", strerror(errno));
 		return IOT_ERROR_FS_OPEN_FAIL;
 	} else {
+	//printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 		handle->fd = fd;
 		snprintf(handle->filename, sizeof(handle->filename), "%s", filename);
 		return IOT_ERROR_NONE;
@@ -123,14 +130,14 @@ iot_error_t iot_bsp_fs_read(iot_bsp_fs_handle_t handle, char *buffer, size_t *le
 
 iot_error_t iot_bsp_fs_write(iot_bsp_fs_handle_t handle, const char *data, unsigned int length)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	int ret;
 
 	if (handle.fd == -1) {
 		return IOT_ERROR_FS_NO_FILE;
 	}
 
-	/* write 'NULL' to file end */
-	ret = write(handle.fd, data, length+1);
+	ret = write(handle.fd, data, length);
 	if (ret == -1) {
 		return IOT_ERROR_FS_WRITE_FAIL;
 	}
@@ -155,6 +162,7 @@ iot_error_t iot_bsp_fs_close(iot_bsp_fs_handle_t handle)
 
 iot_error_t iot_bsp_fs_remove(const char *filename)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	int ret;
 	if (filename == NULL) {
 		return IOT_ERROR_INVALID_ARGS;

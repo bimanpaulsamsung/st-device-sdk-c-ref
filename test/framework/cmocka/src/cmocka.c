@@ -318,9 +318,11 @@ static const char *global_skip_filter_pattern;
 #ifndef _WIN32
 /* Signals caught by exception_handler(). */
 static const int exception_signals[] = {
+#if 0
     SIGFPE,
     SIGILL,
     SIGSEGV,
+#endif
 #ifdef SIGBUS
     SIGBUS,
 #endif

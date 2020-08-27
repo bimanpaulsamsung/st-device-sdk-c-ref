@@ -184,11 +184,14 @@ static int _process_accept_socket(int sock)
 
 static void es_tcp_task(void *pvParameters)
 {
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 	int addr_family, ip_protocol, ret;
 	struct sockaddr_in sourceAddr;
 	uint addrLen;
 
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 	while (!deinit_processing) {
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 		int opt = 1;
 		struct sockaddr_in destAddr;
 		destAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -263,7 +266,9 @@ void es_http_init(void)
 {
 	IOT_INFO("http tcp init!!");
 	IOT_ES_DUMP(IOT_DEBUG_LEVEL_INFO, IOT_DUMP_EASYSETUP_TCP_INIT, 0);
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 	iot_os_thread_create(es_tcp_task, "es_tcp_task", (1024 * 4), NULL, 5, (iot_os_thread * const)(&es_tcp_task_handle));
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 	IOT_ES_DUMP(IOT_DEBUG_LEVEL_INFO, IOT_DUMP_EASYSETUP_TCP_INIT, 1);
 }
 

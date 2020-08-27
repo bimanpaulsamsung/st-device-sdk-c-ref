@@ -34,6 +34,7 @@
 STATIC_FUNCTION
 iot_error_t _iot_security_be_check_context_and_params_is_valid(iot_security_context_t *context, iot_security_sub_system_t sub_system)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	if (!context) {
 		IOT_ERROR("context is null");
 		IOT_ERROR_DUMP_AND_RETURN(CONTEXT_NULL, 0);
@@ -67,6 +68,7 @@ iot_error_t _iot_security_be_check_context_and_params_is_valid(iot_security_cont
 		}
 	}
 
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	return IOT_ERROR_NONE;
 }
 
@@ -1718,6 +1720,7 @@ iot_error_t _iot_security_be_software_storage_read(iot_security_context_t *conte
 STATIC_FUNCTION
 iot_error_t _iot_security_be_software_storage_write(iot_security_context_t *context, iot_security_buffer_t *data_buf)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_error_t err;
 	iot_security_storage_params_t *storage_params;
 
@@ -1733,6 +1736,7 @@ iot_error_t _iot_security_be_software_storage_write(iot_security_context_t *cont
 		IOT_ERROR_DUMP_AND_RETURN(BSP_FN_STORE_NULL, 0);
 	}
 
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	err = context->be_context->bsp_fn->bsp_fs_store(context->be_context, storage_params->storage_id, data_buf);
 	if (err) {
 		return err;
@@ -1805,6 +1809,7 @@ const iot_security_be_funcs_t iot_security_be_software_funcs = {
 
 iot_security_be_context_t *iot_security_be_init(external_nv_callback external_nv_cb)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
 	iot_error_t err;
 	iot_security_be_context_t *be_context;
 

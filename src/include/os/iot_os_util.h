@@ -424,12 +424,17 @@ void iot_os_free(void *ptr);
  */
 char *iot_os_strdup(const char *src);
 #else
+void *iot_os_malloc(size_t size);
+//void *iot_os_calloc(size_t nmemb, size_t size);
+void *iot_os_realloc(void *ptr, size_t size);
+void iot_os_free(void *ptr);
+char *iot_os_strdup(const char *src);
 #include <string.h>
-static inline void *iot_os_malloc(size_t size) { return malloc(size); }
+//static inline void *iot_os_malloc(size_t size) { return malloc(size); }
 static inline void *iot_os_calloc(size_t nmemb, size_t size) { return calloc(nmemb, size); }
-static inline void *iot_os_realloc(void *ptr, size_t size) { return realloc(ptr, size); }
-static inline void iot_os_free(void *ptr) { return free(ptr); }
-static inline char *iot_os_strdup(const char *src) { return strdup(src); }
+//static inline void *iot_os_realloc(void *ptr, size_t size) { return realloc(ptr, size); }
+//static inline void iot_os_free(void *ptr) { return free(ptr); }
+//static inline char *iot_os_strdup(const char *src) { return strdup(src); }
 #endif
 
 #ifdef  __cplusplus

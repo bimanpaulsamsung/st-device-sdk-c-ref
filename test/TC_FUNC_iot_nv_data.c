@@ -66,6 +66,7 @@ int TC_iot_nv_data_setup(void **state)
 #else
     err = iot_nv_init(NULL, 0);
 #endif
+    printf ("err = %d \n", err);
     assert_int_equal(err, IOT_ERROR_NONE);
     return 0;
 }
@@ -83,11 +84,13 @@ int TC_iot_nv_data_teardown(void **state)
 
 void TC_iot_nv_get_wifi_prov_data_success(void **state)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     iot_error_t err;
     struct iot_wifi_prov_data *wifi_prov = NULL;
     wifi_prov = malloc(sizeof(struct iot_wifi_prov_data));
     UNUSED(state);
 
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     // Given : All data
     _setup_wifi_prov_status(DONE);
     _setup_wifi_prov_data(IOT_NVD_AP_SSID);
@@ -106,6 +109,7 @@ void TC_iot_nv_get_wifi_prov_data_success(void **state)
     assert_memory_equal(wifi_prov->bssid.addr, sample_wifi_bssid.addr, IOT_WIFI_MAX_BSSID_LEN);
     assert_int_equal(wifi_prov->security_type, sample_security_type);
 
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     // Local teardown
     _teardown_wifi_prov_data();
 
@@ -117,6 +121,7 @@ void TC_iot_nv_get_wifi_prov_data_success(void **state)
 
     // When
     err = iot_nv_get_wifi_prov_data(wifi_prov);
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     //Then
     assert_int_equal(err, IOT_ERROR_NV_DATA_ERROR);
 
@@ -386,12 +391,15 @@ extern iot_error_t _iot_nv_write_data(const iot_nvd_t nv_type, const char* data,
 
 static void _setup_wifi_prov_status(wifi_status_cmd_t cmd)
 {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
     iot_error_t err;
 
     if (cmd == NONE) {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
         err = _iot_nv_write_data(IOT_NVD_WIFI_PROV_STATUS, "NONE", strlen("NONE"));
         assert_int_equal(err, IOT_ERROR_NONE);
     } else if (cmd == DONE) {
+   printf ("UT: file = %s, func = %s, line = %d \n", __FILE__, __func__, __LINE__);
         err = _iot_nv_write_data(IOT_NVD_WIFI_PROV_STATUS, "DONE", strlen("DONE"));
         assert_int_equal(err, IOT_ERROR_NONE);
     }

@@ -68,21 +68,26 @@ static osPriority_t get_mbed_priority(int priority)
 int iot_os_thread_create(void * thread_function, const char* name, int stack_size,
 		void* data, int priority, iot_os_thread* thread_handle)
 {
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 	Thread *thread = new Thread(get_mbed_priority(priority), stack_size, nullptr, name);
+	//Thread *thread = new Thread();
 	IOT_ERROR_CHECK(!thread, IOT_OS_FALSE, "Memory allocation Failed!!!");
 
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 	osStatus status = thread->start(callback((callbackFN)thread_function, data));
 	if (status) {
 		delete thread;
 		return IOT_OS_FALSE;
 	}
 
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 	if (threadlist.insert(thread) != LINKED_LIST_ERROR_NONE)
 		IOT_WARN("Failed to Insert");
 
 	if (thread_handle)
 		*thread_handle = thread;
 
+	printf("UT: file = %s, func = %s, line = %d  \n", __FILE__, __func__, __LINE__);
 	return IOT_OS_TRUE;
 }
 
