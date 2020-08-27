@@ -74,6 +74,7 @@ Basically, this release builds on the environments of chipset vendor's SDKs.
     - Install [mbed cli](doc/mbed_cli_setup.md) on linux.
     - Install [arm toolchain](doc/mbed_cli_setup.md) and configure with `mbed cli`.
 
+- For instructions to set up and build SmartThings Device SDK for Ubuntu, please refer to [Ubuntu setup](doc/ubuntu_setup.md)
 
 ### Build
 
