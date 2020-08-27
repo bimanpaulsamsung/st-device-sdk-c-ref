@@ -14,6 +14,7 @@ print_usage () {
 	echo "    ex) ./setup.sh rtl8721c"
 	echo "    ex) ./setup.sh emw3166"
 	echo "    ex) ./setup.sh emw3080"
+	echo "    ex) ./setup.sh ubuntu"
 
 	echo "    ex) ./setup.sh mt7682_ss"
 	echo "    ex) ./setup.sh emw3080"
