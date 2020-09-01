@@ -403,24 +403,6 @@ static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 		case HTTP_EVENT_ERROR:
 			printf("HTTP_EVENT_ERROR\n");
 			break;
-		case HTTP_EVENT_ON_CONNECTED:
-			printf("HTTP_EVENT_ON_CONNECTED\n");
-			break;
-		case HTTP_EVENT_HEADER_SENT:
-			printf("HTTP_EVENT_HEADER_SENT\n");
-			break;
-		case HTTP_EVENT_ON_HEADER:
-			printf("HTTP_EVENT_ON_HEADER, key=%s, value=%s\n", evt->header_key, evt->header_value);
-			break;
-		case HTTP_EVENT_ON_DATA:
-			//printf("HTTP_EVENT_ON_DATA, len=%d \n", evt->data_len);
-			break;
-		case HTTP_EVENT_ON_FINISH:
-			printf("HTTP_EVENT_ON_FINISH\n");
-			break;
-		case HTTP_EVENT_DISCONNECTED:
-			printf("HTTP_EVENT_DISCONNECTED\n");
-			break;
 	}
 	return ESP_OK;
 }
@@ -618,7 +600,7 @@ clean_up:
 }
 
 
-#define OTA_VERSION_INFO_BUF_SIZE 1024
+#define OTA_VERSION_INFO_BUF_SIZE 2048
 
 static ota_err_t _read_version_info_from_server(char **version_info, unsigned int *version_info_len)
 {
@@ -626,7 +608,6 @@ static ota_err_t _read_version_info_from_server(char **version_info, unsigned in
 
 	esp_http_client_config_t config = {
 		.url = CONFIG_FIRMWARE_VERSOIN_INFO_URL,
-		.cert_pem = (char *)root_pem_start,
 		.event_handler = _http_event_handler,
 	};
 
@@ -646,7 +627,7 @@ static ota_err_t _read_version_info_from_server(char **version_info, unsigned in
 	ret = esp_http_client_open(client, 0);
 	if (ret != ESP_OK) {
 		esp_http_client_cleanup(client);
-		printf("Failed to open HTTP connection: %d", ret);
+		printf("Failed to open HTTP connection: %d \n", ret);
 		return OTA_FAIL;
 	}
 	esp_http_client_fetch_headers(client);
@@ -692,8 +673,6 @@ static ota_err_t _read_version_info_from_server(char **version_info, unsigned in
 			ptr += data_read;
 		}
 	}
-
-	printf("Written image length %d\n", total_read_len);
 
 	_http_cleanup(client);
 
@@ -789,8 +768,6 @@ static ota_err_t _http_get_available_version(char *update_info, unsigned int upd
 		latest_version[str_len] = '\0';
 
 		*new_version = latest_version;
-	} else {
-		printf("this device cannot update a firmware");
 	}
 
 clean_up:
@@ -929,8 +906,6 @@ void ota_check_for_update(void *user_data)
         printf("Data is NULL.. \n");
         return;
     }
-
-    printf("\n Start checking new version \n");
 
     char *read_data = NULL;
     unsigned int read_data_len = 0;

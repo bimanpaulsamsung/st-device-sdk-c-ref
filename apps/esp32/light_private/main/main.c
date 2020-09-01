@@ -28,6 +28,7 @@
 
 #include "iot_uart_cli.h"
 #include "iot_cli_cmd.h"
+#include "iot_debug.h"
 #include "ota_util.h"
 
 #include "caps_switch.h"
@@ -177,12 +178,20 @@ void ota_polling_task(void *arg)
 
         vTaskDelay(30 * 1000 / portTICK_PERIOD_MS);
 
+        if (g_iot_status != IOT_STATUS_CONNECTING || g_iot_stat_lv != IOT_STAT_LV_DONE) {
+            continue;
+        }
+
+        IOT_MEM_CHECK("OTA START >>PT<<");
+
         if (ota_task_handle != NULL) {
             printf("Device is updating.. \n");
             continue;
         }
 
         ota_check_for_update((void *)arg);
+
+        IOT_MEM_CHECK("OTA END >>PT<<");
 
         vTaskDelay(600 * 1000 / portTICK_PERIOD_MS);
     }
