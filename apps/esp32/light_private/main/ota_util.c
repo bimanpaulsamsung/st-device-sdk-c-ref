@@ -403,6 +403,8 @@ static esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 		case HTTP_EVENT_ERROR:
 			printf("HTTP_EVENT_ERROR\n");
 			break;
+		default:
+			break;
 	}
 	return ESP_OK;
 }
