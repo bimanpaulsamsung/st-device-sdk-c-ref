@@ -15,11 +15,38 @@
  * language governing permissions and limitations under the License.
  *
  ****************************************************************************/
+#ifndef _DEVICE_CONTROL_H_
+#define _DEVICE_CONTROL_H_
 
-#include "device_control.h"
 #include "mbed.h"
 
-void gpio_set_level(PinName gpio_pin, int value)
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define GPIO_OUTPUT_MAINLED LED1
+
+enum switch_onoff_state {
+    SWITCH_OFF = 0,
+    SWITCH_ON = 1,
+};
+
+enum main_led_gpio_state
 {
-	DigitalOut led(gpio_pin, !value);
+	MAINLED_GPIO_ON = 1,
+	MAINLED_GPIO_OFF = 0,
+};
+
+enum button_event_type {
+    BUTTON_LONG_PRESS = 0,
+    BUTTON_SHORT_PRESS = 1,
+};
+
+void gpio_set_level(PinName gpio_pin, int value);
+void change_switch_state(int switch_state);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif
