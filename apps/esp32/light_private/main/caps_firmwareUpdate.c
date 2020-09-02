@@ -67,9 +67,7 @@ static void caps_firmwareUpdate_set_availableVersion_value(caps_ota_data_t *caps
 
 static void caps_firmwareUpdate_attr_currentVersion_send(caps_ota_data_t *caps_data)
 {
-    IOT_EVENT *cap_evt;
-    uint8_t evt_num = 1;
-    int sequence_no;
+    int sequence_no = -1;
 
     if (!caps_data || !caps_data->handle) {
         printf("fail to get handle\n");
@@ -80,26 +78,22 @@ static void caps_firmwareUpdate_attr_currentVersion_send(caps_ota_data_t *caps_d
         return;
     }
 
-    cap_evt = st_cap_attr_create_string((char *)caps_helper_firmwareUpdate.attr_currentVersion.name,
-        caps_data->currentVersion_value, NULL);
-    if (!cap_evt) {
-        printf("fail to create cap_evt\n");
-        return;
-    }
+    ST_CAP_SEND_ATTR_STRING(caps_data->handle,
+            (char *)caps_helper_firmwareUpdate.attr_currentVersion.name,
+            caps_data->currentVersion_value,
+            NULL,
+            NULL,
+            sequence_no);
 
-    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
     if (sequence_no < 0)
-        printf("fail to send ota value\n");
-
-    printf("Sequence number return : %d\n", sequence_no);
-    st_cap_attr_free(cap_evt);
+        printf("fail to send switch value\n");
+    else
+        printf("Sequence number return : %d\n", sequence_no);
 }
 
 static void caps_firmwareUpdate_attr_availableVersion_send(caps_ota_data_t *caps_data)
 {
-    IOT_EVENT *cap_evt;
-    uint8_t evt_num = 1;
-    int sequence_no;
+    int sequence_no = -1;
 
     if (!caps_data || !caps_data->handle) {
         printf("fail to get handle\n");
@@ -110,19 +104,17 @@ static void caps_firmwareUpdate_attr_availableVersion_send(caps_ota_data_t *caps
         return;
     }
 
-    cap_evt = st_cap_attr_create_string((char *)caps_helper_firmwareUpdate.attr_availableVersion.name,
-        caps_data->availableVersion_value, NULL);
-    if (!cap_evt) {
-        printf("fail to create cap_evt\n");
-        return;
-    }
+    ST_CAP_SEND_ATTR_STRING(caps_data->handle,
+            (char *)caps_helper_firmwareUpdate.attr_availableVersion.name,
+            caps_data->availableVersion_value,
+            NULL,
+            NULL,
+            sequence_no);
 
-    sequence_no = st_cap_attr_send(caps_data->handle, evt_num, &cap_evt);
     if (sequence_no < 0)
-        printf("fail to send ota value\n");
-
-    printf("Sequence number return : %d\n", sequence_no);
-    st_cap_attr_free(cap_evt);
+        printf("fail to send switch value\n");
+    else
+        printf("Sequence number return : %d\n", sequence_no);
 }
 
 static void caps_firmwareUpdate_cmd_updateFirmware_cb(IOT_CAP_HANDLE *handle, iot_cap_cmd_data_t *cmd_data, void *usr_data)
