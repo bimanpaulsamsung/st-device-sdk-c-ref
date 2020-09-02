@@ -1,25 +1,25 @@
 #!/bin/bash
 
-export CHIP_NAME=${1}
+export BSP_NAME=${1}
 export PROJECT_TITLE=${2}
 
 export STDK_PATH="${PWD}"
 export CORE_PATH="${PWD}/iot-core"
 
-IOT_APPS_PATH="${PWD}/apps/${CHIP_NAME}"
+IOT_APPS_PATH="${PWD}/apps/${BSP_NAME}"
 PROJECT_PATH="${IOT_APPS_PATH}/${PROJECT_TITLE}"
 
 CA_CERT_FILE="root_ca_prod.pem"
 
 print_usage () {
-  echo "    Usage: ./build.sh CHIP_NAME PROJECT_NAME [make_option]"
+  echo "    Usage: ./build.sh BSP_NAME PROJECT_NAME [make_option]"
   echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-  echo "    ex) ./build.sh ${CHIP_NAME} st_switch"
-  echo "    ex) ./build.sh ${CHIP_NAME} st_switch flash"
-  echo "    ex) ./build.sh ${CHIP_NAME} st_switch clean"
-  echo "    ex) ./build.sh ${CHIP_NAME} st_switch clean flash"
-  echo "    ex) ./build.sh ${CHIP_NAME} st_switch menuconfig"
-  echo "    ex) ./build.sh ${CHIP_NAME} st_switch menuconfig flash"
+  echo "    ex) ./build.sh ${BSP_NAME} switch_example"
+  echo "    ex) ./build.sh ${BSP_NAME} switch_example flash"
+  echo "    ex) ./build.sh ${BSP_NAME} switch_example clean"
+  echo "    ex) ./build.sh ${BSP_NAME} switch_example clean flash"
+  echo "    ex) ./build.sh ${BSP_NAME} switch_example menuconfig"
+  echo "    ex) ./build.sh ${BSP_NAME} switch_example menuconfig flash"
   echo
 }
 
@@ -61,7 +61,7 @@ fi
 
 # Add config file and Generate .mbedignore file
 cp ${PROJECT_PATH}/usr_config.py ${CORE_PATH}/src
-cd ./bsp/${CHIP_NAME}
+cd ./bsp/${BSP_NAME}
 python iot-core/src/component.py
 rm ${CORE_PATH}/src/usr_config.*
 
@@ -80,6 +80,6 @@ arm-none-eabi-ld -r -b binary -o onboarding_config.o onboarding_config.json
 arm-none-eabi-ld -r -b binary -o device_info.o device_info.json
 cd ${STDK_PATH}
 
-cd ./bsp/${CHIP_NAME}
+cd ./bsp/${BSP_NAME}
 ### Build
 mbed compile -m cy8cproto_062_4343w -t GCC_ARM ${FLASH_OPTION}

@@ -34,7 +34,7 @@ print_usage () {
     echo "    ex) ./build.sh tizenrt esp32 st_lamp"
     echo "    ex) ./build.sh cc3220sf st_switch"
     echo "    ex) ./build.sh lpc54018 st_switch"
-    echo "    ex) ./build.sh cy8cproto_062_4343w st_switch"
+    echo "    ex) ./build.sh cy8cproto_062_4343w switch_example"
     echo "    ex) ./build.sh rda5981c st_switch"
     echo "    ex) ./build.sh pic32mz st_switch"
     echo
