@@ -128,6 +128,8 @@ def get_property_string(attr):
         property_string = property_string + "ATTR_SET_VALUE_MAX | "
     if ("value" in attr.required):
         property_string = property_string + "ATTR_SET_VALUE_REQUIRED | "
+    else:
+        print("WARN : fail to find 'ATTR_SET_VALUE_REQUIRED' for " + attr.name)
     if ("unit" in attr.required):
         property_string = property_string + "ATTR_SET_UNIT_REQUIRED | "
     if (attr.jsonSchema.maxlength):
@@ -136,7 +138,7 @@ def get_property_string(attr):
         property_string = property_string + "ATTR_SET_VALUE_ARRAY | "
     property_string = property_string.rstrip("| ")
     if not (property_string):
-        property_string = "NULL"
+        property_string = "0"
     property_string = property_string + ","
     return property_string
 
