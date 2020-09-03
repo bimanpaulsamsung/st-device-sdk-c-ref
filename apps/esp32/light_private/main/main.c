@@ -60,7 +60,7 @@ static caps_switchLevel_data_t *cap_switchLevel_data;
 static caps_colorTemperature_data_t *cap_colorTemp_data;
 static caps_activityLightingMode_data_t *cap_lightMode_data;
 static caps_dustSensor_data_t *cap_dustSensor_data;
-static caps_ota_data_t *cap_ota_data;
+static caps_firmwareUpdate_data_t *cap_ota_data;
 
 TaskHandle_t ota_task_handle = NULL;
 
@@ -197,7 +197,7 @@ void ota_polling_task(void *arg)
     }
 }
 
-static void cap_update_cmd_cb(struct caps_ota_data *caps_data)
+static void cap_update_cmd_cb(struct caps_firmwareUpdate_data *caps_data)
 {
 	ota_nvs_flash_init();
 
@@ -252,13 +252,13 @@ static void capability_init()
         cap_dustSensor_data->set_fineDustLevel_unit(cap_dustSensor_data, caps_helper_dustSensor.attr_fineDustLevel.unit_ug_per_m3);
     }
 
-    cap_ota_data = caps_ota_initialize(ctx, "main", NULL, NULL);
+    cap_ota_data = caps_firmwareUpdate_initialize(ctx, "main", NULL, NULL);
     if (cap_ota_data) {
 
         char *firmware_version = get_current_firmware_version();
 
-        cap_ota_data->set_currentVersion(cap_ota_data, firmware_version);
-        cap_ota_data->cmd_update_firmware_usr_cb = cap_update_cmd_cb;
+        cap_ota_data->set_currentVersion_value(cap_ota_data, firmware_version);
+        cap_ota_data->cmd_updateFirmware_usr_cb = cap_update_cmd_cb;
 
         free(firmware_version);
     }

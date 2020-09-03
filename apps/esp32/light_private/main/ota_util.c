@@ -902,7 +902,7 @@ void ota_check_for_update(void *user_data)
 {
 #if defined(CONFIG_ESP_HTTP_CLIENT_ENABLE_HTTPS)
 
-    caps_ota_data_t *caps_data = (caps_ota_data_t *)user_data;
+    caps_firmwareUpdate_data_t *caps_data = (caps_firmwareUpdate_data_t *)user_data;
 
     if (!caps_data || !caps_data->currentVersion_value) {
         printf("Data is NULL.. \n");
@@ -931,7 +931,7 @@ void ota_check_for_update(void *user_data)
         }
 
         if (available_version) {
-            caps_data->set_availableVersion(caps_data, available_version);
+            caps_data->set_availableVersion_value(caps_data, available_version);
             caps_data->attr_availableVersion_send(caps_data);
 
             free(available_version);
