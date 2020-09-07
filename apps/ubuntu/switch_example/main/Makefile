@@ -5,7 +5,7 @@ LIB_NAME = iotcore
 INC = -I${CORE_PATH}/src/include
 LIB_DIR = -L${CORE_PATH}/output
 LIBS = -l$(LIB_NAME) -lssl -lpthread -lrt -lcrypto $(shell pkg-config --libs gio-2.0 glib-2.0)
-SRCS = switch_example.c
+SRCS = main.c caps_switch.c iot_cli_cmd.c iot_ubuntu_cli.c
 JSONS = device_info.json onboarding_config.json
 OBJS = $(JSONS:%.json=%.o)
 TARGET = switch_example
