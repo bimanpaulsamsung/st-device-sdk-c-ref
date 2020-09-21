@@ -28,6 +28,7 @@ print_usage () {
     echo "    ex) ./build.sh emw3166 switch_example"
     echo "    ex) ./build.sh emw3080 switch_example"
     echo "    ex) ./build.sh ubuntu switch_example"
+    echo "    ex) ./build.sh raspi_os switch_example"
 
     echo "    ex) ./build.sh emw3166 st_switch"
     echo "    ex) ./build.sh emw3080 st_switch"
