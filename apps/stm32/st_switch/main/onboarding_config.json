@@ -1,13 +1,18 @@
 {
   "onboardingConfig": {
-    "deviceOnboardingId": "MBEDONBOARD",
+    "deviceOnboardingId": "STM32PROV",
     "mnId": "fLqY",
-    "setupId": "123",
-    "vid": "CYSRIB01",
+    "setupId": "000",
+    "vid": "STM32ISM01",
     "deviceTypeId": "Switch",
     "ownershipValidationTypes": [
       "JUSTWORKS"
     ],
-    "identityType": "ED25519"
+    "identityType": "ED25519",
+    "deviceIntegrationProfileKey": {
+      "id": "165d3165-a084-43a8-8117-76166b7e137a",
+      "majorVersion": 0,
+      "minorVersion": 1
+    }
   }
 }

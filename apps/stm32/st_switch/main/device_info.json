@@ -1,8 +1,8 @@
 {
 	"deviceInfo": {
-		"firmwareVersion": "firmwareVersion_here",
-		"privateKey": "k0wFnZXqPY/YSEJY9LWnU+5jxILqzrLgUk4I0ARPCMQ=",
-		"publicKey": "G8UvWGjJlS1dQ9qQAo90DDwnDpDwooTbOfkrWNEyU6k=",
-		"serialNumber": "STDKfLqYa9e599ec"
+		"firmwareVersion": "V20200804",
+		"privateKey": "Duyo4sUrAehsPjIPncWNoj/ifXTe142dJsPguNu4gsw=",
+		"publicKey": "yV1dV2d1YedY+qXzpER9vya2noSa52RW+e7zEfz5+dI=",
+		"serialNumber": "STDKfLqYfgTcQeMO"
 	}
 }
