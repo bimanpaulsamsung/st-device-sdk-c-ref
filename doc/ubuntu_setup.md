@@ -27,6 +27,10 @@ This version of STDK works on Ubuntu and has been tested on Ubuntu Server 20.04
     sudo systemctl restart dnsmasq
     ```
 
+- Setting up WiFi 5GHz on Device:\
+  Developer needs to ensure their device is setup to work with 5G WiFi, if the 5GHz band is to be used.\
+  STDK ubuntu port layer assumes 5G WiFi station support by matching "Band 2" in `iw phy` command output.
+
 ## Setup
 
 - Clone the source code.
