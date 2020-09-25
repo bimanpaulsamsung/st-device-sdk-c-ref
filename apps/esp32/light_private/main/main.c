@@ -30,6 +30,7 @@
 #include "iot_cli_cmd.h"
 #include "iot_debug.h"
 #include "ota_util.h"
+#include "log_util.h"
 
 #include "caps_switch.h"
 #include "caps_switchLevel.h"
@@ -37,6 +38,7 @@
 #include "caps_activityLightingMode.h"
 #include "caps_dustSensor.h"
 #include "caps_firmwareUpdate.h"
+#include "caps_logTrigger.h"
 
 // onboarding_config_start is null-terminated string
 extern const uint8_t onboarding_config_start[]    asm("_binary_onboarding_config_json_start");
@@ -61,6 +63,7 @@ static caps_colorTemperature_data_t *cap_colorTemp_data;
 static caps_activityLightingMode_data_t *cap_lightMode_data;
 static caps_dustSensor_data_t *cap_dustSensor_data;
 static caps_firmwareUpdate_data_t *cap_ota_data;
+static caps_logTrigger_data_t *cap_logTrigger_data;
 
 TaskHandle_t ota_task_handle = NULL;
 
@@ -82,6 +85,51 @@ static int get_switch_state(void)
         switch_state = SWITCH_OFF;
     }
     return switch_state;
+}
+
+static void cap_logTrigger_cmd_triggerLogWithLogInfo_cb(struct caps_logTrigger_data *caps_data)
+{
+    iot_cap_cmd_data_t *cmd_data;
+    const JSON_H *json_object;
+    JSON_H *item;
+    char* url;
+
+    if (!caps_data || !caps_data->cmd_data) {
+        printf("Failed to get cmd_data");
+        return;
+    }
+    cmd_data = caps_data->cmd_data;
+    json_object = JSON_PARSE(cmd_data->cmd_data[0].json_object);
+    if (!json_object) {
+        printf("failed to parse json_object\n");
+    }
+
+    item = JSON_GET_OBJECT_ITEM(json_object, "url");
+    url = JSON_GET_STRING_VALUE(item);
+    if (!url) {
+        printf("Failed to get url in log info\n");
+        return;
+    }
+
+    log_dump_send_to_url(ctx, url, 8192);
+}
+
+static void cap_logTrigger_cmd_triggerLogWithUrl_cb(struct caps_logTrigger_data *caps_data)
+{
+    iot_cap_cmd_data_t *cmd_data;
+    char* url;
+
+    if (!caps_data || !caps_data->cmd_data) {
+        printf("Failed to get cmd_data");
+        return;
+    }
+    cmd_data = caps_data->cmd_data;
+    url = cmd_data->cmd_data[0].string;
+    if (!url) {
+        printf("failed to get url\n");
+    }
+
+    log_dump_send_to_url(ctx, url, 8192);
 }
 
 static void cap_switch_cmd_cb(struct caps_switch_data *caps_data)
@@ -261,6 +309,12 @@ static void capability_init()
         cap_ota_data->cmd_updateFirmware_usr_cb = cap_update_cmd_cb;
 
         free(firmware_version);
+    }
+
+    cap_logTrigger_data = caps_logTrigger_initialize(ctx, "main", NULL, NULL);
+    if (cap_logTrigger_data) {
+        cap_logTrigger_data->cmd_triggerLogWithLogInfo_usr_cb = cap_logTrigger_cmd_triggerLogWithLogInfo_cb;
+        cap_logTrigger_data->cmd_triggerLogWithUrl_usr_cb = cap_logTrigger_cmd_triggerLogWithUrl_cb;
     }
 }
 
