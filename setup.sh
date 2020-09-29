@@ -34,6 +34,7 @@ print_usage () {
 	echo "    ex) ./setup.sh rda5981c"
 	echo "    ex) ./setup.sh pic32mz"
 	echo "    ex) ./setup.sh xmc4800"
+	echo "    ex) ./setup.sh stm32"
 	echo
 }
 
