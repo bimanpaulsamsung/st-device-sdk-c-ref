@@ -44,17 +44,23 @@ for arg in "$@"; do
 done
 
 #Generate Configuration in Json formate
-if [ "$CONFIG_OPTION" ]; then cmd=kconfig-mconf; else cmd=kconfig-conf; fi
-if which $cmd &> /dev/null; then
+CONFIG_FILENAME="${PWD}/.config"
+KCONFIG_CMD=kconfig-conf
+
+if which $KCONFIG_CMD &> /dev/null; then
     if [ $CONFIG_OPTION ]; then
-        kconfig-mconf "${CORE_PATH}/src/kconfig-mbed"
-    else
         kconfig-conf "${CORE_PATH}/src/kconfig-mbed"
+    else
+        if test -f "$CONFIG_FILENAME"; then
+            echo "Using existing .config. Use menuconfig option to regenerate .config"
+        else
+            kconfig-conf "${CORE_PATH}/src/kconfig-mbed"
+        fi
     fi
-    INPUT_FILE="${PWD}/.config"
+
     OUTPUT_FILE="${CORE_PATH}/mbed_lib.json"
     CONFIG_SCRIPT="${CORE_PATH}/src/ConfigToJson.py"
-    python $CONFIG_SCRIPT $INPUT_FILE $OUTPUT_FILE
+    python $CONFIG_SCRIPT $CONFIG_FILENAME $OUTPUT_FILE
 else
     echo "Install kconfig-frontends"
 fi
