@@ -113,6 +113,10 @@ static void caps_switch_cmd_off_cb(IOT_CAP_HANDLE *handle, iot_cap_cmd_data_t *c
 static void caps_switch_init_cb(IOT_CAP_HANDLE *handle, void *usr_data)
 {
     caps_switch_data_t *caps_data = usr_data;
+
+    if (caps_data && caps_data->cmd_on_usr_cb)
+            caps_data->cmd_on_usr_cb(caps_data);
+
     if (caps_data && caps_data->init_usr_cb)
         caps_data->init_usr_cb(caps_data);
     caps_switch_attr_switch_send(caps_data);

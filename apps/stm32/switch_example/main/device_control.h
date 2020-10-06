@@ -33,8 +33,8 @@ enum switch_onoff_state {
 
 enum main_led_gpio_state
 {
-	MAINLED_GPIO_ON = 1,
-	MAINLED_GPIO_OFF = 0,
+	MAINLED_GPIO_OFF = 1,
+	MAINLED_GPIO_ON = 0,
 };
 
 enum button_event_type {
