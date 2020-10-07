@@ -111,7 +111,7 @@ static void cap_logTrigger_cmd_triggerLogWithLogInfo_cb(struct caps_logTrigger_d
         return;
     }
 
-    log_dump_send_to_url(ctx, url, 8192);
+    log_dump_send_to_url(ctx, url, LOG_DUMP_SIZE);
 }
 
 static void cap_logTrigger_cmd_triggerLogWithUrl_cb(struct caps_logTrigger_data *caps_data)
@@ -129,7 +129,7 @@ static void cap_logTrigger_cmd_triggerLogWithUrl_cb(struct caps_logTrigger_data 
         printf("failed to get url\n");
     }
 
-    log_dump_send_to_url(ctx, url, 8192);
+    log_dump_send_to_url(ctx, url, LOG_DUMP_SIZE);
 }
 
 static void cap_switch_cmd_cb(struct caps_switch_data *caps_data)

@@ -20,6 +20,7 @@
 #define STDK_LOG_UTIL_H
 
 #define LOG_HTTP_BUFFER_SIZE 2048
+#define LOG_DUMP_SIZE 8192
 
 int log_dump_send_to_url(IOT_CTX* ctx, char *url, size_t log_size);
 #endif //STDK_LOG_UTIL_H
