@@ -23,9 +23,11 @@
 
 #include "st_dev.h"
 
-#include "caps_switch.h"
-#include "iot_cli_cmd.h"
+#include "device_control.h"
+
 #include "iot_raspi_os_cli.h"
+#include "iot_cli_cmd.h"
+#include "caps_switch.h"
 
 // onboarding_config_start is null-terminated string
 extern const uint8_t onboarding_config_start[] asm("_binary_onboarding_config_json_start");
@@ -40,11 +42,6 @@ IOT_CTX *ctx = NULL;
 static caps_switch_data_t *cap_switch_data;
 
 volatile sig_atomic_t is_exit = false;
-
-enum switch_onoff_state {
-    SWITCH_OFF = 0,
-    SWITCH_ON = 1,
-};
 
 void signal_handler(int sig_num)
 {
@@ -80,6 +77,7 @@ static int get_switch_state(void)
 static void cap_switch_cmd_cb(struct caps_switch_data *caps_data)
 {
     int switch_state = get_switch_state();
+    change_switch_state(switch_state);
 }
 
 static void capability_init()
@@ -121,6 +119,11 @@ static void iot_noti_cb(iot_noti_data_t *noti_data, void *noti_usr_data)
         printf("[rate limit] Remaining time:%d, sequence number:%d\n",
                noti_data->raw.rate_limit.remainingTime, noti_data->raw.rate_limit.sequenceNumber);
     }
+}
+
+void button_event(IOT_CAP_HANDLE *handle, int type, int count)
+{
+    //TODO
 }
 
 void main(void)
@@ -165,6 +168,7 @@ void main(void)
     // create a handle to process capability and initialize capability info
     capability_init();
 
+    setup_enable_gpio();
     register_iot_cli_cmd();
     cli_main();
 
@@ -175,4 +179,5 @@ void main(void)
     signal(SIGINT, signal_handler);
 
     event_loop();
+    setup_disable_gpio();
 }
