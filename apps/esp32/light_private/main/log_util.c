@@ -26,7 +26,11 @@ static int _send_buf_to_url(char *url, char *buf, int buf_len)
 
     esp_http_client_config_t config = {
             .url = url,
+#if (ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4,0,0))
             .buffer_size_tx = LOG_HTTP_BUFFER_SIZE,
+#else
+            .buffer_size = LOG_HTTP_BUFFER_SIZE,
+#endif
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&config);
