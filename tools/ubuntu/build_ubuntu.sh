@@ -38,29 +38,12 @@ if [ ! "${3}" = "" ]; then
 fi
 
 cd ${CORE_PATH}
-
-MAKE_LOG_FILE="make.log"
-make ${MAKE_OPTION} 2> >(tee ${MAKE_LOG_FILE})
-MAKE_OUTPUT=${?}
-TIME_WARNING_MSG="modification time"
-if cat ${MAKE_LOG_FILE} | grep -q "${TIME_WARNING_MSG}"; then
-	REMAKE=true
-	echo
-	echo "    Clock skew detected! Please Wait..."
-	echo
-	find . -exec touch {} \;
+make ${MAKE_OPTION}
+if [ ! "${?}" = "0" ]; then
+	exit ${?}
 fi
-if [ ! "${MAKE_OUTPUT}" = "0" ]; then
-	rm ${MAKE_LOG_FILE}
-	exit ${MAKE_OUTPUT}
-fi
-if [ "${REMAKE}" = "true" ]; then
-	make ${MAKE_OPTION}
-fi
-rm ${MAKE_LOG_FILE}
 
 cd "${PROJECT_PATH}/main"
-
 echo
 make ${MAKE_OPTION}
 if [ ! "${?}" = "0" ]; then
