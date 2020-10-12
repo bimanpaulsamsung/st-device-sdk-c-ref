@@ -44,6 +44,10 @@ This version of STDK works on Ubuntu and has been tested on Ubuntu Server 20.04
   $ ./setup.sh ubuntu
   ```
 
+## Build Configuration
+
+- To use specific SmartThings Device SDK build options, directly modify the `sdkconfig` build configuration file present in the corresponding app directory. Refer to the app's `README.md` file for instructions to modify build options.
+
 ## Build
 
 - Run the build script.

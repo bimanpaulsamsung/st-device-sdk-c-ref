@@ -9,6 +9,8 @@ IOT_APPS_PATH="${PWD}/apps/${BSP_NAME}"
 PROJECT_PATH="${IOT_APPS_PATH}/${PROJECT_TITLE}"
 EXECUTABLE_PATH="${PROJECT_PATH}/main/${PROJECT_TITLE}"
 
+SDKCONFIG="${PROJECT_PATH}/sdkconfig"
+
 MAKE_OPTION=all
 
 print_usage () {
@@ -36,6 +38,13 @@ if [ ! "${3}" = "" ]; then
 	shift 2
 	MAKE_OPTION=$@
 fi
+
+while read -r flag; do
+	if [ ! -z "${flag}" ] && case "${flag}" in \#*) false;; *) true;; esac; then
+		CFLAGS_CONFIG="${CFLAGS_CONFIG} -D${flag}"
+	fi
+done < "${SDKCONFIG}"
+export CFLAGS_CONFIG
 
 cd ${CORE_PATH}
 make ${MAKE_OPTION}

@@ -22,5 +22,6 @@ This example assumes the following component and capabilities are used. :
 ('healthCheck' capability is automatically added by Developer Workspace. It doesn't need handler at device side)
 
 ## SmartThings Device SDK config
-If you want to use specific SmartThings Device SDK build options, you can directly modify the build configuration file. For this example, SmartThings Device SDK config is saved in 'iot-core/stdkconfig' file.
+If you want to use specific SmartThings Device SDK build options, you can directly modify the build configuration file. For this example, SmartThings Device SDK config is saved in `sdkconfig` file.
 
+When modifying the contents of `sdkconfig`, enable a flag by setting it to 'y' or an appropriate value, and disable the flag by commenting it out using '#'.
