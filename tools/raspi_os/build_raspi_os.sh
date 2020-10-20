@@ -9,6 +9,8 @@ IOT_APPS_PATH="${PWD}/apps/${BSP_NAME}"
 PROJECT_PATH="${IOT_APPS_PATH}/${PROJECT_TITLE}"
 EXECUTABLE_PATH="${PROJECT_PATH}/main/${PROJECT_TITLE}"
 
+SDKCONFIG="${PROJECT_PATH}/sdkconfig"
+
 MAKE_OPTION=all
 
 print_usage () {
@@ -37,30 +39,20 @@ if [ ! "${3}" = "" ]; then
 	MAKE_OPTION=$@
 fi
 
-cd ${CORE_PATH}
+while read -r flag; do
+	if [ ! -z "${flag}" ] && case "${flag}" in \#*) false;; *) true;; esac; then
+		CFLAGS_CONFIG="${CFLAGS_CONFIG} -D${flag}"
+	fi
+done < "${SDKCONFIG}"
+export CFLAGS_CONFIG
 
-MAKE_LOG_FILE="make.log"
-make ${MAKE_OPTION} 2> >(tee ${MAKE_LOG_FILE})
-MAKE_OUTPUT=${?}
-TIME_WARNING_MSG="modification time"
-if cat ${MAKE_LOG_FILE} | grep -q "${TIME_WARNING_MSG}"; then
-	REMAKE=true
-	echo
-	echo "    Clock skew detected! Please Wait..."
-	echo
-	find . -exec touch {} \;
+cd ${CORE_PATH}
+make ${MAKE_OPTION}
+if [ ! "${?}" = "0" ]; then
+	exit ${?}
 fi
-if [ ! "${MAKE_OUTPUT}" = "0" ]; then
-	rm ${MAKE_LOG_FILE}
-	exit ${MAKE_OUTPUT}
-fi
-if [ "${REMAKE}" = "true" ]; then
-	make ${MAKE_OPTION}
-fi
-rm ${MAKE_LOG_FILE}
 
 cd "${PROJECT_PATH}/main"
-
 echo
 make ${MAKE_OPTION}
 if [ ! "${?}" = "0" ]; then

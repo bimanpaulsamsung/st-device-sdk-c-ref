@@ -27,6 +27,10 @@ This version of STDK works on Raspi OS and has been tested with release 2020-05-
     sudo systemctl restart dnsmasq
     ```
 
+- Setting up WiFi 5GHz on Device:\
+  Developer needs to ensure their device is setup to work with 5G WiFi, if the 5GHz band is to be used.\
+  STDK raspi_os port layer assumes 5G WiFi station support by matching "Band 2" in `iw phy` command output.
+
 ## Setup
 
 - Clone the source code.
@@ -39,6 +43,10 @@ This version of STDK works on Raspi OS and has been tested with release 2020-05-
   ```sh
   $ ./setup.sh raspi_os
   ```
+
+## Build Configuration
+
+- To use specific SmartThings Device SDK build options, directly modify the `sdkconfig` build configuration file present in the corresponding app directory. Refer to the app's `README.md` file for instructions to modify build options.
 
 ## Build
 

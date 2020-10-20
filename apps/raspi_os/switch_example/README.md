@@ -15,12 +15,22 @@ Components and Capabilities are contained in device profile. You can create a de
 
 This example assumes the following component and capabilities are used. :
 
-'main' component
-- 'healthCheck' capability
-- 'switch' capability
+`main` component
+- `healthCheck` capability
+- `switch` capability
 
-('healthCheck' capability is automatically added by Developer Workspace. It doesn't need handler at device side)
+(`healthCheck` capability is automatically added by Developer Workspace. It doesn't need handler at device side)
 
 ## SmartThings Device SDK config
-If you want to use specific SmartThings Device SDK build options, you can directly modify the build configuration file. For this example, SmartThings Device SDK config is saved in 'iot-core/stdkconfig' file.
+If you want to use specific SmartThings Device SDK build options, you can directly modify the build configuration file. For this example, SmartThings Device SDK config is saved in `sdkconfig` file.
 
+When modifying the contents of `sdkconfig`, enable a flag by setting it to 'y' or an appropriate value, and disable the flag by commenting it out using '#'.
+
+## Test device schematics
+This example uses Raspberry Pi 4 GPIO like below.
+> Note: If your device's schematics doesn't match with belows.
+> Please modify GPIO defines for your device at [device_control.h](main/device_control.h)
+> ```c
+> #define GPIO_PIN  24 /* P1-18 */
+> #define GPIO_POUT 4  /* P1-07 */
+> ```
