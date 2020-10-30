@@ -1,4 +1,4 @@
-# SmartThings Device SDK Switch Example
+# SmartThings SDK for Direct Connected Devices for C - Switch Example
 
 ## Introduction
 
@@ -13,15 +13,15 @@ For information on detailed workflow, please refer to the [Getting Started](http
 SmartThings Device is defined using components and capabilities. Capabilities define the features of the device, and capabilities are grouped into components.
 Components and Capabilities are contained in device profile. You can create a device profile in Developer Workspace and associate it with an integration.
 
-This example assumes the following component and capabilities are used. :
+This example assumes the following component and capabilities are used:
 
-'main' component
-- 'healthCheck' capability
-- 'switch' capability
+`main` component
+- `healthCheck` capability
+- `switch` capability
 
-('healthCheck' capability is automatically added by Developer Workspace. It doesn't need handler at device side)
+(`healthCheck` capability is automatically added by Developer Workspace. It doesn't need handler at device side)
 
-## SmartThings Device SDK config
+## SmartThings SDK for Direct Connected Devices - Config
 If you want to use specific SmartThings Device SDK build options, you can directly modify the build configuration file. For this example, SmartThings Device SDK config is saved in `sdkconfig` file.
 
 When modifying the contents of `sdkconfig`, enable a flag by setting it to 'y' or an appropriate value, and disable the flag by commenting it out using '#'.
