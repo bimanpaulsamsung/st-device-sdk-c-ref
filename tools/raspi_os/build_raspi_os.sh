@@ -3,8 +3,6 @@
 export BSP_NAME=${1}
 export PROJECT_TITLE=${2}
 
-export CORE_PATH="${PWD}/iot-core"
-
 IOT_APPS_PATH="${PWD}/apps/${BSP_NAME}"
 PROJECT_PATH="${IOT_APPS_PATH}/${PROJECT_TITLE}"
 EXECUTABLE_PATH="${PROJECT_PATH}/main/${PROJECT_TITLE}"
@@ -46,7 +44,7 @@ while read -r flag; do
 done < "${SDKCONFIG}"
 export CFLAGS_CONFIG
 
-cd ${CORE_PATH}
+cd ${STDK_CORE_PATH}
 make ${MAKE_OPTION}
 if [ ! "${?}" = "0" ]; then
 	exit ${?}
