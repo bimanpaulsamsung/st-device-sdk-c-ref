@@ -41,7 +41,7 @@ This version of STDK works on Ubuntu and has been tested on Ubuntu Server 20.04
   ```
 - Run the setup script.
   ```sh
-  $ ./setup.sh ubuntu
+  $ python setup.py ubuntu
   ```
 
 ## Build Configuration
@@ -52,10 +52,10 @@ This version of STDK works on Ubuntu and has been tested on Ubuntu Server 20.04
 
 - Run the build script.
   ```sh
-  # ./build.sh {app_path} {make_option}
+  # python build.py {app_path} {make_option}
   $ cd ~/st-device-sdk-c-ref
-  $ ./build.sh apps/ubuntu/switch_example
-  $ ./build.sh apps/ubuntu/switch_example clean
+  $ python build.py apps/ubuntu/switch_example
+  $ python build.py apps/ubuntu/switch_example clean
   ```
 
   > Info :
