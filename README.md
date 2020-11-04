@@ -60,6 +60,8 @@ Basically, this release builds on the environments of chipset vendor's SDKs.
 
 - For instructions to set up and build SmartThings Device SDK for Ubuntu, please refer to [Ubuntu setup](doc/ubuntu_setup.md)
 
+- For instructions to set up and build SmartThings Device SDK for Raspberry Pi OS, please refer to [Raspi_os setup](doc/raspi_os_setup.md)
+
 ### Build
 
 1. Download the Device SDK Reference source code. Basically, this reference will download the ported original chipset vendor's SDKs as submodules in the `bsp` directory through the `setup.py` script. If a chipset vendor's SDK does not exist as git format, you can manually copy it under the `bsp` directory.

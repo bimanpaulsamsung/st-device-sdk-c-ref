@@ -41,7 +41,7 @@ This version of STDK works on Raspi OS and has been tested with release 2020-05-
   ```
 - Run the setup script.
   ```sh
-  $ ./setup.sh raspi_os
+  $ python setup.py raspi_os
   ```
 
 ## Build Configuration
@@ -52,10 +52,10 @@ This version of STDK works on Raspi OS and has been tested with release 2020-05-
 
 - Run the build script.
   ```sh
-  # ./build.sh {app_path} {make_option}
+  # python build.py {app_path} {make_option}
   $ cd ~/st-device-sdk-c-ref
-  $ ./build.sh apps/raspi_os/switch_example
-  $ ./build.sh apps/raspi_os/switch_example clean
+  $ python build.py apps/raspi_os/switch_example
+  $ python build.py apps/raspi_os/switch_example clean
   ```
 
   > Info :
