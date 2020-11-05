@@ -39,10 +39,10 @@ fi
 
 while read -r flag; do
 	if [ ! -z "${flag}" ] && case "${flag}" in \#*) false;; *) true;; esac; then
-		CFLAGS_CONFIG="${CFLAGS_CONFIG} -D${flag}"
+		STDK_CONFIGS="${STDK_CONFIGS} -D${flag}"
 	fi
 done < "${SDKCONFIG}"
-export CFLAGS_CONFIG
+export STDK_CONFIGS
 
 cd ${STDK_CORE_PATH}
 make ${MAKE_OPTION}
