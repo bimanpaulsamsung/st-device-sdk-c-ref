@@ -23,14 +23,14 @@ if EXTRA_ARGS:
 else:
     MAKE_OPTION = "all"
 
-CFLAGS_CONFIG = ""
+STDK_CONFIGS = ""
 Read_File = open(SDKCONFIG, 'r')
 for lines in Read_File:
     match = re.search("(\w+=\w+)", lines)
     if match:
-        CFLAGS_CONFIG = CFLAGS_CONFIG + " -D" + match.group()
+        STDK_CONFIGS = STDK_CONFIGS + " -D" + match.group()
 Read_File.close()
-os.environ["CFLAGS_CONFIG"] = CFLAGS_CONFIG
+os.environ["STDK_CONFIGS"] = STDK_CONFIGS
 
 build_cmd = "make" + " " + MAKE_OPTION
 os.chdir(os.environ["STDK_CORE_PATH"])
