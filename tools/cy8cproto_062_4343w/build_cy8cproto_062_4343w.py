@@ -74,5 +74,7 @@ os.system("arm-none-eabi-ld -r -b binary -o device_info.o device_info.json")
 
 os.chdir(os.path.join(BSP_PATH))
 build_cmd = "mbed compile -m" + BSP_NAME + " -t GCC_ARM " + FLASH_OPTION
-os.system(build_cmd)
+build_ret=os.system(build_cmd)
+if build_ret:
+    exit(1)
 
