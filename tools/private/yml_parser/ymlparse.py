@@ -588,7 +588,7 @@ def make_caps_c_header_output(caps):
 
     output.write(            "#include \"caps/iot_caps_helper_" + caps.id + ".h\"\n")
     if (caps.needJSON):
-        output.write(        "#include \"JSON.h\"\n")
+        output.write(        "#include \"external/JSON.h\"\n")
     output.write(            "\n")
     output.write(            "#ifdef __cplusplus\n")
     output.write(            "extern \"C\" {\n")
