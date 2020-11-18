@@ -44,4 +44,6 @@
 [submodule "bsp/pic32mz"]
 	path = bsp/pic32mz
 	url = git@github.sec.samsung.net:STDK/microchip-pic32mz.git
-
+[submodule "bsp/xmc4800/FreeRTOS"]
+	path = bsp/xmc4800/FreeRTOS
+	url = https://github.com/Infineon/amazon-freertos.git

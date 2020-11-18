@@ -38,6 +38,7 @@ print_usage () {
     echo "    ex) ./build.sh cy8cproto_062_4343w switch_example"
     echo "    ex) ./build.sh rda5981c st_switch"
     echo "    ex) ./build.sh pic32mz st_switch"
+    echo "    ex) ./build.sh xmc4800 switch_example"
     echo
 }
 

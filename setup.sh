@@ -33,6 +33,7 @@ print_usage () {
 	echo "    ex) ./setup.sh cy8cproto_062_4343w"
 	echo "    ex) ./setup.sh rda5981c"
 	echo "    ex) ./setup.sh pic32mz"
+	echo "    ex) ./setup.sh xmc4800"
 	echo
 }
 
