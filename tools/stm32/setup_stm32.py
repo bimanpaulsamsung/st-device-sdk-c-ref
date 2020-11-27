@@ -9,6 +9,8 @@ BSP_NAME=sys.argv[1]
 CORE_PATH = os.path.join(os.environ["STDK_CORE_PATH"])
 BSP_PATH = os.path.join(os.environ["STDK_REF_PATH"],"bsp",BSP_NAME)
 PATCH_PATH = os.path.join(os.environ["STDK_REF_PATH"], "patches", BSP_NAME)
+NTP_PATCH_PATH = os.path.join(os.environ["STDK_REF_PATH"], "patches", BSP_NAME, "ntp-client")
+WIFI_PATCH_PATH = os.path.join(os.environ["STDK_REF_PATH"], "patches", BSP_NAME, "wifi")
 
 MBED_OS_TAG = "mbed-os-5.15.2"
 
@@ -48,5 +50,42 @@ def create_link():
 		os.remove(os.path.join(BSP_PATH, "iot-core"))
     	os.symlink(os.path.join(CORE_PATH),os.path.join(BSP_PATH, "iot-core"))
 
+def ntp_setup():
+    print("Start cloning ntp-client..")
+    os.chdir(os.path.join(BSP_PATH))
+    cmd_status = os.system("mbed add https://github.com/ARMmbed/ntp-client")
+
+    if cmd_status == 0:
+        print("Apply ntp Patches..")
+        if os.path.isdir(NTP_PATCH_PATH):
+            os.chdir(os.path.join(BSP_PATH, "ntp-client"))
+            os.system("git checkout " + "master")
+            for patchfile in sorted(os.listdir(NTP_PATCH_PATH)):
+                if patchfile.endswith(".patch"):
+                    os.system("git am " + os.path.join(NTP_PATCH_PATH, patchfile))
+        else:
+            print("Patch folder not present!!")
+    else:
+        print("Failed to clone ntp-client!!!")
+
+def wifi_setup():
+    print("Start cloning wifi library..")
+    os.chdir(os.path.join(BSP_PATH))
+    cmd_status = os.system("mbed add https://os.mbed.com/teams/ST/code/DISCO_L475VG_IOT01A_wifi")
+
+    if cmd_status == 0:
+        print("Apply wifi Patches..")
+        if os.path.isdir(WIFI_PATCH_PATH):
+            os.chdir(os.path.join(BSP_PATH, "DISCO_L475VG_IOT01A_wifi"))
+            for patchfile in sorted(os.listdir(WIFI_PATCH_PATH)):
+                if patchfile.endswith(".patch"):
+                    os.system("hg import " + os.path.join(WIFI_PATCH_PATH, patchfile))
+        else:
+            print("Patch folder not present!!")
+    else:
+        print("Failed to clone wifi library!!!")
+
 create_link()
 pre_setup()
+ntp_setup()
+wifi_setup()
