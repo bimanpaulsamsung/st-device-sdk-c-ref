@@ -1,0 +1,71 @@
+From 9c48425c29b9db309bba17ad80a4b316af4b116d Mon Sep 17 00:00:00 2001
+From: "qiang3.zhang" <qiang3.zhang@samsung.com>
+Date: Wed, 2 Dec 2020 15:20:30 +0800
+Subject: [PATCH] Add STDK_IOT_CORE_EASYSETUP_HTTP_USE_SOCKET_API to tizenrt
+ STDK
+
+Signed-off-by: qiang3.zhang <qiang3.zhang@samsung.com>
+---
+ build/configs/artik053/STDK/defconfig       | 1 +
+ build/configs/esp32_DevKitC/STDK/defconfig  | 1 +
+ build/configs/esp_wrover_kit/STDK/defconfig | 1 +
+ external/stdk/Kconfig                       | 7 ++++++-
+ 4 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/build/configs/artik053/STDK/defconfig b/build/configs/artik053/STDK/defconfig
+index 94623e7..cc8df88 100644
+--- a/build/configs/artik053/STDK/defconfig
++++ b/build/configs/artik053/STDK/defconfig
+@@ -1237,6 +1237,7 @@ CONFIG_OPENSSL_ASSERT_DO_NOTHING=y
+ # CONFIG_OPENSSL_ASSERT_EXIT is not set
+ CONFIG_STDK_IOT_CORE=y
+ CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP=y
++CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP_USE_SOCKET_API=y
+ # CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP_LOG_SUPPORT is not set
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_ERROR=y
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_WARN=y
+diff --git a/build/configs/esp32_DevKitC/STDK/defconfig b/build/configs/esp32_DevKitC/STDK/defconfig
+index 45919ef..f0feb7c 100644
+--- a/build/configs/esp32_DevKitC/STDK/defconfig
++++ b/build/configs/esp32_DevKitC/STDK/defconfig
+@@ -1083,6 +1083,7 @@ CONFIG_OPENSSL_ASSERT_DO_NOTHING=y
+ # CONFIG_OPENSSL_ASSERT_EXIT is not set
+ CONFIG_STDK_IOT_CORE=y
+ CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP=y
++CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP_USE_SOCKET_API=y
+ # CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP_LOG_SUPPORT is not set
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_ERROR=y
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_WARN=y
+diff --git a/build/configs/esp_wrover_kit/STDK/defconfig b/build/configs/esp_wrover_kit/STDK/defconfig
+index 19ac512..eb62b53 100644
+--- a/build/configs/esp_wrover_kit/STDK/defconfig
++++ b/build/configs/esp_wrover_kit/STDK/defconfig
+@@ -1129,6 +1129,7 @@ CONFIG_OPENSSL_ASSERT_DO_NOTHING=y
+ # CONFIG_OPENSSL_ASSERT_EXIT is not set
+ CONFIG_STDK_IOT_CORE=y
+ CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP=y
++CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP_USE_SOCKET_API=y
+ # CONFIG_STDK_IOT_CORE_EASYSETUP_HTTP_LOG_SUPPORT is not set
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_ERROR=y
+ CONFIG_STDK_IOT_CORE_LOG_LEVEL_WARN=y
+diff --git a/external/stdk/Kconfig b/external/stdk/Kconfig
+index 0e8fe94..27102bd 100644
+--- a/external/stdk/Kconfig
++++ b/external/stdk/Kconfig
+@@ -21,7 +21,12 @@ config STDK_IOT_CORE_EASYSETUP_HTTP
+ 	depends on STDK_IOT_CORE
+ 	---help---
+ 		If this option is enabled, STDK will use httpd for easy setup.
+-
++config STDK_IOT_CORE_EASYSETUP_HTTP_USE_SOCKET_API
++	bool "Use http socket api for easysetup"
++	default y
++	depends on STDK_IOT_CORE_EASYSETUP_HTTP
++	---help---
++		If this option is enabled, STDK will use httpd with socket api for easy setup.
+ config STDK_IOT_CORE_EASYSETUP_HTTP_LOG_SUPPORT
+ 	bool "Logging via device-to-device"
+ 	default n
+-- 
+2.7.4
+
