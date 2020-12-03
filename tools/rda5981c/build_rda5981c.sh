@@ -11,7 +11,7 @@ PROJECT_PATH="${IOT_APPS_PATH}/${PROJECT_TITLE}"
 
 OUTPUT_BUILD=y
 
-CA_CERT_FILE="root_ca_prod.pem"
+CA_CERT_FILE="root_ca_prod_k8.pem"
 
 print_usage () {
   echo "    Usage: ./build.sh CHIP_NAME PROJECT_NAME [make_option]"
