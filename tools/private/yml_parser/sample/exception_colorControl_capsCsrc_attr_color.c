@@ -32,7 +32,7 @@ static void caps_$CAPS_ID$_attr_$ATTR_NAME$_send(caps_$CAPS_ID$_data_t *caps_dat
             NULL);
 
     value[1].type = IOT_CAP_VAL_TYPE_NUMBER;
-    value[1].number = caps_data->hue_value;
+    value[1].number = caps_data->saturation_value;
 
     cap_evt[1] = st_cap_create_attr(caps_data->handle,
             (char *) caps_helper_$CAPS_ID$.attr_saturation.name,
