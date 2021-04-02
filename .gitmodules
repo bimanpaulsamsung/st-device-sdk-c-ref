@@ -46,3 +46,6 @@
 [submodule "bsp/mt7682_ss"]
 	path = bsp/mt7682_ss
 	url = git@github.sec.samsung.net:STDK/MT7682_SDK.git
+[submodule "bsp/esp32_v4.3"]
+	path = bsp/esp32_v4.3
+	url = https://github.com/espressif/esp-idf.git
