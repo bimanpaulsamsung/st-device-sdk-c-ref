@@ -26,6 +26,7 @@ PATCH_PATH = os.path.join(os.environ["STDK_REF_PATH"], "patches", BSP_NAME)
 def pre_setup():	
     print("Clone STM32CubeL4...")
     os.chdir(os.path.join(BSP_PATH, "stm32l4"))
+    print(os.getcwd())
     os.system("git submodule update --init --recursive")
     os.system("git submodule foreach --recursive git reset --hard")
 
