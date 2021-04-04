@@ -28,3 +28,6 @@
 [submodule "bsp/emw3080/mico-os"]
 	path = bsp/emw3080/mico-os
 	url = https://github.com/MXCHIP/mico-os
+[submodule "bsp/b-l475e-iot01a/stm32l4"]
+	path = bsp/b-l475e-iot01a/stm32l4
+	url = https://github.com/STMicroelectronics/STM32CubeL4
