@@ -44,10 +44,10 @@ def pre_setup():
    
 def create_link():
 	if not os.path.exists(os.path.join(BSP_PATH)):
-        	os.mkdir(os.path.join(BSP_PATH))	
+		os.mkdir(os.path.join(BSP_PATH))	
 	if os.path.islink(os.path.join(BSP_PATH, "iot-core")):
 		os.remove(os.path.join(BSP_PATH, "iot-core"))
-    	os.symlink(os.path.join(CORE_PATH),os.path.join(BSP_PATH, "iot-core"))
+		os.symlink(os.path.join(CORE_PATH),os.path.join(BSP_PATH, "iot-core"))
 
 create_link()
 pre_setup()
