@@ -1,0 +1,18 @@
+{
+  "onboardingConfig": {
+    "deviceOnboardingId": "Light_private",
+    "mnId": "0ADv",
+    "setupId": "008",
+    "vid": "SSHLP001",
+    "deviceTypeId": "Light",
+    "ownershipValidationTypes": [
+      "BUTTON"
+    ],
+    "identityType": "ED25519",
+    "deviceIntegrationProfileKey": {
+      "id": "07b71c8b-e72a-48f2-a6d9-7e79542edf62",
+      "majorVersion": 0,
+      "minorVersion": 1
+    }
+  }
+}
